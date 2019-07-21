@@ -1,0 +1,20 @@
+- Familiarity with the rtmidi API 
+- rtmidi with Python / Cython
+- try Mido python lib
+- PTQ cli parse for preset names
+- Preset names to PTQ MIDI map (is this midi device specific?, looks like not)
+- PTQ prefs:
+  Located at ~/.config/Modartt/Pianoteq65\ STAGE.prefs 
+  Can specify file to store prefs at startup on cli, can we supply our own?
+  It's an XML file.
+
+- Midi Mappings
+  Located in ~/.local/share/Modartt/Pianoteq/MidiMappings
+  Can specify midi mapping by name at startup
+  Looks like a binary file.
+  
+- Mock my interface as CLI?
+- Think about artifact for Pi, (add CI/CD?)
+- Purchase the LCD and tools
+- Blog
+

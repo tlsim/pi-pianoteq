@@ -1,6 +1,8 @@
 #include <iostream>
 #include "Probe.h"
-#include "rtmidi-tests/midiprobe.cpp"
+//#include "rtmidi-tests/midiprobe.cpp"
+#include "rtmidi-tests/midiout.cpp"
+
 /*int main() {
     std::cout << "Hello, World!" << std::endl;
     return 0;
