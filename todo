@@ -1,5 +1,5 @@
-- Familiarity with the rtmidi API 
-- rtmidi with Python / Cython
+- DONE: Familiarity with the rtmidi API (No desire to continue this using C++)
+- DONE: rtmidi with Python / Cython
 - try Mido python lib
 - PTQ cli parse for preset names
 - Preset names to PTQ MIDI map (is this midi device specific?, looks like not)
@@ -16,5 +16,7 @@
 - Mock my interface as CLI?
 - Think about artifact for Pi, (add CI/CD?)
 - Purchase the LCD and tools
+- This one looks nice, but need menu buttons... https://www.balena.io/blog/build-a-raspberry-pi-powered-train-station-oled-sign-for-your-desk/#hardwarerequired
+- The adafruit LCD has a plate and buttons.
 - Blog
 
