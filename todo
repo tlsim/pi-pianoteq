@@ -1,7 +1,7 @@
 - DONE: Familiarity with the rtmidi API (No desire to continue this using C++)
 - DONE: rtmidi with Python / Cython
 - try Mido python lib
-- PTQ cli parse for preset names
+- DONE: PTQ cli parse for preset names
 - Preset names to PTQ MIDI map (is this midi device specific?, looks like not)
 - PTQ prefs:
   Located at ~/.config/Modartt/Pianoteq65\ STAGE.prefs 
@@ -18,5 +18,5 @@
 - Purchase the LCD and tools
 - This one looks nice, but need menu buttons... https://www.balena.io/blog/build-a-raspberry-pi-powered-train-station-oled-sign-for-your-desk/#hardwarerequired
 - The adafruit LCD has a plate and buttons.
+- The pimoroni gfx hat lcd looks simple to use and has capacitive buttons.
 - Blog
-
