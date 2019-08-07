@@ -1,13 +1,16 @@
 from struct import *
 from typing import Optional
 
-HEADER_CONST = [bytes.fromhex('19a3 e038'), bytes.fromhex('0000 0300')]
+HEADER_CONST = bytes.fromhex('19a3 e038')
+MAPPING_CONST = bytes.fromhex('0300 0000')
 ROW_CONST = bytes.fromhex('0100 0000')
 NOTES_CHANNEL = -1
 NOTES_TRANSPOSITION = 0
 MIDI_DIALECT = 0
-SIZE_TEMP = bytes.fromhex('7d01 0000')  # TODO
-ROWS_TEMP = bytes.fromhex('0500 0000')  # TODO
+ROWS_TEMP = bytes.fromhex('0100 0000')  # TODO
+ENCODING = 'utf-8'
+
+# TODO: What do the mappings look like on ARM?
 
 
 def pack_c_long(i: int) -> bytes:
@@ -15,7 +18,7 @@ def pack_c_long(i: int) -> bytes:
 
 
 def pack_size(in_bytes: bytes) -> bytes:
-    return pack_c_long(len(in_bytes))  # TODO
+    return pack_c_long(len(in_bytes))
 
 
 def map_from_pc(controller: int, channel: Optional[int] = None) -> str:
@@ -30,8 +33,8 @@ def map_to_load_preset(preset: str):
 
 
 def create_row(map_from: str, map_to: str) -> bytes:
-    map_from_bytes = bytes(map_from, 'utf-8')  # TODO
-    map_to_bytes = bytes(map_to, 'utf-8')
+    map_from_bytes = bytes(map_from, ENCODING)
+    map_to_bytes = bytes(map_to, ENCODING)
     return ROW_CONST + \
         pack_size(map_from_bytes) + \
         map_from_bytes + \
@@ -39,18 +42,20 @@ def create_row(map_from: str, map_to: str) -> bytes:
         map_to_bytes
 
 
-RESULT = HEADER_CONST[0] + \
-         SIZE_TEMP + \
-         HEADER_CONST[1] + \
-         pack_c_long(NOTES_CHANNEL) + \
-         pack_c_long(NOTES_TRANSPOSITION) + \
-         pack_c_long(MIDI_DIALECT) + \
-         ROWS_TEMP + \
-         create_row(map_from_pc(10, 5), map_to_load_preset('Tiny Piano'))
+def build() -> bytes:
+    mapping = MAPPING_CONST + \
+        pack_c_long(NOTES_CHANNEL) + \
+        pack_c_long(NOTES_TRANSPOSITION) + \
+        pack_c_long(MIDI_DIALECT) + \
+        ROWS_TEMP + \
+        create_row(map_from_pc(10, 5), map_to_load_preset('Toy Piano Original'))
 
-# TODO: What do the mappings look like on ARM?
-READABLE = RESULT.hex()
+    return HEADER_CONST + pack_size(mapping) + mapping
+
 
 if __name__ == '__main__':
-    print(RESULT)
-    print(READABLE)
+    output = build()
+    print(output)
+    print(output.hex())
+    with open('test_write_mapping.ptm', 'wb') as outfile:
+        outfile.write(output)
