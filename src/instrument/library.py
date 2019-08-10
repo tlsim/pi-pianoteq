@@ -5,6 +5,7 @@ from sys import stderr
 from instrument.Instrument import Instrument
 from instrument.Preset import Preset
 from constants import UNKNOWN_INSTRUMENT, PIANOTEQ_BIN, PIANOTEQ_DIR
+from os import path
 
 
 def get_presets() -> List[str]:
@@ -17,7 +18,7 @@ def get_presets() -> List[str]:
 
 
 def get_instruments() -> List[str]:
-    with open('instruments') as instruments:
+    with open(path.join(path.dirname(__file__), 'instruments')) as instruments:
         return instruments.read().splitlines()
 
 
