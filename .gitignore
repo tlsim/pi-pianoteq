@@ -3,3 +3,5 @@ cmake-build-debug/
 *~
 venv/
 __pycache__
+
+src/midimapping/test_write_mapping.ptm
