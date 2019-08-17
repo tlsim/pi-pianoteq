@@ -1,6 +1,6 @@
 - DONE: Familiarity with the rtmidi API (No desire to continue this using C++)
 - DONE: rtmidi with Python / Cython
-- try Mido python lib if more complex message types are requried?
+- Mido python lib if more complex message types are requried?
 - DONE: PTQ cli parse for preset names
 - DONE: Preset names to PTQ MIDI map
 
@@ -13,16 +13,12 @@
   Located in ~/.local/share/Modartt/Pianoteq/MidiMappings
   Can specify midi mapping by name at startup
   Create with mapping.py classes
-
-- Extend Mapping with 'minimalistic' or 'full featured' mappings, and allow setting other params
+  Extend Mapping with 'minimalistic' or 'full featured' mappings, and allow setting other params
 
 - Mock my interface as CLI - use something like prompt_toolkit
+- Create interface for gfxhat.
 - Consolidate instruments etc in yaml config
 - Support custom preset groupings/banks
 - Think about artifact for Pi, (add CI/CD?)
-- Purchase the LCD and tools
-- This one looks nice, but need menu buttons... https://www.balena.io/blog/build-a-raspberry-pi-powered-train-station-oled-sign-for-your-desk/#hardwarerequired
-- The adafruit LCD has a plate and buttons.
-- The pimoroni gfx hat lcd looks simple to use and has capacitive buttons.
 - License, copyright
 - Blog
