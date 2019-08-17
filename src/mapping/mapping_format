@@ -7,8 +7,8 @@ Byte | Value | Explain
 3    | 38    | Constant
 4    | 7d    | Size of mapping (file size in bytes - 8) LSB
 5    | 01    | Size of mapping (file size in bytes - 8) MSB
-6    | 00    | Size of mapping higher order bits as 32 bit integer ?
-7    | 00    | Size of mapping higher order bits as 32 bit integer ?
+6    | 00    | Size of mapping higher order byte as 32 bit integer ?
+7    | 00    | Size of mapping higher order byte as 32 bit integer ?
 8    | 00    | Constant ?
 9    | 00    | Constant ?
 10   | 03    | Constant ?
@@ -23,13 +23,13 @@ Byte | Value | Explain
 18   | 00    | Notes Transposition 00 | ff
 19   | 00    | Notes Transposition 00 | ff
 20   | 00    | Midi Dialect: 00 Standard Midi, 01 Hi-Res, 02 Disklavier, 03 Auto
-21   | 00    | Midi Dialect higher order bits / unused ?
-22   | 00    | Midi Dialect higher order bits / unused ?
-23   | 00    | Midi Dialect higher order bits / unused ?
+21   | 00    | Midi Dialect higher order byte / unused ?
+22   | 00    | Midi Dialect higher order byte / unused ?
+23   | 00    | Midi Dialect higher order byte / unused ?
 24   | 05    | Number of rows in table LSB
-25   | 00    | Number of rows in table higher order bits ?
-26   | 00    | Number of rows in table higher order bits ?
-27   | 00    | Number of rows in table higher order bits ?
+25   | 00    | Number of rows in table higher order byte ?
+26   | 00    | Number of rows in table higher order byte ?
+27   | 00    | Number of rows in table higher order byte ?
 
 Rows of mapping table follow in blocks of variable length
 
@@ -38,16 +38,16 @@ Block:
 bytes                           | value       | explain
 First 4 bytes                   | 01 00 00 00 | start of row constant
 Next 4 bytes                    | 19 00 00 00 | length of 'map from': 25
-Next length of 'map from' bytes | 436f 6e74 726f 6c6c 6572 2036 3420 2f20 4368 616e 6e65 6c31 30 | ASCII "Controller 64 / Channel10"
+Next length of 'map from' bytes | 436f 6e74 726f 6c6c 6572 2036 3420 2f20 4368 616e 6e65 6c31 30 | String "Controller 64 / Channel10"
 Next 4 bytes                    | 1b 00 00 00 | length of 'map to': 27
-Next length of 'map to' bytes   | 7b 5365 7450 6172 616d 6574 6572 7c33 7c50 646c 5b34 5d7c 303a 317d | ASCII "{SetParameter|3|Pdl[4]|0:1}"
+Next length of 'map to' bytes   | 7b 5365 7450 6172 616d 6574 6572 7c33 7c50 646c 5b34 5d7c 303a 317d | String "{SetParameter|3|Pdl[4]|0:1}"
 
 PTQ Ranges
 Control Change                   | 0:119
 Channel                          | 1:16 or 'Any'
 Program Change                   | 1:128
 
-ASCII Map From
+String Map From
 value                            | explain
 Controller 5                     | Control change 5, any channel
 Controller 10 / Channel5         | Control change 10, channel 5
@@ -57,7 +57,7 @@ Pitch Bend / Channel15           | ...
 Aftertouch / Channel16           | ...
 MMC Deferred Play                | ...
 
-ASCII Map To
+String Map To
 Value                                         | Explain
 {LoadPreset|28||Steinway D Jazz|0}            | Loads a preset with specified preset name
 {LoadPreset|28||Tank Drum - thin metal|0}     |
