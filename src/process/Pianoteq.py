@@ -1,13 +1,13 @@
 import subprocess
-from constants import PIANOTEQ_DIR, PIANOTEQ_BIN
+from constants import PIANOTEQ_DIR, PIANOTEQ_BIN, MIDI_MAPPING_NAME
 from os.path import expanduser
 from typing import List
 
 
 class Pianoteq:
-    def __init__(self, mapping_name: str):
+    def __init__(self):
         self.headless = False
-        self.mapping_name = mapping_name
+        self.mapping_name = MIDI_MAPPING_NAME
         self.directory = expanduser(PIANOTEQ_DIR)
         self.executable = PIANOTEQ_BIN
         self.process = None

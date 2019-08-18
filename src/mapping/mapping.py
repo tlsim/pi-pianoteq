@@ -19,13 +19,13 @@ class Mapping:
     def add_row(self, row):
         self.rows.append(row)
 
-    def build(self) -> bytes:
+    def get_bytes(self) -> bytes:
         mapping = MAPPING_CONST + \
                   pack_c_long(NOTES_CHANNEL_ANY) + \
                   pack_c_long(NOTES_TRANSPOSITION_ZERO) + \
                   pack_c_long(MIDI_DIALECT_AUTO) + \
                   pack_c_long(len(self.rows)) + \
-                  reduce(lambda x, y: x + y.build(), self.rows, b'')
+                  reduce(lambda x, y: x + y.get_bytes(), self.rows, b'')
 
         return HEADER_CONST + pack_size(mapping) + mapping
 
@@ -35,7 +35,7 @@ class Row:
         self.map_from = map_from
         self.map_to = map_to
 
-    def build(self) -> bytes:
+    def get_bytes(self) -> bytes:
         map_from_bytes = bytes(self.map_from, ENCODING)
         map_to_bytes = bytes(self.map_to, ENCODING)
         return ROW_CONST + \

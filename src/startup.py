@@ -1,4 +1,4 @@
-from mapping.mapping import Mapping, ProgramChangeLoadPresetRow
+from mapping.MappingBuilder import MappingBuilder
 from mapping.Writer import Writer
 from instrument.library import Library, get_instruments
 from process.Pianoteq import Pianoteq
@@ -10,20 +10,10 @@ import constants
 
 
 def main():
-    mapping_name = 'full_mapping_aug18'
-    pianoteq = Pianoteq(mapping_name)
-
+    pianoteq = Pianoteq()
     library = Library(pianoteq.get_presets(), get_instruments())
-    mapping = Mapping()
-    for instrument in library.get_known_instruments():
-        for preset in instrument.presets:
-            if preset.has_midi_params():
-                ptq_program = preset.midi_program_number + 1
-                ptq_channel = preset.midi_channel + 1
-                preset_row = ProgramChangeLoadPresetRow(preset.name, ptq_program, ptq_channel)
-                mapping.add_row(preset_row)
-    writer = Writer(mapping)
-    writer.write(mapping_name)
+    mapping = MappingBuilder(library).build()
+    Writer(mapping).write()
 
     print(pianoteq.get_version())
     pianoteq.start()

@@ -6,7 +6,6 @@
 - Instrument names (from ptq's pov)
 - Do we need subprocess.REALTIME_PRIORITY_CLASS?
 
-
 - PTQ prefs:
   Located at ~/.config/Modartt/Pianoteq65\ STAGE.prefs 
   Can specify file to store prefs at startup on cli, can we supply our own?
@@ -15,7 +14,6 @@
 - Midi Mappings
   Located in ~/.local/share/Modartt/Pianoteq/MidiMappings
   Can specify midi mapping by name at startup
-  Create with mapping.py classes
   Extend Mapping with 'minimalistic' or 'full featured' mappings, and allow setting other params
 
 - Mock my interface as CLI - use something like prompt_toolkit
