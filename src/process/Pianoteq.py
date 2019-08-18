@@ -28,7 +28,7 @@ class Pianoteq:
                                        text=True)
         pianoteq_proc.check_returncode()
         output = pianoteq_proc.stdout
-        return " ".join(output.splitlines())
+        return ' '.join(output.splitlines())
 
     def start(self):
         args = [self.executable, '--midimapping', self.mapping_name]

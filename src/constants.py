@@ -6,6 +6,6 @@ PIANOTEQ_DATA_DIR = '~/.local/share/Modartt/Pianoteq/'
 PIANOTEQ_MIDI_MAPPINGS_DIR = PIANOTEQ_DATA_DIR + 'MidiMappings'
 PIANOTEQ_PREFS_FILE = '~/.config/Modartt/Pianoteq65 STAGE.prefs'
 
-MIDI_PORT_NAME = 'Pi-PTQ'
-MIDI_MAPPING_NAME = 'Pi-PTQ-Mapping'
+MIDI_PORT_NAME = 'PI-PTQ'
+MIDI_MAPPING_NAME = 'PI-PTQ-Mapping'
 UNKNOWN_INSTRUMENT = 'Unknown'

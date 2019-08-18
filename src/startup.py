@@ -17,7 +17,7 @@ def main():
 
     print(pianoteq.get_version())
     pianoteq.start()
-    print("Will switch presets every 2 seconds")
+    print('Will switch presets every 2 seconds')
 
     midiout = MidiOut()
     midiout.open_virtual_port(constants.MIDI_PORT_NAME)
@@ -31,5 +31,5 @@ def main():
     pianoteq.terminate()
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     main()

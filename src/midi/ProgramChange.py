@@ -16,7 +16,7 @@ class ProgramChange:
                 message = [channel_byte, preset.midi_program_number]
                 self.midiout.send_message(message)
             except ValueError:
-                raise MidiException(f"Failed to set preset ${preset.name}. Invalid MIDI Program Change message")
+                raise MidiException(f'Failed to set preset ${preset.name}. Invalid MIDI Program Change message')
         else:
-            raise MidiException(f"Failed to set preset ${preset.name}. No MIDI mapping exists for preset")
+            raise MidiException(f'Failed to set preset ${preset.name}. No MIDI mapping exists for preset')
 
