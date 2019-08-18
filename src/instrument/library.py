@@ -1,20 +1,9 @@
-import subprocess
-
 from typing import List, Dict, Tuple, Iterator
 from sys import stderr
 from instrument.Instrument import Instrument
 from instrument.Preset import Preset
-from constants import UNKNOWN_INSTRUMENT, PIANOTEQ_BIN, PIANOTEQ_DIR
+from constants import UNKNOWN_INSTRUMENT
 from os import path
-
-
-def get_presets() -> List[str]:
-    pianoteq_proc = subprocess.Popen([PIANOTEQ_BIN, '--list-presets'],
-                                     cwd=PIANOTEQ_DIR,
-                                     stdout=subprocess.PIPE,
-                                     universal_newlines=True)
-    output, error = pianoteq_proc.communicate()
-    return output.splitlines()
 
 
 def get_instruments() -> List[str]:
@@ -68,14 +57,3 @@ class Library:
                     print('Failed to assign midi program change number to all presets - '
                           'there were insufficient channels / program numbers available', file=stderr)
                     return
-
-
-if __name__ == '__main__':
-    library = Library(get_presets(), get_instruments())
-    for instrument in library.get_all_instruments():
-        print('Instrument:', instrument.name)
-        print('Presets: ')
-        for p in instrument.presets:
-            print(p.name)
-            print(p.midi_channel)
-            print(p.midi_program_number)

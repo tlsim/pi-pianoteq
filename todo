@@ -3,6 +3,9 @@
 - Mido python lib if more complex message types are requried?
 - DONE: PTQ cli parse for preset names
 - DONE: Preset names to PTQ MIDI map
+- Instrument names (from ptq's pov)
+- Do we need subprocess.REALTIME_PRIORITY_CLASS?
+
 
 - PTQ prefs:
   Located at ~/.config/Modartt/Pianoteq65\ STAGE.prefs 

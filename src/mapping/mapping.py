@@ -52,15 +52,6 @@ class ProgramChangeLoadPresetRow(Row):
         super().__init__(map_from, map_to)
 
 
-class Writer:
-    def __init__(self, mapping: Mapping):
-        self.mapping = mapping
-
-    def write(self, name: str):
-        with open(f'{name}.ptm', 'wb') as outfile:
-            outfile.write(self.mapping.build())
-
-
 def pack_c_long(i: int) -> bytes:
     return pack('<l', i)
 
@@ -78,13 +69,3 @@ def map_from_program_change(program: int, channel: Optional[int] = None) -> str:
 
 def map_to_load_preset(preset: str) -> str:
     return f'{{LoadPreset|28||{preset}|0}}'
-
-
-if __name__ == '__main__':
-    test_row = ProgramChangeLoadPresetRow(program=10, preset='Toy Piano Original')
-    test_row_2 = ProgramChangeLoadPresetRow(program=11, preset='MK1 Bark')
-    test_mapping = Mapping()
-    test_mapping.add_row(test_row)
-    test_mapping.add_row(test_row_2)
-    writer = Writer(test_mapping)
-    writer.write('test_write_mapping')
