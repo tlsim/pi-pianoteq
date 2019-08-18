@@ -1,5 +1,5 @@
 import unittest
-from instrument.library import Library
+from instrument.Library import Library
 
 s1 = 'Steinway D Prelude'
 s2 = 'Steinway D Jazz'

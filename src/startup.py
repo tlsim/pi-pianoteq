@@ -1,6 +1,6 @@
 from mapping.MappingBuilder import MappingBuilder
 from mapping.Writer import Writer
-from instrument.library import Library, get_instruments
+from instrument.Library import Library, get_instruments
 from process.Pianoteq import Pianoteq
 from rtmidi import MidiOut
 from midi.ProgramChange import ProgramChange

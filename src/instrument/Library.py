@@ -1,25 +1,15 @@
-from typing import List, Dict, Tuple, Iterator
+from typing import List, Dict
 from sys import stderr
 from instrument.Instrument import Instrument
 from instrument.Preset import Preset
 from constants import UNKNOWN_INSTRUMENT
+from midi.util import program_numbers_by_channel
 from os import path
 
 
 def get_instruments() -> List[str]:
     with open(path.join(path.dirname(__file__), 'instruments')) as instruments:
         return instruments.read().splitlines()
-
-
-def midi_program_numbers_by_channel(from_channel: int = 0) -> Iterator[Tuple[int, int]]:
-    program_number = 0
-    channel_number = from_channel
-    while channel_number < 16:
-        while program_number < 128:
-            yield (channel_number, program_number)
-            program_number += 1
-        program_number = 0
-        channel_number += 1
 
 
 class Library:
@@ -48,7 +38,7 @@ class Library:
         return [i for i in self.instruments.values() if len(i.presets) > 0]
 
     def assign_midi_program_numbers(self):
-        generator = midi_program_numbers_by_channel()
+        generator = program_numbers_by_channel()
         for inst in self.get_all_instruments():
             for preset in inst.presets:
                 try:

@@ -1,5 +1,5 @@
 from mapping.mapping import Mapping, ProgramChangeLoadPresetRow
-from instrument.library import Library
+from instrument.Library import Library
 
 
 class MappingBuilder:
