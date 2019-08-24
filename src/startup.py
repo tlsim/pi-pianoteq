@@ -4,7 +4,8 @@ from instrument.Library import Library, get_instruments
 from process.Pianoteq import Pianoteq
 from rtmidi import MidiOut
 from midi.ProgramChange import ProgramChange
-from time import sleep
+from lib.ClientLib import ClientLib
+from client.cli.CliClient import CliClient
 
 import constants
 
@@ -17,17 +18,16 @@ def main():
 
     print(pianoteq.get_version())
     pianoteq.start()
-    print('Will switch presets every 2 seconds')
 
     midiout = MidiOut()
     midiout.open_virtual_port(constants.MIDI_PORT_NAME)
     program_change = ProgramChange(midiout)
 
-    for instrument in library.get_known_instruments():
-        preset = instrument.presets[0]
-        sleep(2)
-        program_change.set_preset(preset)
+    client_lib = ClientLib(library, program_change)
+    client = CliClient(client_lib)
 
+    # program_change.set_preset(library.get_current_preset())
+    client.start()
     pianoteq.terminate()
 
 

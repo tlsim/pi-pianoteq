@@ -18,6 +18,7 @@
 
 - Mock my interface as CLI - use something like prompt_toolkit
 - Create interface for gfxhat.
+- Common PTQ setup as method in client lib, create loading screen
 - Consolidate instruments etc in yaml config
 - Support custom preset groupings/banks
 - Think about artifact for Pi, (add CI/CD?)

@@ -8,7 +8,7 @@ class MappingBuilder:
         self.library = library
 
     def build_program_change_rows(self):
-        for instrument in self.library.get_known_instruments():
+        for instrument in self.library.get_instruments():
             for preset in instrument.presets:
                 if preset.has_midi_params():
                     ptq_program = preset.midi_program_number + 1
