@@ -21,7 +21,12 @@
 - Common PTQ setup as method in client lib, create loading screen
 - Consolidate instruments etc in yaml config
 - Support custom preset groupings/banks
+
 - Think about artifact for Pi, (add CI/CD?)
+  Easy install pre-built deb package for python3-rtmidi, but prompt_toolkit is a major version lower...
+  Build a deb package as artifact, include python3-rtmidi as dependency?
+  Package the remainder with something like linkedin shiv?
+
 - License, copyright
 - Pianoteq legal.
 - Blog
