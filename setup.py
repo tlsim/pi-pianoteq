@@ -132,7 +132,7 @@ setup(
     # https://packaging.python.org/en/latest/requirements.html
     install_requires=[
         "prompt-toolkit==3.0.5",
-        "python-rtmidi==1.4.0",
+        #"python-rtmidi==1.4.0", # Does not compile on vanilla pi - missing alsa headers. But by making a debian package, we can install the native dependency - TODO!
         "wcwidth==0.1.9",
     ],  # Optional
     # List additional groups of dependencies here (e.g. development

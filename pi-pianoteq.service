@@ -3,7 +3,7 @@ Description = Service for pi-pianoteq
 
 [Service]
 Type=simple
-ExecStart=python3 /opt/pi-pianoteq/startup.py
+ExecStart=python3 -m pi-pianoteq
 
 [Install]
 WantedBy=default.target

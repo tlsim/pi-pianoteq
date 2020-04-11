@@ -6,3 +6,7 @@ __pycache__
 
 *.ptm
 !config/MidiMappings/ptm/*.ptm
+
+dist/
+*.egg-info
+.DS_Store
