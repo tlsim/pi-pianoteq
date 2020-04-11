@@ -1,7 +1,8 @@
 import subprocess
-from constants import PIANOTEQ_DIR, PIANOTEQ_BIN, MIDI_MAPPING_NAME
 from os.path import expanduser
 from typing import List
+
+from pi_pianoteq.constants import PIANOTEQ_DIR, PIANOTEQ_BIN, MIDI_MAPPING_NAME
 
 
 class Pianoteq:

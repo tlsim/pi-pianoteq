@@ -1,6 +1,6 @@
-from client.ClientApi import ClientApi
-from midi.ProgramChange import ProgramChange
-from instrument.Library import Library
+from pi_pianoteq.client.ClientApi import ClientApi
+from pi_pianoteq.instrument.Library import Library
+from pi_pianoteq.midi.ProgramChange import ProgramChange
 
 
 class ClientLib(ClientApi):

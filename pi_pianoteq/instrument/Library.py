@@ -1,10 +1,11 @@
-from typing import List, Dict
-from sys import stderr
-from instrument.Instrument import Instrument
-from instrument.Preset import Preset
-from constants import UNKNOWN_INSTRUMENT
-from midi.util import program_numbers_by_channel
 from os import path
+from sys import stderr
+from typing import List, Dict
+
+from pi_pianoteq.constants import UNKNOWN_INSTRUMENT
+from pi_pianoteq.instrument.Instrument import Instrument
+from pi_pianoteq.instrument.Preset import Preset
+from pi_pianoteq.midi.util import program_numbers_by_channel
 
 
 def get_instruments() -> List[str]:

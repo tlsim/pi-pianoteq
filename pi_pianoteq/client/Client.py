@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
-from client.ClientApi import ClientApi
+
+from pi_pianoteq.client.ClientApi import ClientApi
 
 
 class Client(ABC):

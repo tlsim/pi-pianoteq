@@ -1,5 +1,5 @@
-from mapping.mapping import Mapping, ProgramChangeLoadPresetRow
-from instrument.Library import Library
+from pi_pianoteq.instrument.Library import Library
+from pi_pianoteq.mapping.mapping import Mapping, ProgramChangeLoadPresetRow
 
 
 class MappingBuilder:

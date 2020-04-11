@@ -1,6 +1,6 @@
+from functools import reduce
 from struct import pack
 from typing import Optional, List
-from functools import reduce
 
 # TODO: What do the mappings look like on ARM?
 HEADER_CONST = bytes.fromhex('19a3 e038')

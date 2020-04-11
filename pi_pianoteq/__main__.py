@@ -1,13 +1,13 @@
-from mapping.MappingBuilder import MappingBuilder
-from mapping.Writer import Writer
-from instrument.Library import Library, get_instruments
-from process.Pianoteq import Pianoteq
 from rtmidi import MidiOut
-from midi.ProgramChange import ProgramChange
-from lib.ClientLib import ClientLib
-from client.cli.CliClient import CliClient
 
 import constants
+from pi_pianoteq.client.cli.CliClient import CliClient
+from pi_pianoteq.instrument.Library import Library, get_instruments
+from pi_pianoteq.lib.ClientLib import ClientLib
+from pi_pianoteq.mapping.MappingBuilder import MappingBuilder
+from pi_pianoteq.mapping.Writer import Writer
+from pi_pianoteq.midi.ProgramChange import ProgramChange
+from pi_pianoteq.process.Pianoteq import Pianoteq
 
 
 def main():

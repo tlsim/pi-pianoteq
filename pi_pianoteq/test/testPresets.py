@@ -1,5 +1,6 @@
 import unittest
-from instrument.Library import Library
+
+from pi_pianoteq.instrument.Library import Library
 
 s1 = 'Steinway D Prelude'
 s2 = 'Steinway D Jazz'

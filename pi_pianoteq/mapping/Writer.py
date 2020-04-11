@@ -1,7 +1,8 @@
-from mapping.mapping import Mapping
-from constants import PIANOTEQ_MIDI_MAPPINGS_DIR, MIDI_MAPPING_NAME
 from os.path import expanduser
 from pathlib import Path
+
+from pi_pianoteq.constants import PIANOTEQ_MIDI_MAPPINGS_DIR, MIDI_MAPPING_NAME
+from pi_pianoteq.mapping.mapping import Mapping
 
 
 class Writer:

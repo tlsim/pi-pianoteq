@@ -1,6 +1,7 @@
 from rtmidi import MidiOut
-from instrument import Preset
-from midi.MidiException import MidiException
+
+from pi_pianoteq.instrument import Preset
+from pi_pianoteq.midi.MidiException import MidiException
 
 CHANNEL_VOICE_PC_STATUS = 0xC0
 

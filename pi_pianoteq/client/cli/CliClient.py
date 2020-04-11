@@ -1,10 +1,10 @@
-from client.Client import Client
-from client.ClientApi import ClientApi
-
 from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import Layout
 from prompt_toolkit.widgets import Box, Frame, TextArea
+
+from pi_pianoteq.client.Client import Client
+from pi_pianoteq.client.ClientApi import ClientApi
 
 
 class CliClient(Client):
