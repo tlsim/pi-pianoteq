@@ -1,6 +1,6 @@
 from rtmidi import MidiOut
 
-import constants
+from pi_pianoteq.constants import MIDI_PORT_NAME
 from pi_pianoteq.client.cli.CliClient import CliClient
 from pi_pianoteq.instrument.Library import Library, get_instruments
 from pi_pianoteq.lib.ClientLib import ClientLib
@@ -20,7 +20,7 @@ def main():
     pianoteq.start()
 
     midiout = MidiOut()
-    midiout.open_virtual_port(constants.MIDI_PORT_NAME)
+    midiout.open_virtual_port(MIDI_PORT_NAME)
     program_change = ProgramChange(midiout)
 
     client_lib = ClientLib(library, program_change)

@@ -1,3 +1,3 @@
 # Pi-Pianoteq
 
-Pi-pianoteq is an rtmidi based remote control for Pianoteq
+Pi-Pianoteq is a Python/Midi remote control for Pianoteq

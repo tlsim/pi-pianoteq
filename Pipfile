@@ -12,3 +12,6 @@ prompt-toolkit = "~=3.0"
 
 [requires]
 python_version = "3.8"
+
+[scripts]
+package = "python3 setup.py sdist"
