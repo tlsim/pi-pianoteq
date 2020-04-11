@@ -1,0 +1,14 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+pipenv-setup = "*"
+
+[packages]
+python-rtmidi = "~=1.4"
+prompt-toolkit = "~=3.0"
+
+[requires]
+python_version = "3.8"
