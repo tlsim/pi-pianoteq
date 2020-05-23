@@ -4,34 +4,27 @@ import signal
 from gfxhat import touch, lcd, backlight, fonts
 from PIL import Image, ImageFont, ImageDraw
 
+led_states = [False for _ in range(6)]
+width, height = lcd.dimensions()
+image = Image.new('P', (width, height))
+draw = ImageDraw.Draw(image)
+font = ImageFont.truetype(fonts.AmaticSCBold, 38)
+text = "Hello Green!"
+w, h = font.getsize(text)
+x = (width - w) // 2
+y = (height - h) // 2
+draw.text((x, y), text, 1, font)
+
 
 def hello():
-    global led_states, width, height, draw, font, text, x, y
     print("""GfxhatClient.py
 This basic example prints the text "Hello World" in the middle of the LCD
 Press any button to see its corresponding LED toggle on/off.
 Press Ctrl+C to exit.
 """)
-    led_states = [False for _ in range(6)]
-    width, height = lcd.dimensions()
-    image = Image.new('P', (width, height))
-    draw = ImageDraw.Draw(image)
-    font = ImageFont.truetype(fonts.AmaticSCBold, 38)
-    text = "Hello Green!"
-    w, h = font.getsize(text)
-    x = (width - w) // 2
-    y = (height - h) // 2
-    draw.text((x, y), text, 1, font)
 
-    def handler(ch, event):
-        if event == 'press':
-            led_states[ch] = not led_states[ch]
-            touch.set_led(ch, led_states[ch])
-            if led_states[ch]:
-                backlight.set_pixel(ch, 0, 255, 255)
-            else:
-                backlight.set_pixel(ch, 0, 255, 0)
-            backlight.show()
+    signal.signal(signal.SIGTERM, reset_gfx)
+    signal.signal(signal.SIGINT, reset_gfx)
 
     for x in range(6):
         touch.set_led(x, 1)
@@ -39,20 +32,31 @@ Press Ctrl+C to exit.
         touch.set_led(x, 0)
     for x in range(6):
         backlight.set_pixel(x, 0, 255, 0)
-        touch.on(x, handler)
+        touch.on(x, handle_touch)
     backlight.show()
     for x in range(128):
         for y in range(64):
             pixel = image.getpixel((x, y))
             lcd.set_pixel(x, y, pixel)
     lcd.show()
-    try:
-        signal.pause()
-    except KeyboardInterrupt:
-        for x in range(6):
-            backlight.set_pixel(x, 0, 0, 0)
-            touch.set_led(x, 0)
-        backlight.show()
-        lcd.clear()
-        lcd.show()
+    signal.pause()
 
+
+def handle_touch(ch, event):
+    if event == 'press':
+        led_states[ch] = not led_states[ch]
+        touch.set_led(ch, led_states[ch])
+        if led_states[ch]:
+            backlight.set_pixel(ch, 0, 255, 255)
+        else:
+            backlight.set_pixel(ch, 0, 255, 0)
+        backlight.show()
+
+
+def reset_gfx(signal_number, stack_frame):
+    for index in range(6):
+        backlight.set_pixel(index, 0, 0, 0)
+        touch.set_led(index, 0)
+    backlight.show()
+    lcd.clear()
+    lcd.show()

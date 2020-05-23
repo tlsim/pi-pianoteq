@@ -1,5 +1,5 @@
 - DONE: Familiarity with the rtmidi API (No desire to continue this using C++)
-- DONE: rtmidi with Python / Cython
+- DONE: rtmidi with Python
 - DONE: PTQ cli parse for preset names
 - DONE: Preset names to PTQ MIDI map
 - Instrument names (from ptq's pov)
@@ -25,6 +25,7 @@
   Easy to install pre-built deb package for python3-rtmidi, but prompt_toolkit is a major version lower...
   TODO: Build a deb package as artifact, include python3-rtmidi as dependency?
   DONE: Package the remainder with pip / setuptools
+  TODO: Rename to ptqpi
 
 - License, copyright
 - Pianoteq legal.
