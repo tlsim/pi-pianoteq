@@ -7,6 +7,7 @@ class ClientLib(ClientApi):
     def __init__(self, instrument_library: Library, program_change: ProgramChange):
         self.program_change = program_change
         self.instrument_library = instrument_library
+        program_change.set_preset(instrument_library.get_current_preset())
 
     def set_preset_next(self) -> None:
         self.instrument_library.set_preset_next()

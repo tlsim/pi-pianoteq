@@ -3,7 +3,10 @@ Description = Service for pi_pianoteq
 
 [Service]
 Type=simple
+ExecStartPre=cpupower frequency-set -g performance
 ExecStart=python3 -m pi_pianoteq
+ExecStopPost=cpupower frequency-set -g ondemand
+PermissionsStartOnly=true
 User=pi
 Group=pi
 
