@@ -15,15 +15,15 @@
   Can specify midi mapping by name at startup
   Extend Mapping with 'minimalistic' or 'full featured' mappings, and allow setting other params
 
-- Mock my interface as CLI - use something like prompt_toolkit
+- DONE: Mock my interface as CLI - use something like prompt_toolkit
 - Create interface for gfxhat.
 - Common PTQ setup as method in client lib, create loading screen
 - Consolidate instruments etc in yaml config
 - Support custom preset groupings/banks
 
-- Think about artifact for Pi, (add CI/CD?)
+- DONE: Think about artifact for Pi, (add CI/CD?)
   Easy to install pre-built deb package for python3-rtmidi, but prompt_toolkit is a major version lower...
-  Build a deb package as artifact, include python3-rtmidi as dependency?
+  TODO: Build a deb package as artifact, include python3-rtmidi as dependency?
   DONE: Package the remainder with pip / setuptools
 
 - License, copyright

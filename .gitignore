@@ -2,6 +2,7 @@ cmake-build-debug/
 .idea/
 *~
 venv/
+.venv/
 __pycache__
 
 *.ptm
