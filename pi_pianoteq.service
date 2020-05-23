@@ -3,12 +3,16 @@ Description = Service for pi_pianoteq
 
 [Service]
 Type=simple
+User=pi
+Group=pi
 ExecStartPre=cpupower frequency-set -g performance
 ExecStart=python3 -m pi_pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
 PermissionsStartOnly=true
-User=pi
-Group=pi
+LimitMEMLOCK=500000
+LimitRTPRIO=90
+LimitNICE=-10
+Nice=-10
 
 [Install]
 WantedBy=default.target

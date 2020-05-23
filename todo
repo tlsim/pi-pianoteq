@@ -3,7 +3,6 @@
 - DONE: PTQ cli parse for preset names
 - DONE: Preset names to PTQ MIDI map
 - Instrument names (from ptq's pov)
-- Do we need subprocess.REALTIME_PRIORITY_CLASS?
 
 - PTQ prefs:
   Located at ~/.config/Modartt/Pianoteq65\ STAGE.prefs 
@@ -16,8 +15,8 @@
   Extend Mapping with 'minimalistic' or 'full featured' mappings, and allow setting other params
 
 - DONE: Mock my interface as CLI - use something like prompt_toolkit
-- Create interface for gfxhat.
-- Common PTQ setup as method in client lib, create loading screen
+- DONE: Create interface for gfxhat.
+- Common PTQ setup as method in client lib?
 - Consolidate instruments etc in yaml config
 - Support custom preset groupings/banks
 
