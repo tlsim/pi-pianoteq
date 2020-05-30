@@ -17,3 +17,16 @@ class ClientApi(ABC):
     @abstractmethod
     def get_current_preset(self) -> str:
         raise NotImplemented
+
+    @abstractmethod
+    def set_instrument_next(self):
+        raise NotImplemented
+
+    @abstractmethod
+    def set_instrument_prev(self):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_current_instrument(self) -> str:
+        raise NotImplemented
+

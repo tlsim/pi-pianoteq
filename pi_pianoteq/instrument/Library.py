@@ -8,7 +8,7 @@ from pi_pianoteq.instrument.Preset import Preset
 from pi_pianoteq.midi.util import program_numbers_by_channel
 
 
-def get_instruments() -> List[str]:
+def load_instruments() -> List[str]:
     with open(path.join(path.dirname(__file__), 'instruments')) as instruments:
         return instruments.read().splitlines()
 
@@ -20,7 +20,6 @@ class Library:
         self.presets: List[Preset] = [Preset(name) for name in preset_names]
         self.instruments: Dict[str, Instrument] = self.group_presets_by_instrument()
         self.assign_midi_program_numbers()
-        self.current_preset_idx: int = 0
 
     def group_presets_by_instrument(self) -> Dict[str, Instrument]:
         instruments = {name: Instrument(name) for name in self.instrument_names}
@@ -46,12 +45,3 @@ class Library:
                     print('Failed to assign midi program change number to all presets - '
                           'there were insufficient channels / program numbers available', file=stderr)
                     return
-
-    def get_current_preset(self) -> Preset:
-        return self.presets[self.current_preset_idx]
-
-    def set_preset_next(self) -> None:
-        self.current_preset_idx = (self.current_preset_idx + 1) % len(self.presets)
-
-    def set_preset_prev(self) -> None:
-        self.current_preset_idx = (self.current_preset_idx - 1) % len(self.presets)
