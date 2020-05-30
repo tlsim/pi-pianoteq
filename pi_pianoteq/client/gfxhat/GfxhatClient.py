@@ -11,7 +11,8 @@ class GfxhatClient(Client):
 
     def __init__(self, api: ClientApi):
         super().__init__(api)
-        self.text = self.api.get_current_preset()
+        self.preset = self.api.get_current_preset()
+        self.instrument = self.api.get_current_instrument()
         self.width, self.height = lcd.dimensions()
         self.font = ImageFont.truetype(fonts.BitbuntuFull, 10)
         self.image = Image.new('P', (self.width, self.height))
@@ -31,10 +32,15 @@ class GfxhatClient(Client):
 
     def draw_text(self):
         self.image.paste(0, (0, 0, self.width, self.height))
-        w, h = self.font.getsize(self.text)
-        a = (self.width - w) // 2
-        b = (self.height - h) // 2
-        self.draw.text((a, b), self.text, 1, self.font)
+        w_p, h_p = self.font.getsize(self.preset)
+        w_i, h_i = self.font.getsize(self.instrument)
+
+        a = (self.width - w_p) // 2
+        b = (self.height - h_p) // 2
+        c = (self.width - w_i) // 2
+        d = 0
+        self.draw.text((a, b), self.preset, 1, self.font)
+        self.draw.text((c, d), self.instrument, 1, self.font)
         for x in range(128):
             for y in range(64):
                 pixel = self.image.getpixel((x, y))
@@ -45,11 +51,16 @@ class GfxhatClient(Client):
         def handler(ch, event):
             if event != 'press':
                 return
-            if ch == 1:
+            if ch == touch.DOWN:
                 self.api.set_preset_next()
-            if ch == 0:
+            if ch == touch.UP:
                 self.api.set_preset_prev()
-            self.text = self.api.get_current_preset()
+            if ch == touch.LEFT:
+                self.api.set_instrument_prev()
+            if ch == touch.RIGHT:
+                self.api.set_instrument_next()
+            self.preset = self.api.get_current_preset()
+            self.instrument = self.api.get_current_instrument()
             self.draw_text()
         return handler
 

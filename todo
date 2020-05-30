@@ -16,11 +16,11 @@
 
 - DONE: Mock my interface as CLI - use something like prompt_toolkit
 - TODO: Create interface for gfxhat.
-  - Prev/Next instrument
+  - DONE: Prev/Next instrument
   - Instrument backlight colours
   - Select preset/instrument via menu
   - Turn off/quit via menu
-  - Display instrument and preset
+  - DONE: Display instrument and preset
   - Scrolling text for long names
   - Display MidiIn events
 - TODO: Run Headless, at boot? with minimal startup screen / selector?
