@@ -15,14 +15,27 @@
   Extend Mapping with 'minimalistic' or 'full featured' mappings, and allow setting other params
 
 - DONE: Mock my interface as CLI - use something like prompt_toolkit
-- DONE: Create interface for gfxhat.
+- TODO: Create interface for gfxhat.
+  - Prev/Next instrument
+  - Instrument backlight colours
+  - Select preset/instrument via menu
+  - Turn off/quit via menu
+  - Display instrument and preset
+  - Scrolling text for long names
+  - Display MidiIn events
+- TODO: Run Headless, at boot? with minimal startup screen / selector?
 - Common PTQ setup as method in client lib?
 - Consolidate instruments etc in yaml config
 - Support custom preset groupings/banks
 
-- DONE: Think about artifact for Pi, (add CI/CD?)
+- DONE: Think about artifact for Pi, (add CI/CD)
   Easy to install pre-built deb package for python3-rtmidi, but prompt_toolkit is a major version lower...
   TODO: Build a deb package as artifact, include python3-rtmidi as dependency?
+  TODO: Alternatively, clarify dependencies in steps to install:
+        - install gfxhat (pimoroni)
+        - install python3-rtmidi
+        - optionally install cpupower
+        - optionally install prompt-toolikt
   DONE: Package the remainder with pip / setuptools
   TODO: Rename to ptqpi
 
