@@ -13,7 +13,7 @@ from pi_pianoteq.client.gfxhat.GfxhatClient import GfxhatClient
 
 def main():
     pianoteq = Pianoteq()
-    library = Library(pianoteq.get_presets(), Config.load_instrument_config())
+    library = Library(pianoteq.get_presets(), Config.load_instruments())
     selector = Selector(library.get_instruments())
     mapping = MappingBuilder(library).build()
     Writer(mapping).write()

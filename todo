@@ -2,7 +2,7 @@
 - DONE: rtmidi with Python
 - DONE: PTQ cli parse for preset names
 - DONE: Preset names to PTQ MIDI map
-- Instrument names (from ptq's pov)
+- DONE: Instrument names (from ptq's pov)
 
 - PTQ prefs:
   Located at ~/.config/Modartt/Pianoteq65\ STAGE.prefs 
@@ -25,7 +25,7 @@
   - Display MidiIn events
 - TODO: Run Headless, at boot? with minimal startup screen / selector?
 - Common PTQ setup as method in client lib?
-- Consolidate instruments etc in application config
+- DONE: Consolidate instruments etc in application config
 - Support custom preset groupings/banks
 
 - DONE: Think about artifact for Pi, (add CI/CD)
