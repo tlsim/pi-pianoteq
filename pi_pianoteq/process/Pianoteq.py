@@ -2,14 +2,14 @@ import subprocess
 from os.path import expanduser
 from typing import List
 
-from pi_pianoteq.constants import PIANOTEQ_DIR, PIANOTEQ_BIN, MIDI_MAPPING_NAME
+from pi_pianoteq.config import Config
 
 
 class Pianoteq:
     def __init__(self):
         self.headless = False
-        self.mapping_name = MIDI_MAPPING_NAME
-        self.executable = expanduser(PIANOTEQ_DIR) + PIANOTEQ_BIN
+        self.mapping_name = Config.MIDI_MAPPING_NAME
+        self.executable = expanduser(Config.PIANOTEQ_DIR) + Config.PIANOTEQ_BIN
         self.process = None
 
     def get_presets(self) -> List[str]:

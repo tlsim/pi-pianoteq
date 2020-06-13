@@ -1,16 +1,10 @@
-from os import path
 from sys import stderr
 from typing import List, Dict
 
-from pi_pianoteq.constants import UNKNOWN_INSTRUMENT
+from pi_pianoteq.config import Config
 from pi_pianoteq.instrument.Instrument import Instrument
 from pi_pianoteq.instrument.Preset import Preset
 from pi_pianoteq.midi.util import program_numbers_by_channel
-
-
-def load_instruments() -> List[str]:
-    with open(path.join(path.dirname(__file__), 'instruments')) as instruments:
-        return instruments.read().splitlines()
 
 
 class Library:
@@ -23,13 +17,13 @@ class Library:
 
     def group_presets_by_instrument(self) -> Dict[str, Instrument]:
         instruments = {name: Instrument(name) for name in self.instrument_names}
-        instruments[UNKNOWN_INSTRUMENT] = Instrument(UNKNOWN_INSTRUMENT)
+        instruments[Config.UNKNOWN_INSTRUMENT] = Instrument(Config.UNKNOWN_INSTRUMENT)
         for preset in self.presets:
             inst = next((i for i in self.instrument_names if preset.name.find(i) == 0), None)
             if inst is not None:
                 instruments[inst].add_preset(preset)
             else:
-                instruments[UNKNOWN_INSTRUMENT].add_preset(preset)
+                instruments[Config.UNKNOWN_INSTRUMENT].add_preset(preset)
         return instruments
 
     def get_instruments(self) -> List[Instrument]:
