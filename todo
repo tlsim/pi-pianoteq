@@ -17,12 +17,13 @@
 - DONE: Mock my interface as CLI - use something like prompt_toolkit
 - TODO: Create interface for gfxhat.
   - DONE: Prev/Next instrument
-  - Instrument backlight colours
+  - DONE: Instrument backlight colours
   - Select preset/instrument via menu
   - Turn off/quit via menu
   - DONE: Display instrument and preset
-  - Scrolling text for long names
+  - Scrolling text / multiline for long names
   - Display MidiIn events
+  - Piano images
 - TODO: Run Headless, at boot? with minimal startup screen / selector?
 - Common PTQ setup as method in client lib?
 - DONE: Consolidate instruments etc in application config
