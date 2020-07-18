@@ -13,6 +13,8 @@ class GfxhatClient(Client):
         super().__init__(api)
         self.preset = self.api.get_current_preset()
         self.instrument = self.api.get_current_instrument()
+        self.background_primary = self.api.get_current_background_primary()
+        self.background_secondary = self.api.get_current_background_secondary()
         self.width, self.height = lcd.dimensions()
         self.font = ImageFont.truetype(fonts.BitbuntuFull, 10)
         self.image = Image.new('P', (self.width, self.height))
@@ -21,13 +23,12 @@ class GfxhatClient(Client):
     def start(self):
         for index in range(6):
             touch.set_led(index, 0)
-            backlight.set_pixel(index, 255, 255, 255)
             touch.on(index, self.get_handler())
-        backlight.show()
 
         signal.signal(signal.SIGTERM, self.cleanup)
         signal.signal(signal.SIGINT, self.cleanup)
         self.draw_text()
+        self.set_backlight()
         signal.pause()
 
     def draw_text(self):
@@ -35,7 +36,7 @@ class GfxhatClient(Client):
         w_p, h_p = self.font.getsize(self.preset)
         w_i, h_i = self.font.getsize(self.instrument)
 
-        a = (self.width - w_p) // 2
+        a = 0
         b = (self.height - h_p) // 2
         c = (self.width - w_i) // 2
         d = 0
@@ -46,6 +47,23 @@ class GfxhatClient(Client):
                 pixel = self.image.getpixel((x, y))
                 lcd.set_pixel(x, y, pixel)
         lcd.show()
+
+    def set_backlight(self):
+        p_r, p_g, p_b = self.hex_to_rgb(self.background_primary)
+        s_r, s_g, s_b = self.hex_to_rgb(self.background_secondary)
+        for i in range(6):
+            if i == 0 or i == 5:
+                backlight.set_pixel(i, s_r, s_g, s_b)
+            elif i == 1 or i == 4:
+                backlight.set_pixel(i, 0, 0, 0)
+            else:
+                backlight.set_pixel(i, p_r, p_g, p_b)
+        backlight.show()
+
+    @staticmethod
+    def hex_to_rgb(hex):
+        h = hex.lstrip('#')
+        return tuple(int(h[i:i+2], 16) for i in (0, 2, 4))
 
     def get_handler(self):
         def handler(ch, event):
@@ -61,7 +79,10 @@ class GfxhatClient(Client):
                 self.api.set_instrument_next()
             self.preset = self.api.get_current_preset()
             self.instrument = self.api.get_current_instrument()
+            self.background_primary = self.api.get_current_background_primary()
+            self.background_secondary = self.api.get_current_background_secondary()
             self.draw_text()
+            self.set_backlight()
         return handler
 
     @staticmethod

@@ -5,6 +5,7 @@ from pi_pianoteq.midi.ProgramChange import ProgramChange
 
 
 class ClientLib(ClientApi):
+
     def __init__(self, instrument_library: Library, selector: Selector, program_change: ProgramChange):
         self.program_change = program_change
         self.instrument_library = instrument_library
@@ -33,3 +34,10 @@ class ClientLib(ClientApi):
 
     def get_current_instrument(self) -> str:
         return self.selector.get_current_instrument().name
+
+    def get_current_background_primary(self) -> str:
+        return self.selector.get_current_instrument().background_primary
+
+    def get_current_background_secondary(self) -> str:
+        return self.selector.get_current_instrument().background_secondary
+

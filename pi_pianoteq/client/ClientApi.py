@@ -30,3 +30,10 @@ class ClientApi(ABC):
     def get_current_instrument(self) -> str:
         raise NotImplemented
 
+    @abstractmethod
+    def get_current_background_primary(self) -> str:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_current_background_secondary(self) -> str:
+        raise NotImplemented

@@ -25,4 +25,7 @@ class Config:
     def load_instruments() -> List[Instrument]:
         with open(path.join(path.dirname(__file__), INSTRUMENTS_FILE)) as instruments:
             instruments_json = json.load(instruments)
-            return [Instrument(i["name"], i["preset_prefix"]) for i in instruments_json]
+            return [
+                Instrument(i["name"], i["preset_prefix"], i["background_primary"], i["background_secondary"])
+                for i in instruments_json
+            ]
