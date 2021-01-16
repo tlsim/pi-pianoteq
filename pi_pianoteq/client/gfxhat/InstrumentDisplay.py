@@ -56,14 +56,14 @@ class InstrumentDisplay:
                 self.api.set_instrument_next()
             if ch == touch.ENTER:
                 self.on_enter()
-            self.update_display_data()
-            self.draw_text()
-            self.set_backlight()
+            self.update_display()
 
         return handler
 
-    def update_display_data(self):
+    def update_display(self):
         self.preset = self.api.get_current_preset()
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
         self.background_secondary = self.api.get_current_background_secondary()
+        self.draw_text()
+        self.set_backlight()

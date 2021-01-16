@@ -27,6 +27,14 @@ class ClientApi(ABC):
         raise NotImplemented
 
     @abstractmethod
+    def set_instrument(self, name):
+        raise NotImplemented
+
+    @abstractmethod
+    def get_instrument_names(self):
+        raise NotImplemented
+
+    @abstractmethod
     def get_current_instrument(self) -> str:
         raise NotImplemented
 

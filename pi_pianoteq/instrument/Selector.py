@@ -19,6 +19,12 @@ class Selector:
         self.current_instrument_idx = (self.current_instrument_idx - 1) % len(self.instruments)
         self.current_instrument_preset_idx = 0
 
+    def set_instrument(self, name) -> None:
+        instrument = next((i for i in self.instruments if name == i.name), None)
+        if instrument is not None:
+            self.current_instrument_idx = self.instruments.index(instrument)
+            self.current_instrument_preset_idx = 0
+
     def get_current_preset(self) -> Preset:
         return self.get_current_instrument().presets[self.current_instrument_preset_idx]
 

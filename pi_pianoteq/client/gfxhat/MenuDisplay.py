@@ -16,20 +16,20 @@ class MenuDisplay:
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
         self.menu_options = self.get_menu_options()
-        self.current_menu_option = 1
+        self.current_menu_option = 0
         self.backlight = Backlight("#cccccc")
         self.draw_image()
 
     def get_menu_options(self):
-        return [
-            MenuOption('Set BL Red', self.set_backlight, self.font, ('#ff0000',)),
-            MenuOption('Set BL Green', self.set_backlight, self.font, ('#00ff00',)),
-            MenuOption('Set BL Blue', self.set_backlight, self.font, ('#0000bb',)),
-            MenuOption('Set BL White', self.set_backlight, self.font, ('#ffffff',))
-        ]
+        instrument_names = self.api.get_instrument_names()
+        return [MenuOption(i, self.set_instrument, self.font, (i,)) for i in instrument_names]
 
     def set_backlight(self, hex_colour):
         self.backlight.set_all_backlights(hex_colour)
+
+    def set_instrument(self, name):
+        self.api.set_instrument(name)
+        self.on_exit()
 
     def draw_image(self):
         self.image.paste(0, (0, 0, self.width, self.height))
