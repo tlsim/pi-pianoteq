@@ -38,7 +38,7 @@
         - optionally install cpupower
         - optionally install prompt-toolikt
   DONE: Package the remainder with pip / setuptools
-  TODO: Rename to ptqpi
+  TODO: Rename to ptqpi?
 
 - License, copyright
 - Pianoteq legal.
