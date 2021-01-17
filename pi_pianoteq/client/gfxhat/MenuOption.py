@@ -7,5 +7,4 @@ class MenuOption:
         self.width, self.height = self.size
 
     def trigger(self):
-        print(*self.options)
         self.action(*self.options)

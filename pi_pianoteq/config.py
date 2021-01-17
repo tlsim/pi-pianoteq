@@ -20,6 +20,7 @@ class Config:
     PIANOTEQ_PREFS_FILE = parser.get(PTQ_SECTION, 'PIANOTEQ_PREFS_FILE')
     MIDI_PORT_NAME = parser.get(MIDI_SECTION, 'MIDI_PORT_NAME')
     MIDI_MAPPING_NAME = parser.get(MIDI_SECTION, 'MIDI_MAPPING_NAME')
+    MIDI_PIANOTEQ_STARTUP_DELAY = int(parser.get(MIDI_SECTION, 'MIDI_PIANOTEQ_STARTUP_DELAY'))
 
     @staticmethod
     def load_instruments() -> List[Instrument]:

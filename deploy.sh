@@ -2,8 +2,6 @@
 
 REMOTE=pi@raspberrypi.local
 
-# ssh pi@raspberrypi sudo rm -f /etc/systemd/system/pi_pianoteq.service
-
 scp dist/pi_pianoteq-1.0.0.tar.gz $REMOTE:/tmp/pi_pianoteq-1.0.0.tar.gz
 scp pi_pianoteq.service $REMOTE:/tmp/pi_pianoteq.service
 

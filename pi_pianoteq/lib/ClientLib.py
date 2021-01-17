@@ -2,8 +2,10 @@ from pi_pianoteq.client.ClientApi import ClientApi
 from pi_pianoteq.instrument.Library import Library
 from pi_pianoteq.instrument.Selector import Selector
 from pi_pianoteq.midi.ProgramChange import ProgramChange
+from pi_pianoteq.config import Config
 
 from typing import List
+from time import sleep
 
 class ClientLib(ClientApi):
 
@@ -11,8 +13,11 @@ class ClientLib(ClientApi):
         self.program_change = program_change
         self.instrument_library = instrument_library
         self.selector = selector
-        # TODO: wait for PTQ
-        # program_change.set_preset(instrument_library.get_current_preset())
+        self.reset_initial_preset()
+
+    def reset_initial_preset(self) -> None:
+        sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
+        self.program_change.set_preset(self.selector.get_current_preset())
 
     def set_preset_next(self) -> None:
         self.selector.set_preset_next()
