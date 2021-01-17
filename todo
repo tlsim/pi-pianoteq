@@ -18,7 +18,7 @@
 - TODO: Create interface for gfxhat.
   - DONE: Prev/Next instrument
   - DONE: Instrument backlight colours
-  - Select preset/instrument via menu
+  - DONE Select instrument via menu
   - Turn off/quit via menu
   - DONE: Display instrument and preset
   - Scrolling text / multiline for long names

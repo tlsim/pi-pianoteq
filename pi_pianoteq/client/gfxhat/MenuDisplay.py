@@ -17,6 +17,7 @@ class MenuDisplay:
         self.draw = ImageDraw.Draw(self.image)
         self.menu_options = self.get_menu_options()
         self.current_menu_option = 0
+        self.selected_menu_option = 0
         self.backlight = Backlight("#cccccc")
         self.draw_image()
 
@@ -51,11 +52,19 @@ class MenuDisplay:
         w, h = self.font.getsize('>')
         self.draw.text((0, (self.height - h) / 2), '>', 1, self.font)
 
+    def update_instrument(self):
+        current_instrument = self.api.get_current_instrument()
+        current_option = next((o for o in self.menu_options if o.name == current_instrument), None)
+        if current_option is not None:
+            self.current_menu_option = self.menu_options.index(current_option)
+            self.draw_image()
+
     def get_handler(self):
         def handler(ch, event):
             if event != 'press':
                 return
             if ch == touch.BACK:
+                self.current_menu_option = self.selected_menu_option
                 self.on_exit()
             if ch == touch.UP:
                 self.current_menu_option -= 1
@@ -67,6 +76,7 @@ class MenuDisplay:
                 pass
             if ch == touch.ENTER:
                 self.menu_options[self.current_menu_option].trigger()
+                self.selected_menu_option = self.current_menu_option
             self.current_menu_option %= len(self.menu_options)
             self.draw_image()
 

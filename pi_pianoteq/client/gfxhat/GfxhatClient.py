@@ -69,6 +69,7 @@ class GfxhatClient(Client):
 
     def on_enter_menu(self):
         self.menu_open = True
+        self.menu_display.update_instrument()
         self.update_handler()
 
     def on_exit_menu(self):
