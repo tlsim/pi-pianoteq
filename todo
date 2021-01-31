@@ -19,12 +19,13 @@
   - DONE: Prev/Next instrument
   - DONE: Instrument backlight colours
   - DONE Select instrument via menu
-  - Turn off/quit via menu
+  - DONE: Turn off/quit via menu
   - DONE: Display instrument and preset
   - Scrolling text / multiline for long names
   - Display MidiIn events
   - Piano images
-- TODO: Run Headless, at boot? with minimal startup screen / selector?
+- TODO: Run Headless (configure this?), at boot?
+  - with minimal startup screen / selector?
 - Common PTQ setup as method in client lib?
 - DONE: Consolidate instruments etc in application config
 - Support custom preset groupings/banks

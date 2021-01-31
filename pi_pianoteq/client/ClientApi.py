@@ -45,3 +45,7 @@ class ClientApi(ABC):
     @abstractmethod
     def get_current_background_secondary(self) -> str:
         raise NotImplemented
+
+    @abstractmethod
+    def shutdown_device(self):
+        raise NotImplemented

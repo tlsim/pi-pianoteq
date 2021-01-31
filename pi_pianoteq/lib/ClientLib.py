@@ -6,6 +6,7 @@ from pi_pianoteq.config import Config
 
 from typing import List
 from time import sleep
+from os import system
 
 class ClientLib(ClientApi):
 
@@ -54,3 +55,6 @@ class ClientLib(ClientApi):
     def get_current_background_secondary(self) -> str:
         return self.selector.get_current_instrument().background_secondary
 
+    def shutdown_device(self) -> None:
+        print("Client requested shutdown")
+        system(Config.SHUTDOWN_COMMAND)

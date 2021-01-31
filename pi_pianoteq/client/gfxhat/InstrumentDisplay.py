@@ -35,6 +35,9 @@ class InstrumentDisplay:
         self.draw.text((a, b), self.preset, 1, self.font)
         self.draw.text((c, d), self.instrument, 1, self.font)
 
+    def get_backlight(self):
+        return self.backlight
+
     def set_backlight(self):
         for i in range(6):
             if i == 0 or i == 5:
@@ -59,6 +62,9 @@ class InstrumentDisplay:
             self.update_display()
 
         return handler
+
+    def get_image(self):
+        return self.image
 
     def update_display(self):
         self.preset = self.api.get_current_preset()

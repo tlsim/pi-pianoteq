@@ -17,5 +17,6 @@ gfxhat = "==0.0.1"
 python_version = "3.8"
 
 [scripts]
+check = "python3 -m compileall pi_pianoteq"
 package = "python3 setup.py sdist"
 deploy = "sh deploy.sh"

@@ -8,6 +8,7 @@ CONFIG_FILE = 'pi_pianoteq.conf'
 INSTRUMENTS_FILE = 'instruments.json'
 PTQ_SECTION = 'Pianoteq'
 MIDI_SECTION = 'Midi'
+SYSTEM_SECTION = 'System'
 
 
 class Config:
@@ -21,6 +22,7 @@ class Config:
     MIDI_PORT_NAME = parser.get(MIDI_SECTION, 'MIDI_PORT_NAME')
     MIDI_MAPPING_NAME = parser.get(MIDI_SECTION, 'MIDI_MAPPING_NAME')
     MIDI_PIANOTEQ_STARTUP_DELAY = int(parser.get(MIDI_SECTION, 'MIDI_PIANOTEQ_STARTUP_DELAY'))
+    SHUTDOWN_COMMAND = parser.get(SYSTEM_SECTION, 'SHUTDOWN_COMMAND')
 
     @staticmethod
     def load_instruments() -> List[Instrument]:

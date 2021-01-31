@@ -5,7 +5,7 @@ from PIL import ImageFont, Image
 import time
 
 from pi_pianoteq.client.gfxhat.InstrumentDisplay import InstrumentDisplay
-from pi_pianoteq.client.gfxhat.MenuDisplay import MenuDisplay
+from pi_pianoteq.client.gfxhat.InstrumentMenuDisplay import InstrumentMenuDisplay
 from pi_pianoteq.client.Client import Client
 from pi_pianoteq.client.ClientApi import ClientApi
 
@@ -19,7 +19,7 @@ class GfxhatClient(Client):
         self.width, self.height = lcd.dimensions()
         font = ImageFont.truetype(fonts.BitbuntuFull, 10)
         self.instrument_display = InstrumentDisplay(api, self.width, self.height, font, self.on_enter_menu)
-        self.menu_display = MenuDisplay(api, self.width, self.height, font, self.on_exit_menu)
+        self.menu_display = InstrumentMenuDisplay(api, self.width, self.height, font, self.on_exit_menu)
 
     def start(self):
         for index in range(6):
@@ -29,7 +29,7 @@ class GfxhatClient(Client):
         signal.signal(signal.SIGTERM, self.cleanup)
         signal.signal(signal.SIGINT, self.cleanup)
         while True:
-            self.get_display().backlight.apply_backlight()
+            self.get_display().get_backlight().apply_backlight()
             self.blit_image()
             backlight.show()
             lcd.show()
@@ -48,7 +48,7 @@ class GfxhatClient(Client):
         for index in range(6):
             touch.on(index, handler)
 
-    def get_display(self) -> Image:
+    def get_display(self):
         if self.menu_open:
             return self.menu_display
         else:
@@ -57,7 +57,7 @@ class GfxhatClient(Client):
     def blit_image(self):
         for x in range(128):
             for y in range(64):
-                pixel = self.get_display().image.getpixel((x, y))
+                pixel = self.get_display().get_image().getpixel((x, y))
                 lcd.set_pixel(x, y, pixel)
 
     def cleanup(self, signal_number, stack_frame):

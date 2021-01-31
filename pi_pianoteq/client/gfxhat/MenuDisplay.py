@@ -1,36 +1,31 @@
 from PIL import Image, ImageDraw
 
-from pi_pianoteq.client.ClientApi import ClientApi
-from pi_pianoteq.client.gfxhat.Backlight import Backlight
 from pi_pianoteq.client.gfxhat.MenuOption import MenuOption
+from pi_pianoteq.client.gfxhat.Backlight import Backlight
+
 from gfxhat import touch
 
 
 class MenuDisplay:
-    def __init__(self, api: ClientApi, width, height, font, on_exit):
+    def __init__(self, api, width, height, font, on_exit):
+        self.api = api
         self.width = width
         self.height = height
-        self.api = api
         self.font = font
         self.on_exit = on_exit
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
         self.menu_options = self.get_menu_options()
+        self.backlight = Backlight("#cccccc")
         self.current_menu_option = 0
         self.selected_menu_option = 0
-        self.backlight = Backlight("#cccccc")
         self.draw_image()
 
     def get_menu_options(self):
-        instrument_names = self.api.get_instrument_names()
-        return [MenuOption(i, self.set_instrument, self.font, (i,)) for i in instrument_names]
+        raise NotImplemented
 
-    def set_backlight(self, hex_colour):
-        self.backlight.set_all_backlights(hex_colour)
-
-    def set_instrument(self, name):
-        self.api.set_instrument(name)
-        self.on_exit()
+    def get_backlight(self):
+        return self.backlight
 
     def draw_image(self):
         self.image.paste(0, (0, 0, self.width, self.height))
@@ -52,13 +47,6 @@ class MenuDisplay:
         w, h = self.font.getsize('>')
         self.draw.text((0, (self.height - h) / 2), '>', 1, self.font)
 
-    def update_instrument(self):
-        current_instrument = self.api.get_current_instrument()
-        current_option = next((o for o in self.menu_options if o.name == current_instrument), None)
-        if current_option is not None:
-            self.current_menu_option = self.menu_options.index(current_option)
-            self.draw_image()
-
     def get_handler(self):
         def handler(ch, event):
             if event != 'press':
@@ -71,9 +59,9 @@ class MenuDisplay:
             if ch == touch.DOWN:
                 self.current_menu_option += 1
             if ch == touch.LEFT:
-                pass
+                self.current_menu_option -= 1
             if ch == touch.RIGHT:
-                pass
+                self.current_menu_option += 1
             if ch == touch.ENTER:
                 self.menu_options[self.current_menu_option].trigger()
                 self.selected_menu_option = self.current_menu_option
@@ -81,3 +69,6 @@ class MenuDisplay:
             self.draw_image()
 
         return handler
+
+    def get_image(self):
+        return self.image
