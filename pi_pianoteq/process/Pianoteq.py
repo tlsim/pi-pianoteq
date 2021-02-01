@@ -7,7 +7,7 @@ from pi_pianoteq.config import Config
 
 class Pianoteq:
     def __init__(self):
-        self.headless = False
+        self.headless = Config.PIANOTEQ_HEADLESS
         self.mapping_name = Config.MIDI_MAPPING_NAME
         self.executable = expanduser(Config.PIANOTEQ_DIR) + Config.PIANOTEQ_BIN
         self.process = None
@@ -31,7 +31,7 @@ class Pianoteq:
     def start(self):
         args = [self.executable, '--midimapping', self.mapping_name]
         if self.headless:
-            args.append(['--headless'])
+            args.append('--headless')
         self.process = subprocess.Popen(args,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)
