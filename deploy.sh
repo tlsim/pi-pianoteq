@@ -14,6 +14,7 @@ sudo chmod 644 /etc/systemd/system/pi_pianoteq.service
 pip3 install /home/pi/pi_pianoteq-1.0.0
 
 sudo systemctl daemon-reload
+sudo systemctl enable pi_pianoteq
 sudo systemctl restart pi_pianoteq
 
 rm -r /tmp/pi_pianoteq*
