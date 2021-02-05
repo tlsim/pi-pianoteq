@@ -37,4 +37,5 @@ class Pianoteq:
                                         stderr=subprocess.PIPE)
 
     def terminate(self):
-        self.process.terminate()
+        if self.process.returncode is not None:
+            self.process.terminate()

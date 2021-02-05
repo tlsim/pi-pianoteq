@@ -15,6 +15,7 @@ class ClientLib(ClientApi):
         self.instrument_library = instrument_library
         self.selector = selector
         self.reset_initial_preset()
+        self.on_exit = None
 
     def reset_initial_preset(self) -> None:
         sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
@@ -55,6 +56,11 @@ class ClientLib(ClientApi):
     def get_current_background_secondary(self) -> str:
         return self.selector.get_current_instrument().background_secondary
 
+    def set_on_exit(self, on_exit) -> None:
+        self.on_exit = on_exit
+
     def shutdown_device(self) -> None:
         print("Client requested shutdown")
+        if self.on_exit is not None:
+            self.on_exit()
         system(Config.SHUTDOWN_COMMAND)

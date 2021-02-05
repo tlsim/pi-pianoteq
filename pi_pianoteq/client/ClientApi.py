@@ -49,3 +49,7 @@ class ClientApi(ABC):
     @abstractmethod
     def shutdown_device(self):
         raise NotImplemented
+
+    @abstractmethod
+    def set_on_exit(self, on_exit) -> None:
+        raise NotImplemented

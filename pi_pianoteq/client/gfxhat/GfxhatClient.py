@@ -14,6 +14,7 @@ class GfxhatClient(Client):
 
     def __init__(self, api: ClientApi):
         super().__init__(api)
+        self.api.set_on_exit(self.cleanup)
         self.interrupt = False
         self.menu_open = False
         self.width, self.height = lcd.dimensions()
@@ -26,8 +27,8 @@ class GfxhatClient(Client):
             touch.set_led(index, 0)
             touch.on(index, self.instrument_display.get_handler())
 
-        signal.signal(signal.SIGTERM, self.cleanup)
-        signal.signal(signal.SIGINT, self.cleanup)
+        signal.signal(signal.SIGTERM, lambda signal_num, stack_frame: self.cleanup())
+        signal.signal(signal.SIGINT, lambda signal_num, stack_frame: self.cleanup())
         while True:
             self.get_display().get_backlight().apply_backlight()
             self.blit_image()
@@ -36,6 +37,7 @@ class GfxhatClient(Client):
             time.sleep(1.0 / 30)
             if self.interrupt:
                 break
+        time.sleep(2.0)
 
     def update_handler(self):
         if self.menu_open:
@@ -60,8 +62,9 @@ class GfxhatClient(Client):
                 pixel = self.get_display().get_image().getpixel((x, y))
                 lcd.set_pixel(x, y, pixel)
 
-    def cleanup(self, signal_number, stack_frame):
+    def cleanup(self):
         self.interrupt = True
+        time.sleep(1.0)
         backlight.set_all(0, 0, 0)
         backlight.show()
         lcd.clear()
