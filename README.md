@@ -15,6 +15,6 @@ Package the module
 Deploy to remote Raspberry Pi  
 `pipenv deploy`
 
-Manual install  
+Or manual install  
 `pip3 install pi_pianoteq-1.0.0`
 
