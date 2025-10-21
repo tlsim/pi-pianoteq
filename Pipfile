@@ -7,16 +7,16 @@ verify_ssl = true
 pipenv-setup = "*"
 
 [packages]
-python-rtmidi = "~=1.4"
+python-rtmidi = "~=1.5"
 prompt-toolkit = "~=3.0"
-pillow = "~=7.1"
+pillow = "~=11.1"
 gfxhat = "==0.0.1"
 
 [requires]
-# TODO: 3.7, or 3?
-python_version = "3.8"
+python_version = "3.13"
 
 [scripts]
 check = "python3 -m compileall pi_pianoteq"
 package = "python3 setup.py sdist"
 deploy = "sh deploy.sh"
+build-and-deploy = "bash -c 'python3 setup.py sdist && sh deploy.sh'"
