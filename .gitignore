@@ -10,8 +10,15 @@ deploy.conf
 !config/MidiMappings/ptm/*.ptm
 
 dist/
+build/
 *.egg-info
 .DS_Store
+pi_pianoteq.service
+
+# Test and type checking cache
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
 
 pi-pianoteq/*
 backup-*/
