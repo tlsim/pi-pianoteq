@@ -2,6 +2,15 @@
 
 Pi-Pianoteq is a Python/Midi remote control for Pianoteq
 
+# System Dependencies (Raspberry Pi)
+
+On the Raspberry Pi, install python3-rtmidi via apt:
+```bash
+sudo apt install python3-rtmidi
+```
+
+This avoids compiling from source (which requires ALSA development headers). The deployment script will automatically install other dependencies (gfxhat, prompt-toolkit, etc.) into the virtual environment.
+
 # Usage
 
 First, check and update the configuration in `pi_pianoteq/pi_pianoteq.conf`
@@ -46,6 +55,12 @@ python3 -m build && ./deploy.sh
 pip3 install --user build
 ```
 
-## Manual install
-`pip3 install pi_pianoteq-1.0.0`
+## Deployment Details
+
+Deployment uses a virtual environment for proper isolation:
+- Creates `~/pi_pianoteq_venv` with access to system packages (`--system-site-packages`)
+- Installs `pi_pianoteq` and dependencies into the venv
+- Systemd service uses the venv Python
+
+PEP 668 compliant and follows Python best practices.
 
