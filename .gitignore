@@ -15,10 +15,5 @@ build/
 .DS_Store
 pi_pianoteq.service
 
-# Test and type checking cache
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
 pi-pianoteq/*
 backup-*/
