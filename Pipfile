@@ -17,6 +17,6 @@ python_version = "3.13"
 
 [scripts]
 check = "python3 -m compileall pi_pianoteq"
-package = "python3 setup.py sdist"
+package = "python3 -m build"
 deploy = "sh deploy.sh"
-build-and-deploy = "bash -c 'python3 setup.py sdist && sh deploy.sh'"
+build-and-deploy = "bash -c 'python3 -m build && sh deploy.sh'"

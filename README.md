@@ -9,25 +9,42 @@ First, check and update the configuration in `pi_pianoteq/pi_pianoteq.conf`
 ## Using pipenv (recommended)
 
 Install dependencies
-`pipenv install`
+```bash
+pipenv install
+```
 
 Build and deploy in one command
-`pipenv run build-and-deploy`
+```bash
+pipenv run build-and-deploy
+```
 
 Or run separately:
-`pipenv run package` - Build the package
-`pipenv run deploy` - Deploy to remote Raspberry Pi
+```bash
+pipenv run package  # Build the package using pyproject.toml
+pipenv run deploy   # Deploy to remote Raspberry Pi
+```
 
 ## Direct commands
 
-Build the package
-`python3 setup.py sdist`
+Build the package (using modern pyproject.toml)
+```bash
+python3 -m build
+```
 
 Deploy to remote Raspberry Pi
-`./deploy.sh`
+```bash
+./deploy.sh
+```
 
 Or build and deploy
-`python3 setup.py sdist && ./deploy.sh`
+```bash
+python3 -m build && ./deploy.sh
+```
+
+**Note:** Building requires the `build` package:
+```bash
+pip3 install --user build
+```
 
 ## Manual install
 `pip3 install pi_pianoteq-1.0.0`

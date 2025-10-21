@@ -25,23 +25,20 @@ sed "s/{{USER}}/$USER/g" pi_pianoteq.service.template > pi_pianoteq.service
 
 echo "Deploying to $REMOTE..."
 
-scp dist/pi_pianoteq-1.0.0.tar.gz $REMOTE:/tmp/pi_pianoteq-1.0.0.tar.gz
+scp dist/pi_pianoteq-1.0.0-py3-none-any.whl $REMOTE:/tmp/pi_pianoteq-1.0.0-py3-none-any.whl
 scp pi_pianoteq.service $REMOTE:/tmp/pi_pianoteq.service
 
 ssh $REMOTE <<EOF
-tar -xvf /tmp/pi_pianoteq-1.0.0.tar.gz
-
 sudo mv /tmp/pi_pianoteq.service /etc/systemd/system/pi_pianoteq.service
 sudo chmod 644 /etc/systemd/system/pi_pianoteq.service
 
-pip3 install --break-system-packages /home/$USER/pi_pianoteq-1.0.0
+pip3 install --break-system-packages --upgrade --force-reinstall --no-deps /tmp/pi_pianoteq-1.0.0-py3-none-any.whl
 
 sudo systemctl daemon-reload
 sudo systemctl enable pi_pianoteq
 sudo systemctl restart pi_pianoteq
 
-rm -r /tmp/pi_pianoteq*
-rm -r /home/$USER/pi_pianoteq-1.0.0
+rm /tmp/pi_pianoteq*
 
 EOF
 
