@@ -25,8 +25,12 @@ class InstrumentDisplay:
 
     def draw_text(self):
         self.image.paste(0, (0, 0, self.width, self.height))
-        width_preset, height_preset = self.font.getsize(self.preset)
-        width_instrument, height_instrument = self.font.getsize(self.instrument)
+        bbox_preset = self.font.getbbox(self.preset)
+        width_preset = bbox_preset[2] - bbox_preset[0]
+        height_preset = bbox_preset[3] - bbox_preset[1]
+        bbox_instrument = self.font.getbbox(self.instrument)
+        width_instrument = bbox_instrument[2] - bbox_instrument[0]
+        height_instrument = bbox_instrument[3] - bbox_instrument[1]
 
         a = 0
         b = (self.height - height_preset) // 2

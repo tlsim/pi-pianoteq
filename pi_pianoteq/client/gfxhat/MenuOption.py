@@ -3,8 +3,10 @@ class MenuOption:
         self.name = name
         self.action = action
         self.options = options
-        self.size = font.getsize(name)
-        self.width, self.height = self.size
+        bbox = font.getbbox(name)
+        self.width = bbox[2] - bbox[0]
+        self.height = bbox[3] - bbox[1]
+        self.size = (self.width, self.height)
 
     def trigger(self):
         self.action(*self.options)
