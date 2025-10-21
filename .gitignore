@@ -4,6 +4,7 @@ cmake-build-debug/
 venv/
 .venv/
 __pycache__
+deploy.conf
 
 *.ptm
 !config/MidiMappings/ptm/*.ptm
