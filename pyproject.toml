@@ -15,8 +15,8 @@ authors = [
 keywords = ["pianoteq", "rtmidi", "midi", "raspberry-pi"]
 classifiers = [
     "Development Status :: 3 - Alpha",
-    "Intended Audience :: Developers",
-    "Topic :: Software Development :: Build Tools",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Multimedia :: Sound/Audio :: MIDI",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3.13",
 ]
