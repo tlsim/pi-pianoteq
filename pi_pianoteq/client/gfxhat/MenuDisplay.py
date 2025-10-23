@@ -44,7 +44,9 @@ class MenuDisplay:
                 self.draw.rectangle(((x-2, y-1), (self.width, y+10)), 1)
             self.draw.text((x, y), option.name, 0 if index == self.current_menu_option else 1, self.font)
 
-        w, h = self.font.getsize('>')
+        bbox = self.font.getbbox('>')
+        w = bbox[2] - bbox[0]
+        h = bbox[3] - bbox[1]
         self.draw.text((0, (self.height - h) / 2), '>', 1, self.font)
 
     def get_handler(self):

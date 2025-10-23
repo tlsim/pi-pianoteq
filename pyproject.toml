@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "pi_pianoteq"
+version = "1.1.0"
+description = "An rtmidi based remote control for Pianoteq"
+readme = "README.md"
+requires-python = ">=3.13"
+license = "MIT"
+authors = [
+    {name = "Tom Simmons", email = "info@tomsimmons.dev"}
+]
+keywords = ["pianoteq", "rtmidi", "midi", "raspberry-pi"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "Topic :: Multimedia :: Sound/Audio :: MIDI",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.13",
+]
+dependencies = [
+    "prompt-toolkit~=3.0.5",
+    "python-rtmidi~=1.5.8",
+    "pillow~=11.1",
+    "gfxhat==0.0.1",
+    "wcwidth~=0.1.9",
+]
+
+[project.urls]
+Homepage = "https://github.com/tlsim/pi-pianoteq"
+"Bug Reports" = "https://github.com/tlsim/pi-pianoteq/issues"
+Source = "https://github.com/tlsim/pi-pianoteq"
+
+[tool.setuptools]
+packages = ["pi_pianoteq", "pi_pianoteq.client", "pi_pianoteq.client.cli", "pi_pianoteq.client.gfxhat", "pi_pianoteq.instrument", "pi_pianoteq.lib", "pi_pianoteq.mapping", "pi_pianoteq.midi", "pi_pianoteq.process"]
+
+[tool.setuptools.package-data]
+pi_pianoteq = ["instruments.json", "pi_pianoteq.conf"]

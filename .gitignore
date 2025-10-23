@@ -4,12 +4,16 @@ cmake-build-debug/
 venv/
 .venv/
 __pycache__
+deploy.conf
 
 *.ptm
 !config/MidiMappings/ptm/*.ptm
 
 dist/
+build/
 *.egg-info
 .DS_Store
+pi_pianoteq.service
 
 pi-pianoteq/*
+backup-*/

@@ -1,46 +1,29 @@
-- DONE: Familiarity with the rtmidi API (No desire to continue this using C++)
-- DONE: rtmidi with Python
-- DONE: PTQ cli parse for preset names
-- DONE: Preset names to PTQ MIDI map
-- DONE: Instrument names (from ptq's pov)
+Last updated: 2025-10-21
 
-- PTQ prefs:
-  Located at ~/.config/Modartt/Pianoteq65\ STAGE.prefs 
-  Can specify file to store prefs at startup on cli, can we supply our own?
-  It's an XML file.
-
-- Midi Mappings
-  Located in ~/.local/share/Modartt/Pianoteq/MidiMappings
-  Can specify midi mapping by name at startup
-  Extend Mapping with 'minimalistic' or 'full featured' mappings, and allow setting other params
-
-- DONE: Mock my interface as CLI - use something like prompt_toolkit
-- TODO: Create interface for gfxhat.
+- DONE: rtmidi integration with Python
+- DONE: Pianoteq MIDI mapping and control
+- DONE: CLI interface (prompt_toolkit)
+- DONE: GFX HAT interface
   - DONE: Prev/Next instrument
   - DONE: Instrument backlight colours
-  - DONE Select instrument via menu
+  - DONE: Select instrument via menu
   - DONE: Turn off/quit via menu
   - DONE: Display instrument and preset
-  - Scrolling text / multiline for long names
-  - Display MidiIn events
-  - Piano images
-- TODO: Run Headless (configure this?), at boot?
-  - with minimal startup screen / selector?
-- Common PTQ setup as method in client lib?
-- DONE: Consolidate instruments etc in application config
-- Support custom preset groupings/banks
+- DONE: Runs headless at boot (systemd service)
+- DONE: Application config (pi_pianoteq.conf)
+- DONE: Modern build system (pyproject.toml)
+- DONE: Virtual environment deployment
+- DONE: PEP 668 compliant deployment
 
-- DONE: Think about artifact for Pi, (add CI/CD)
-  Easy to install pre-built deb package for python3-rtmidi, but prompt_toolkit is a major version lower...
-  TODO: Build a deb package as artifact, include python3-rtmidi as dependency?
-  TODO: Alternatively, clarify dependencies in steps to install:
-        - install gfxhat (pimoroni)
-        - install python3-rtmidi
-        - optionally install cpupower
-        - optionally install prompt-toolikt
-  DONE: Package the remainder with pip / setuptools
-  TODO: Rename to ptqpi?
-
-- License, copyright
-- Pianoteq legal.
-- Blog
+- TODO: Scrolling text for long instrument/preset names
+- TODO: Display MIDI input events on GFX HAT, with piano graphic
+- TODO: Support custom preset groupings/banks
+- TODO: Extended MIDI mappings (minimalistic vs full featured)
+- TODO: Custom Pianoteq prefs file support
+- TODO: Add type hints (Python 3.13)
+- TODO: Add unit tests
+- TODO: Add logging (replace print statements)
+- TODO: Add CHANGELOG.md
+- TODO: Build Debian package (.deb artifact)?
+- TODO: Update license/copyright/legal info
+- TODO: Project rename? (ptqpi?)

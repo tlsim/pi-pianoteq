@@ -3,10 +3,10 @@ Description = Service for pi_pianoteq
 
 [Service]
 Type=simple
-User=pi
-Group=pi
+User={{USER}}
+Group={{USER}}
 ExecStartPre=cpupower frequency-set -g performance
-ExecStart=python3 -m pi_pianoteq
+ExecStart=/home/{{USER}}/pi_pianoteq_venv/bin/python -m pi_pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
 PermissionsStartOnly=true
 LimitMEMLOCK=500000
