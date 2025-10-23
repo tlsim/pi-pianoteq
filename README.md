@@ -28,19 +28,14 @@ Note: `linux-cpupower` is required if using the systemd service (for CPU perform
 
 ### 3. Install pi_pianoteq
 
-**From release:**
-```bash
-pip install pi_pianoteq-1.2.0-py3-none-any.whl
-```
-
-**From source:**
+Clone and install from source:
 ```bash
 git clone https://github.com/tlsim/pi-pianoteq.git
 cd pi-pianoteq
 pip install .
 ```
 
-**Using pipenv (recommended for development):**
+Or using pipenv (recommended for development):
 ```bash
 pipenv install
 ```
