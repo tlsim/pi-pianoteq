@@ -2,16 +2,55 @@
 
 Pi-Pianoteq is a Python/Midi remote control for Pianoteq
 
-# Setup on Raspberry Pi
+# Installation
 
-## 1. Install Pianoteq
+Choose one of the following installation methods:
 
-Install Pianoteq on the Raspberry Pi:
+## Option A: Install Directly on Raspberry Pi
+
+For users who want to install and run pi_pianoteq directly on their Pi.
+
+### 1. Install Pianoteq
+
 - Download from [Modartt](https://www.modartt.com/pianoteq)
 - Extract to a location like `~/pianoteq/Pianoteq 8 STAGE/`
 - Note the installation path for configuration
 
-## 2. System Dependencies
+### 2. Install Dependencies
+
+```bash
+sudo apt install python3-rtmidi python3-pip python3-venv
+```
+
+### 3. Install pi_pianoteq
+
+Download the wheel file from releases or build it, then:
+
+```bash
+pip install pi_pianoteq-1.2.0-py3-none-any.whl
+```
+
+Or install from source:
+
+```bash
+git clone https://github.com/tlsim/pi-pianoteq.git
+cd pi-pianoteq
+pip install .
+```
+
+### 4. Run
+
+```bash
+python -m pi_pianoteq
+```
+
+See [Configuration](#configuration) below to customize settings.
+
+## Option B: Remote Deployment (Developer Workflow)
+
+For developers who want to build on a dev machine and deploy to a remote Pi.
+
+### Prerequisites on Raspberry Pi
 
 Install python3-rtmidi via apt:
 ```bash
@@ -20,7 +59,11 @@ sudo apt install python3-rtmidi
 
 This avoids compiling from source (which requires ALSA development headers). The deployment script will automatically install other dependencies (gfxhat, prompt-toolkit, etc.) into the virtual environment.
 
-## 3. Configure pi_pianoteq
+### On Your Dev Machine
+
+See [Usage](#usage) section below for build and deployment instructions.
+
+# Configuration
 
 Pi-Pianoteq uses a flexible configuration system with the following priority:
 
@@ -29,9 +72,9 @@ Pi-Pianoteq uses a flexible configuration system with the following priority:
 2. **User config** - `~/.config/pi_pianoteq/pi_pianoteq.conf` - for per-Pi customization
 3. **Bundled default** - ships with the package
 
-### Initial setup (optional)
+### Customizing configuration (optional)
 
-After deploying to your Raspberry Pi, you can customize the configuration:
+You can customize the configuration on your Raspberry Pi:
 
 ```bash
 # SSH into your Pi
@@ -95,16 +138,47 @@ PIANOTEQ_DIR=/custom/path python -m pi_pianoteq
 
 Or set them in the systemd service file for permanent changes.
 
+## After Deployment
+
+The `deploy.sh` script automatically:
+- Installs the package to the Pi's virtual environment
+- Sets up and enables the systemd service
+- Starts the service
+
+Check the service status:
+```bash
+ssh tom@192.168.0.169 "systemctl status pi_pianoteq"
+```
+
+The service will automatically start on boot. To manage it manually:
+```bash
+sudo systemctl stop pi_pianoteq     # Stop the service
+sudo systemctl start pi_pianoteq    # Start the service
+sudo systemctl restart pi_pianoteq  # Restart the service
+```
+
 # Usage
 
 ## Using pipenv (recommended)
 
-Install dependencies
+### Configure deployment
+
+Create or edit `deploy.conf` to specify your Pi's connection details:
+
+```ini
+[Deploy]
+USER = pi
+PI_HOST = 192.168.0.169
+```
+
+### Build and deploy
+
+Install dependencies:
 ```bash
 pipenv install
 ```
 
-Build and deploy in one command
+Build and deploy in one command:
 ```bash
 pipenv run build-and-deploy
 ```
