@@ -2,18 +2,41 @@
 
 Pi-Pianoteq is a Python/Midi remote control for Pianoteq
 
-# System Dependencies (Raspberry Pi)
+# Setup on Raspberry Pi
 
-On the Raspberry Pi, install python3-rtmidi via apt:
+## 1. Install Pianoteq
+
+Install Pianoteq on the Raspberry Pi (arm-64bit version):
+- Download from [Modartt](https://www.modartt.com/pianoteq)
+- Extract to a location like `~/pianoteq/Pianoteq 8 STAGE/arm-64bit/`
+- Note the installation path for configuration
+
+## 2. System Dependencies
+
+Install python3-rtmidi via apt:
 ```bash
 sudo apt install python3-rtmidi
 ```
 
 This avoids compiling from source (which requires ALSA development headers). The deployment script will automatically install other dependencies (gfxhat, prompt-toolkit, etc.) into the virtual environment.
 
-# Usage
+## 3. Configure pi_pianoteq
 
-First, check and update the configuration in `pi_pianoteq/pi_pianoteq.conf`
+Edit `pi_pianoteq/pi_pianoteq.conf` to match your Pianoteq installation:
+
+```ini
+[Pianoteq]
+PIANOTEQ_DIR = ~/pianoteq/Pianoteq 8 STAGE/arm-64bit/
+PIANOTEQ_BIN = Pianoteq 8 STAGE
+PIANOTEQ_PREFS_FILE = ~/.config/Modartt/Pianoteq84 STAGE.prefs
+```
+
+Update these paths to match:
+- `PIANOTEQ_DIR`: Directory containing the Pianoteq binary
+- `PIANOTEQ_BIN`: Name of the Pianoteq executable
+- `PIANOTEQ_PREFS_FILE`: Pianoteq preferences file (version-specific)
+
+# Usage
 
 ## Using pipenv (recommended)
 

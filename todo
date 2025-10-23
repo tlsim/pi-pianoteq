@@ -14,6 +14,7 @@ Last updated: 2025-10-21
 - DONE: Modern build system (pyproject.toml)
 - DONE: Virtual environment deployment
 - DONE: PEP 668 compliant deployment
+- DONE: Add CHANGELOG.md
 
 - TODO: Scrolling text for long instrument/preset names
 - TODO: Display MIDI input events on GFX HAT, with piano graphic
@@ -23,7 +24,10 @@ Last updated: 2025-10-21
 - TODO: Add type hints (Python 3.13)
 - TODO: Add unit tests
 - TODO: Add logging (replace print statements)
-- TODO: Add CHANGELOG.md
-- TODO: Build Debian package (.deb artifact)?
+- TODO: GitHub release for easier installation
+  - Create release with wheel artifact (pi_pianoteq-X.Y.Z-py3-none-any.whl)
+  - Add installation instructions in README for downloading from releases
+  - Split README into "For users" (download wheel) and "For developers" (build from source)
+  - No need for users to install build tools or clone repo
 - TODO: Update license/copyright/legal info
 - TODO: Project rename? (ptqpi?)
