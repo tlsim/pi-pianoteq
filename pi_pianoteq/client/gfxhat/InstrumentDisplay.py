@@ -4,6 +4,7 @@ from pi_pianoteq.client.ClientApi import ClientApi
 
 from gfxhat import touch
 from pi_pianoteq.client.gfxhat.Backlight import Backlight
+from pi_pianoteq.client.gfxhat.ScrollingText import ScrollingText
 
 
 class InstrumentDisplay:
@@ -19,25 +20,44 @@ class InstrumentDisplay:
         self.background_secondary = self.api.get_current_background_secondary()
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
+
+        # Create scrolling text instances
+        # Slower, more leisurely scrolling: 1px per update, every 200ms
+        self.preset_scroller = ScrollingText(
+            self.preset, self.font, self.width - 5,
+            scroll_speed=1, update_interval=0.2
+        )
+        self.instrument_scroller = ScrollingText(
+            self.instrument, self.font, self.width - 5,
+            scroll_speed=1, update_interval=0.2
+        )
+
         self.draw_text()
         self.backlight = Backlight("000000")
         self.set_backlight()
 
     def draw_text(self):
         self.image.paste(0, (0, 0, self.width, self.height))
+
+        # Calculate heights for positioning
         bbox_preset = self.font.getbbox(self.preset)
-        width_preset = bbox_preset[2] - bbox_preset[0]
         height_preset = bbox_preset[3] - bbox_preset[1]
         bbox_instrument = self.font.getbbox(self.instrument)
-        width_instrument = bbox_instrument[2] - bbox_instrument[0]
         height_instrument = bbox_instrument[3] - bbox_instrument[1]
 
-        a = 0
-        b = (self.height - height_preset) // 2
-        c = (self.width - width_instrument) // 2
-        d = 0
-        self.draw.text((a, b), self.preset, 1, self.font)
-        self.draw.text((c, d), self.instrument, 1, self.font)
+        # Get scroll offsets
+        preset_offset = self.preset_scroller.get_offset()
+        instrument_offset = self.instrument_scroller.get_offset()
+
+        # Draw instrument at top, scrolling from left
+        instrument_x = 2 - instrument_offset
+        instrument_y = 0
+        self.draw.text((instrument_x, instrument_y), self.instrument, 1, self.font)
+
+        # Draw preset at vertical center, scrolling from left
+        preset_x = 2 - preset_offset
+        preset_y = (self.height - height_preset) // 2
+        self.draw.text((preset_x, preset_y), self.preset, 1, self.font)
 
     def get_backlight(self):
         return self.backlight
@@ -75,5 +95,20 @@ class InstrumentDisplay:
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
         self.background_secondary = self.api.get_current_background_secondary()
+
+        # Update scrolling text instances
+        self.preset_scroller.update_text(self.preset)
+        self.instrument_scroller.update_text(self.instrument)
+
         self.draw_text()
         self.set_backlight()
+
+    def start_scrolling(self):
+        """Start scrolling animation for long text."""
+        self.preset_scroller.start()
+        self.instrument_scroller.start()
+
+    def stop_scrolling(self):
+        """Stop scrolling animation."""
+        self.preset_scroller.stop()
+        self.instrument_scroller.stop()

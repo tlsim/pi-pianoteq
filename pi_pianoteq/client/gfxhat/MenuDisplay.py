@@ -2,6 +2,7 @@ from PIL import Image, ImageDraw
 
 from pi_pianoteq.client.gfxhat.MenuOption import MenuOption
 from pi_pianoteq.client.gfxhat.Backlight import Backlight
+from pi_pianoteq.client.gfxhat.ScrollingText import ScrollingText
 
 from gfxhat import touch
 
@@ -19,6 +20,20 @@ class MenuDisplay:
         self.backlight = Backlight("#cccccc")
         self.current_menu_option = 0
         self.selected_menu_option = 0
+
+        # Create scroller for selected menu option
+        # Menu text area is from x=10 to width (128px), leave more margin for visibility
+        # Using a smaller max_width (80px) to trigger scrolling for medium-length text
+        self.option_scroller = None
+        if self.menu_options:
+            self.option_scroller = ScrollingText(
+                self.menu_options[0].name,
+                self.font,
+                max_width=80,
+                scroll_speed=1,
+                update_interval=0.2
+            )
+
         self.draw_image()
 
     def get_menu_options(self):
@@ -36,13 +51,18 @@ class MenuDisplay:
                 break
             offset_top += 12
 
+        scroll_offset = self.option_scroller.get_offset() if self.option_scroller else 0
+
         for index in range(len(self.menu_options)):
             x = 10
             y = (index * 12) + (self.height / 2) - 4 - offset_top
             option = self.menu_options[index]
             if index == self.current_menu_option:
                 self.draw.rectangle(((x-2, y-1), (self.width, y+10)), 1)
-            self.draw.text((x, y), option.name, 0 if index == self.current_menu_option else 1, self.font)
+
+            # Apply scroll offset to the selected option
+            text_x = x if index != self.current_menu_option else (x - scroll_offset)
+            self.draw.text((text_x, y), option.name, 0 if index == self.current_menu_option else 1, self.font)
 
         bbox = self.font.getbbox('>')
         w = bbox[2] - bbox[0]
@@ -56,6 +76,9 @@ class MenuDisplay:
             if ch == touch.BACK:
                 self.current_menu_option = self.selected_menu_option
                 self.on_exit()
+
+            prev_option = self.current_menu_option
+
             if ch == touch.UP:
                 self.current_menu_option -= 1
             if ch == touch.DOWN:
@@ -68,9 +91,24 @@ class MenuDisplay:
                 self.menu_options[self.current_menu_option].trigger()
                 self.selected_menu_option = self.current_menu_option
             self.current_menu_option %= len(self.menu_options)
+
+            # Update scroller if selection changed
+            if prev_option != self.current_menu_option and self.option_scroller:
+                self.option_scroller.update_text(self.menu_options[self.current_menu_option].name)
+
             self.draw_image()
 
         return handler
+
+    def start_scrolling(self):
+        """Start scrolling animation for selected menu option."""
+        if self.option_scroller:
+            self.option_scroller.start()
+
+    def stop_scrolling(self):
+        """Stop scrolling animation."""
+        if self.option_scroller:
+            self.option_scroller.stop()
 
     def get_image(self):
         return self.image
