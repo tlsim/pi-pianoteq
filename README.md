@@ -6,9 +6,9 @@ Pi-Pianoteq is a Python/Midi remote control for Pianoteq
 
 ## 1. Install Pianoteq
 
-Install Pianoteq on the Raspberry Pi (arm-64bit version):
+Install Pianoteq on the Raspberry Pi:
 - Download from [Modartt](https://www.modartt.com/pianoteq)
-- Extract to a location like `~/pianoteq/Pianoteq 8 STAGE/arm-64bit/`
+- Extract to a location like `~/pianoteq/Pianoteq 8 STAGE/`
 - Note the installation path for configuration
 
 ## 2. System Dependencies
@@ -43,8 +43,11 @@ python -m pi_pianoteq --init-config
 # Edit the config
 nano ~/.config/pi_pianoteq/pi_pianoteq.conf
 
-# Restart the service
+# If using systemd service (installed via deploy.sh):
 sudo systemctl restart pi_pianoteq
+
+# If running manually:
+python -m pi_pianoteq
 ```
 
 ### Configuration options
@@ -57,6 +60,8 @@ PIANOTEQ_DIR = ~/pianoteq/Pianoteq 8 STAGE/arm-64bit/
 PIANOTEQ_BIN = Pianoteq 8 STAGE
 PIANOTEQ_PREFS_FILE = ~/.config/Modartt/Pianoteq84 STAGE.prefs
 PIANOTEQ_HEADLESS = true
+PIANOTEQ_DATA_DIR = ~/.local/share/Modartt/Pianoteq/
+PIANOTEQ_MIDI_MAPPINGS_DIR = ~/.local/share/Modartt/Pianoteq/MidiMappings
 
 [Midi]
 MIDI_PORT_NAME = PI-PTQ
