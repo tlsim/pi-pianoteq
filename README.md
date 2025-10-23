@@ -112,7 +112,7 @@ For developers who want to build and deploy to a remote Pi, see [DEVELOPMENT.md]
 
 - Python 3.13+
 - Pianoteq (any version)
-- Raspberry Pi with:
+- Raspberry Pi (tested on Pi 4B) with:
   - python3-rtmidi (system package)
   - [Pimoroni GFX HAT](https://github.com/pimoroni/gfx-hat) (optional, for hardware interface)
 
