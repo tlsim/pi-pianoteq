@@ -1,66 +1,116 @@
 # Pi-Pianoteq
 
-Pi-Pianoteq is a Python/Midi remote control for Pianoteq
+Pi-Pianoteq is a Python/MIDI remote control for Pianoteq on Raspberry Pi.
 
-# System Dependencies (Raspberry Pi)
+## Features
 
-On the Raspberry Pi, install python3-rtmidi via apt:
+- Control Pianoteq via MIDI virtual port
+- [GFX HAT](https://github.com/pimoroni/gfx-hat) interface for instrument/preset selection
+- Flexible configuration system
+- Headless operation support
+- Systemd service for auto-start on boot
+
+## Installation
+
+### 1. Install Pianoteq
+
+Download and install Pianoteq on your Raspberry Pi:
+- Download from [Modartt](https://www.modartt.com/pianoteq)
+- Extract to a location like `~/pianoteq/Pianoteq 8 STAGE/`
+
+### 2. Install System Dependencies
+
 ```bash
-sudo apt install python3-rtmidi
+sudo apt install python3-rtmidi python3-pip python3-venv linux-cpupower
 ```
 
-This avoids compiling from source (which requires ALSA development headers). The deployment script will automatically install other dependencies (gfxhat, prompt-toolkit, etc.) into the virtual environment.
+Note: `linux-cpupower` is required if using the systemd service (for CPU performance management).
 
-# Usage
+### 3. Install pi_pianoteq
 
-First, check and update the configuration in `pi_pianoteq/pi_pianoteq.conf`
+Clone and install from source:
+```bash
+git clone https://github.com/tlsim/pi-pianoteq.git
+cd pi-pianoteq
+pip install .
+```
 
-## Using pipenv (recommended)
-
-Install dependencies
+Or using pipenv (recommended for development):
 ```bash
 pipenv install
 ```
 
-Build and deploy in one command
+## Configuration
+
+Initialize your configuration:
 ```bash
-pipenv run build-and-deploy
+python -m pi_pianoteq --init-config
 ```
 
-Or run separately:
+Edit the config file:
 ```bash
-pipenv run package  # Build the package using pyproject.toml
-pipenv run deploy   # Deploy to remote Raspberry Pi
+nano ~/.config/pi_pianoteq/pi_pianoteq.conf
 ```
 
-## Direct commands
+Update the paths to match your Pianoteq installation:
 
-Build the package (using modern pyproject.toml)
-```bash
-python3 -m build
+```ini
+[Pianoteq]
+PIANOTEQ_DIR = ~/pianoteq/Pianoteq 8 STAGE/arm-64bit/
+PIANOTEQ_BIN = Pianoteq 8 STAGE
+PIANOTEQ_PREFS_FILE = ~/.config/Modartt/Pianoteq84 STAGE.prefs
+PIANOTEQ_HEADLESS = true
 ```
 
-Deploy to remote Raspberry Pi
+View your active configuration:
 ```bash
-./deploy.sh
+python -m pi_pianoteq --show-config
 ```
 
-Or build and deploy
+### Configuration Priority
+
+Configuration is loaded with the following priority (highest to lowest):
+1. Environment variables
+2. User config (`~/.config/pi_pianoteq/pi_pianoteq.conf`)
+3. Bundled default
+
+User config persists across package upgrades.
+
+## Running
+
+### Run Manually
+
 ```bash
-python3 -m build && ./deploy.sh
+python -m pi_pianoteq
 ```
 
-**Note:** Building requires the `build` package:
+Or with pipenv:
 ```bash
-pip3 install --user build
+pipenv run python -m pi_pianoteq
 ```
 
-## Deployment Details
+### Run as a Service (Auto-start on Boot)
 
-Deployment uses a virtual environment for proper isolation:
-- Creates `~/pi_pianoteq_venv` with access to system packages (`--system-site-packages`)
-- Installs `pi_pianoteq` and dependencies into the venv
-- Systemd service uses the venv Python
+See [SYSTEMD.md](SYSTEMD.md) for instructions on setting up a systemd service.
 
-PEP 668 compliant and follows Python best practices.
+## Development
 
+For developers who want to build and deploy to a remote Pi, see [DEVELOPMENT.md](DEVELOPMENT.md).
+
+## Documentation
+
+- [SYSTEMD.md](SYSTEMD.md) - Running as a systemd service
+- [DEVELOPMENT.md](DEVELOPMENT.md) - Development and deployment workflow
+- [CHANGELOG.md](CHANGELOG.md) - Version history
+
+## Requirements
+
+- Python 3.13+
+- Pianoteq (any version)
+- Raspberry Pi (tested on Pi 4B) with:
+  - python3-rtmidi (system package)
+  - [Pimoroni GFX HAT](https://github.com/pimoroni/gfx-hat) (optional, for hardware interface)
+
+## License
+
+MIT

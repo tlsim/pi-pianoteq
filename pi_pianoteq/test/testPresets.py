@@ -15,7 +15,7 @@ i2 = 'Ant. Petrof'
 class InstrumentTestCase(unittest.TestCase):
     def test_preset_instrument_grouping(self):
         preset_names = [a1, s1, s2, a2]
-        instruments = [Instrument(i1, i1), Instrument(i2, i2)]
+        instruments = [Instrument(i1, i1, '#000000', '#FFFFFF'), Instrument(i2, i2, '#000000', '#FFFFFF')]
         library = Library(preset_names, instruments)
         grouped = library.get_instruments()
         self.assertEqual(2, len(grouped))

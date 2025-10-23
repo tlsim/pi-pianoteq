@@ -5,6 +5,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-10-23
+
+### Added
+- Multi-source configuration: environment variables > user config > bundled default
+- User configuration at `~/.config/pi_pianoteq/pi_pianoteq.conf` (persists across upgrades)
+- `--show-config` command to display active configuration and sources
+- `--init-config` command to initialize user configuration
+- pytest test suite with 20 unit tests
+
+### Changed
+- `PIANOTEQ_HEADLESS` default now `true`
+- Hardware dependencies imported lazily (enables `--show-config` on dev machines)
+
 ## [1.1.0] - 2025-10-21
 
 ### Added

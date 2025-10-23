@@ -1,4 +1,4 @@
-Last updated: 2025-10-21
+Last updated: 2025-10-23
 
 - DONE: rtmidi integration with Python
 - DONE: Pianoteq MIDI mapping and control
@@ -14,6 +14,14 @@ Last updated: 2025-10-21
 - DONE: Modern build system (pyproject.toml)
 - DONE: Virtual environment deployment
 - DONE: PEP 668 compliant deployment
+- DONE: Add CHANGELOG.md
+- DONE: Add unit tests
+- DONE: Multi-source configuration system (env > user > bundled)
+- DONE: User configuration persists across upgrades (~/.config/pi_pianoteq/)
+- DONE: Split README into separate docs
+  - DONE: README.md for users (simple installation)
+  - DONE: DEVELOPMENT.md for build/deploy workflow
+  - DONE: SYSTEMD.md for service setup
 
 - TODO: Scrolling text for long instrument/preset names
 - TODO: Display MIDI input events on GFX HAT, with piano graphic
@@ -21,9 +29,9 @@ Last updated: 2025-10-21
 - TODO: Extended MIDI mappings (minimalistic vs full featured)
 - TODO: Custom Pianoteq prefs file support
 - TODO: Add type hints (Python 3.13)
-- TODO: Add unit tests
 - TODO: Add logging (replace print statements)
-- TODO: Add CHANGELOG.md
-- TODO: Build Debian package (.deb artifact)?
+- TODO: GitHub release for easier installation
+  - Create release with wheel artifact (pi_pianoteq-X.Y.Z-py3-none-any.whl)
+  - Update installation instructions to reference releases
 - TODO: Update license/copyright/legal info
 - TODO: Project rename? (ptqpi?)
