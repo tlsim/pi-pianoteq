@@ -5,6 +5,27 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2025-10-23
+
+### Added
+- Multi-source configuration system with priority: environment variables > user config > bundled default
+- User configuration directory at `~/.config/pi_pianoteq/pi_pianoteq.conf`
+- `--show-config` command to display active configuration and sources for debugging
+- `--init-config` command to initialize user configuration file
+- Comprehensive test suite with pytest (20 unit tests for configuration system)
+- Configuration source tracking for debugging
+
+### Changed
+- Configuration is now loaded from `~/.config/pi_pianoteq/` when available
+- User configuration persists across package upgrades
+- `PIANOTEQ_HEADLESS` default changed to `true` for reliable boot without X11/VNC
+- Command-line argument handling moved to argparse
+- Hardware dependencies (rtmidi, gfxhat) are now imported only when needed (allows `--show-config` on dev machines)
+
+### Fixed
+- Service now starts reliably at boot in headless mode without requiring VNC/X11
+- No more zombie Pianoteq processes from failed GUI initialization
+
 ## [1.1.0] - 2025-10-21
 
 ### Added

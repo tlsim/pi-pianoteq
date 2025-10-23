@@ -5,6 +5,7 @@ verify_ssl = true
 
 [dev-packages]
 build = "*"
+pytest = "*"
 
 [packages]
 python-rtmidi = "~=1.5"
@@ -17,6 +18,7 @@ python_version = "3.13"
 
 [scripts]
 check = "python3 -m compileall pi_pianoteq"
+test = "pytest pi_pianoteq/test -v"
 package = "python3 -m build"
 deploy = "sh deploy.sh"
 build-and-deploy = "bash -c 'python3 -m build && sh deploy.sh'"

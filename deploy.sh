@@ -25,7 +25,7 @@ sed "s/{{USER}}/$USER/g" pi_pianoteq.service.template > pi_pianoteq.service
 
 echo "Deploying to $REMOTE..."
 
-scp dist/pi_pianoteq-1.1.0-py3-none-any.whl $REMOTE:/tmp/pi_pianoteq-1.1.0-py3-none-any.whl
+scp dist/pi_pianoteq-1.2.0-py3-none-any.whl $REMOTE:/tmp/pi_pianoteq-1.2.0-py3-none-any.whl
 scp pi_pianoteq.service $REMOTE:/tmp/pi_pianoteq.service
 
 ssh $REMOTE <<EOF
@@ -38,7 +38,7 @@ fi
 
 # Install/upgrade package in venv (dependencies will use system packages where available)
 echo "Installing pi_pianoteq into virtual environment..."
-"\$VENV_PATH/bin/pip" install --upgrade --force-reinstall --no-deps /tmp/pi_pianoteq-1.1.0-py3-none-any.whl
+"\$VENV_PATH/bin/pip" install --upgrade --force-reinstall --no-deps /tmp/pi_pianoteq-1.2.0-py3-none-any.whl
 
 # Update systemd service
 sudo mv /tmp/pi_pianoteq.service /etc/systemd/system/pi_pianoteq.service
