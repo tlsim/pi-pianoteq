@@ -8,6 +8,11 @@ from gfxhat import touch
 
 
 class MenuDisplay:
+    MENU_ARROW_WIDTH = 10
+    MENU_TEXT_MARGIN = 5
+    MENU_ITEM_HEIGHT = 12
+    WRAP_GAP = 20
+
     def __init__(self, api, width, height, font, on_exit):
         self.api = api
         self.width = width
@@ -22,12 +27,11 @@ class MenuDisplay:
         self.selected_menu_option = 0
         self.option_scroller = None
         if self.menu_options:
+            menu_text_width = self.width - self.MENU_ARROW_WIDTH - self.MENU_TEXT_MARGIN
             self.option_scroller = ScrollingText(
                 self.menu_options[0].name,
                 self.font,
-                max_width=80,
-                scroll_speed=1,
-                update_interval=0.2
+                max_width=menu_text_width
             )
 
         self.draw_image()
@@ -45,19 +49,28 @@ class MenuDisplay:
         for index in range(len(self.menu_options)):
             if index == self.current_menu_option:
                 break
-            offset_top += 12
+            offset_top += self.MENU_ITEM_HEIGHT
 
         scroll_offset = self.option_scroller.get_offset() if self.option_scroller else 0
 
         for index in range(len(self.menu_options)):
-            x = 10
-            y = (index * 12) + (self.height / 2) - 4 - offset_top
+            x = self.MENU_ARROW_WIDTH
+            y = (index * self.MENU_ITEM_HEIGHT) + (self.height / 2) - 4 - offset_top
             option = self.menu_options[index]
             if index == self.current_menu_option:
                 self.draw.rectangle(((x-2, y-1), (self.width, y+10)), 1)
 
-            text_x = x if index != self.current_menu_option else (x - scroll_offset)
-            self.draw.text((text_x, y), option.name, 0 if index == self.current_menu_option else 1, self.font)
+            is_selected = index == self.current_menu_option
+            text_x = x if not is_selected else (x - scroll_offset)
+            color = 0 if is_selected else 1
+            self.draw.text((text_x, y), option.name, color, self.font)
+
+            if is_selected and self.option_scroller and self.option_scroller.needs_scrolling and scroll_offset > 0:
+                option_bbox = self.font.getbbox(option.name)
+                option_width = option_bbox[2] - option_bbox[0]
+                wrap_x = text_x + option_width + self.WRAP_GAP
+                if wrap_x < self.width:
+                    self.draw.text((wrap_x, y), option.name, color, self.font)
 
         bbox = self.font.getbbox('>')
         w = bbox[2] - bbox[0]

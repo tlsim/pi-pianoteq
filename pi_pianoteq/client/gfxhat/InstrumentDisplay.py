@@ -8,6 +8,10 @@ from pi_pianoteq.client.gfxhat.ScrollingText import ScrollingText
 
 
 class InstrumentDisplay:
+    TEXT_START_X = 2
+    TEXT_MARGIN = 5
+    WRAP_GAP = 20
+
     def __init__(self, api: ClientApi, width, height, font, on_enter):
         self.api = api
         self.width = width
@@ -20,14 +24,8 @@ class InstrumentDisplay:
         self.background_secondary = self.api.get_current_background_secondary()
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
-        self.preset_scroller = ScrollingText(
-            self.preset, self.font, self.width - 5,
-            scroll_speed=1, update_interval=0.2
-        )
-        self.instrument_scroller = ScrollingText(
-            self.instrument, self.font, self.width - 5,
-            scroll_speed=1, update_interval=0.2
-        )
+        self.preset_scroller = ScrollingText(self.preset, self.font, self.width - self.TEXT_MARGIN)
+        self.instrument_scroller = ScrollingText(self.instrument, self.font, self.width - self.TEXT_MARGIN)
 
         self.draw_text()
         self.backlight = Backlight("000000")
@@ -44,13 +42,19 @@ class InstrumentDisplay:
         preset_offset = self.preset_scroller.get_offset()
         instrument_offset = self.instrument_scroller.get_offset()
 
-        instrument_x = 2 - instrument_offset
+        instrument_x = self.TEXT_START_X - instrument_offset
         instrument_y = 0
         self.draw.text((instrument_x, instrument_y), self.instrument, 1, self.font)
+        if self.instrument_scroller.needs_scrolling:
+            wrap_x = instrument_x + bbox_instrument[2] - bbox_instrument[0] + self.WRAP_GAP
+            self.draw.text((wrap_x, instrument_y), self.instrument, 1, self.font)
 
-        preset_x = 2 - preset_offset
+        preset_x = self.TEXT_START_X - preset_offset
         preset_y = (self.height - height_preset) // 2
         self.draw.text((preset_x, preset_y), self.preset, 1, self.font)
+        if self.preset_scroller.needs_scrolling:
+            wrap_x = preset_x + bbox_preset[2] - bbox_preset[0] + self.WRAP_GAP
+            self.draw.text((wrap_x, preset_y), self.preset, 1, self.font)
 
     def get_backlight(self):
         return self.backlight
