@@ -61,11 +61,15 @@ class ScrollingText:
             self.scroll_offset = 0
 
     def _scroll_worker(self):
+        """Background thread worker that continuously updates scroll offset."""
+        # Wait for initial delay before starting to scroll
         if not self.stop_flag.wait(self.initial_delay):
+            # Wrap point includes text width + gap before repeating
             wrap_point = self.text_width + self.wrap_gap
             while not self.stop_flag.is_set():
                 with self.lock:
                     self.scroll_offset += self.scroll_speed
+                    # Reset to 0 for seamless loop (caller draws text twice)
                     if self.scroll_offset >= wrap_point:
                         self.scroll_offset = 0
 
@@ -80,6 +84,9 @@ class ScrollingText:
         """
         Update the text and recalculate if scrolling is needed.
         Restarts scrolling if currently running.
+
+        This allows reusing the same ScrollingText instance when text changes
+        (e.g., switching instruments) without creating new objects/threads.
         """
         was_running = self.scroll_thread and self.scroll_thread.is_alive()
 
