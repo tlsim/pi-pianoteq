@@ -30,6 +30,7 @@ class InstrumentMenuDisplay(MenuDisplay):
         current_option = next((o for o in self.menu_options if o.name == current_instrument), None)
         if current_option is not None:
             self.current_menu_option = self.menu_options.index(current_option)
+            self._update_selected_option()
             self.draw_image()
 
     def get_image(self):

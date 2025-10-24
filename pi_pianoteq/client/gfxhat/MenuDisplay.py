@@ -20,10 +20,6 @@ class MenuDisplay:
         self.backlight = Backlight("#cccccc")
         self.current_menu_option = 0
         self.selected_menu_option = 0
-
-        # Create scroller for selected menu option
-        # Menu text area is from x=10 to width (128px), leave more margin for visibility
-        # Using a smaller max_width (80px) to trigger scrolling for medium-length text
         self.option_scroller = None
         if self.menu_options:
             self.option_scroller = ScrollingText(
@@ -60,7 +56,6 @@ class MenuDisplay:
             if index == self.current_menu_option:
                 self.draw.rectangle(((x-2, y-1), (self.width, y+10)), 1)
 
-            # Apply scroll offset to the selected option
             text_x = x if index != self.current_menu_option else (x - scroll_offset)
             self.draw.text((text_x, y), option.name, 0 if index == self.current_menu_option else 1, self.font)
 
@@ -76,6 +71,7 @@ class MenuDisplay:
             if ch == touch.BACK:
                 self.current_menu_option = self.selected_menu_option
                 self.on_exit()
+                return
 
             prev_option = self.current_menu_option
 
@@ -92,21 +88,23 @@ class MenuDisplay:
                 self.selected_menu_option = self.current_menu_option
             self.current_menu_option %= len(self.menu_options)
 
-            # Update scroller if selection changed
-            if prev_option != self.current_menu_option and self.option_scroller:
-                self.option_scroller.update_text(self.menu_options[self.current_menu_option].name)
+            if prev_option != self.current_menu_option:
+                self._update_selected_option()
 
             self.draw_image()
 
         return handler
 
+    def _update_selected_option(self):
+        if self.option_scroller:
+            self.option_scroller.update_text(self.menu_options[self.current_menu_option].name)
+            self.option_scroller.start()
+
     def start_scrolling(self):
-        """Start scrolling animation for selected menu option."""
         if self.option_scroller:
             self.option_scroller.start()
 
     def stop_scrolling(self):
-        """Stop scrolling animation."""
         if self.option_scroller:
             self.option_scroller.stop()
 
