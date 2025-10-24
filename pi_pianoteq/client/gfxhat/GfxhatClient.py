@@ -29,8 +29,19 @@ class GfxhatClient(Client):
 
         signal.signal(signal.SIGTERM, lambda signal_num, stack_frame: self.cleanup())
         signal.signal(signal.SIGINT, lambda signal_num, stack_frame: self.cleanup())
+
+        # Start scrolling for instrument display
+        self.instrument_display.start_scrolling()
+
         while True:
-            self.get_display().get_backlight().apply_backlight()
+            # Redraw display to pick up scroll offset changes
+            display = self.get_display()
+            if hasattr(display, 'draw_text'):
+                display.draw_text()
+            elif hasattr(display, 'draw_image'):
+                display.draw_image()
+
+            display.get_backlight().apply_backlight()
             self.blit_image()
             backlight.show()
             lcd.show()
@@ -64,6 +75,9 @@ class GfxhatClient(Client):
 
     def cleanup(self):
         self.interrupt = True
+        # Stop all scrolling threads
+        self.instrument_display.stop_scrolling()
+        self.menu_display.stop_scrolling()
         time.sleep(1.0)
         backlight.set_all(0, 0, 0)
         backlight.show()
@@ -71,11 +85,15 @@ class GfxhatClient(Client):
         lcd.show()
 
     def on_enter_menu(self):
+        self.instrument_display.stop_scrolling()
         self.menu_open = True
         self.menu_display.update_instrument()
+        self.menu_display.start_scrolling()
         self.update_handler()
 
     def on_exit_menu(self):
+        self.menu_display.stop_scrolling()
         self.menu_open = False
         self.update_handler()
         self.instrument_display.update_display()
+        self.instrument_display.start_scrolling()

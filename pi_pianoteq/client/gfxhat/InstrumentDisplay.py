@@ -4,9 +4,20 @@ from pi_pianoteq.client.ClientApi import ClientApi
 
 from gfxhat import touch
 from pi_pianoteq.client.gfxhat.Backlight import Backlight
+from pi_pianoteq.client.gfxhat.ScrollingText import ScrollingText
 
 
 class InstrumentDisplay:
+    """
+    Main display showing current instrument and preset with scrolling text.
+
+    Uses ScrollingText instances with background threads for smooth scrolling.
+    Threads are started when this display is visible, stopped when switching to menu.
+    """
+    TEXT_START_X = 2
+    TEXT_MARGIN = 5
+    WRAP_GAP = 20
+
     def __init__(self, api: ClientApi, width, height, font, on_enter):
         self.api = api
         self.width = width
@@ -19,25 +30,48 @@ class InstrumentDisplay:
         self.background_secondary = self.api.get_current_background_secondary()
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
+        self.preset_scroller = ScrollingText(self.preset, self.font, self.width - self.TEXT_MARGIN)
+        self.instrument_scroller = ScrollingText(self.instrument, self.font, self.width - self.TEXT_MARGIN)
+
         self.draw_text()
         self.backlight = Backlight("000000")
         self.set_backlight()
 
     def draw_text(self):
+        """
+        Render instrument and preset text with scrolling.
+
+        Uses seamless marquee technique: draws text twice (at primary position
+        and wrap position) so there's no visible jump when scrolling loops.
+        """
         self.image.paste(0, (0, 0, self.width, self.height))
+
         bbox_preset = self.font.getbbox(self.preset)
-        width_preset = bbox_preset[2] - bbox_preset[0]
         height_preset = bbox_preset[3] - bbox_preset[1]
         bbox_instrument = self.font.getbbox(self.instrument)
-        width_instrument = bbox_instrument[2] - bbox_instrument[0]
         height_instrument = bbox_instrument[3] - bbox_instrument[1]
 
-        a = 0
-        b = (self.height - height_preset) // 2
-        c = (self.width - width_instrument) // 2
-        d = 0
-        self.draw.text((a, b), self.preset, 1, self.font)
-        self.draw.text((c, d), self.instrument, 1, self.font)
+        # Get current scroll offset from background threads
+        preset_offset = self.preset_scroller.get_offset()
+        instrument_offset = self.instrument_scroller.get_offset()
+
+        # Draw instrument name (top of display)
+        instrument_x = self.TEXT_START_X - instrument_offset
+        instrument_y = 0
+        self.draw.text((instrument_x, instrument_y), self.instrument, 1, self.font)
+        # Draw second copy for seamless wrap if text is scrolling
+        if self.instrument_scroller.needs_scrolling:
+            wrap_x = instrument_x + bbox_instrument[2] - bbox_instrument[0] + self.WRAP_GAP
+            self.draw.text((wrap_x, instrument_y), self.instrument, 1, self.font)
+
+        # Draw preset name (middle of display)
+        preset_x = self.TEXT_START_X - preset_offset
+        preset_y = (self.height - height_preset) // 2
+        self.draw.text((preset_x, preset_y), self.preset, 1, self.font)
+        # Draw second copy for seamless wrap if text is scrolling
+        if self.preset_scroller.needs_scrolling:
+            wrap_x = preset_x + bbox_preset[2] - bbox_preset[0] + self.WRAP_GAP
+            self.draw.text((wrap_x, preset_y), self.preset, 1, self.font)
 
     def get_backlight(self):
         return self.backlight
@@ -71,9 +105,23 @@ class InstrumentDisplay:
         return self.image
 
     def update_display(self):
+        """Update display when instrument/preset changes (e.g., button press)."""
         self.preset = self.api.get_current_preset()
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
         self.background_secondary = self.api.get_current_background_secondary()
+        # Update text and restart scrolling threads
+        self.preset_scroller.update_text(self.preset)
+        self.instrument_scroller.update_text(self.instrument)
+        self.preset_scroller.start()
+        self.instrument_scroller.start()
         self.draw_text()
         self.set_backlight()
+
+    def start_scrolling(self):
+        self.preset_scroller.start()
+        self.instrument_scroller.start()
+
+    def stop_scrolling(self):
+        self.preset_scroller.stop()
+        self.instrument_scroller.stop()
