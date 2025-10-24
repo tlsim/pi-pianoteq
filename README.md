@@ -76,6 +76,19 @@ Configuration is loaded with the following priority (highest to lowest):
 
 User config persists across package upgrades.
 
+## MIDI Configuration
+
+After installing pi_pianoteq, you need to enable the PI-PTQ MIDI port in Pianoteq:
+
+1. Launch Pianoteq
+2. Go to **Edit → Preferences → Devices**
+3. Under "Active MIDI Inputs", check the box next to **PI-PTQ**
+4. Click OK
+
+This is a one-time setup. The setting persists in your Pianoteq preferences.
+
+**Note:** pi_pianoteq will warn you on startup if this is not configured, but will continue running.
+
 ## Running
 
 ### Run Manually
@@ -88,6 +101,20 @@ Or with pipenv:
 ```bash
 pipenv run python -m pi_pianoteq
 ```
+
+### Run with CLI Client (for testing/development)
+
+For usage without GFX HAT hardware, use the CLI client:
+
+```bash
+python -m pi_pianoteq --cli
+```
+
+Controls:
+- `Ctrl-K`: Show current preset
+- `Ctrl-N`: Next preset
+- `Ctrl-P`: Previous preset
+- `Ctrl-C`: Exit
 
 ### Run as a Service (Auto-start on Boot)
 

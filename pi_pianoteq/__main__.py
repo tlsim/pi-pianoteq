@@ -69,6 +69,11 @@ def main():
         action='store_true',
         help='Initialize user config file at ~/.config/pi_pianoteq/ and exit'
     )
+    parser.add_argument(
+        '--cli',
+        action='store_true',
+        help='Use CLI client instead of GFX HAT client (for development/testing)'
+    )
 
     args = parser.parse_args()
 
@@ -89,7 +94,13 @@ def main():
     from pi_pianoteq.mapping.Writer import Writer
     from pi_pianoteq.midi.ProgramChange import ProgramChange
     from pi_pianoteq.process.Pianoteq import Pianoteq
-    from pi_pianoteq.client.gfxhat.GfxhatClient import GfxhatClient
+    from pi_pianoteq.util.pianoteq_prefs import is_midi_device_enabled
+
+    # Import appropriate client based on mode
+    if args.cli:
+        from pi_pianoteq.client.cli.CliClient import CliClient
+    else:
+        from pi_pianoteq.client.gfxhat.GfxhatClient import GfxhatClient
 
     pianoteq = Pianoteq()
     library = Library(pianoteq.get_presets(), Config.load_instruments())
@@ -106,7 +117,29 @@ def main():
     program_change = ProgramChange(midiout)
 
     client_lib = ClientLib(library, selector, program_change)
-    client = GfxhatClient(client_lib)
+
+    # Check if PI-PTQ MIDI device is enabled in Pianoteq preferences
+    if not is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE):
+        print("⚠️  WARNING: PI-PTQ MIDI port not enabled in Pianoteq")
+        print()
+        print("Please enable it in Pianoteq preferences:")
+        print("  1. Open Pianoteq")
+        print("  2. Go to Edit → Preferences → Devices")
+        print("  3. Check the box next to \"PI-PTQ\" under Active MIDI Inputs")
+        print("  4. Click OK and restart pi_pianoteq")
+        print()
+        print("Continuing anyway (preset/instrument changes won't work until configured)...")
+        print()
+
+        # Only wait for keypress in CLI mode (not in headless/systemd service)
+        if args.cli:
+            input("Press Enter to continue...")
+            print()
+
+    if args.cli:
+        client = CliClient(client_lib)
+    else:
+        client = GfxhatClient(client_lib)
 
     client.start()
     pianoteq.terminate()

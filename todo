@@ -1,4 +1,4 @@
-Last updated: 2025-10-23
+Last updated: 2025-10-24
 
 - DONE: rtmidi integration with Python
 - DONE: Pianoteq MIDI mapping and control
@@ -9,6 +9,8 @@ Last updated: 2025-10-23
   - DONE: Select instrument via menu
   - DONE: Turn off/quit via menu
   - DONE: Display instrument and preset
+  - DONE: Scrolling text for long instrument/preset names
+  - DONE: Smart preset name display (strip redundant instrument prefix)
 - DONE: Runs headless at boot (systemd service)
 - DONE: Application config (pi_pianoteq.conf)
 - DONE: Modern build system (pyproject.toml)
@@ -22,8 +24,8 @@ Last updated: 2025-10-23
   - DONE: README.md for users (simple installation)
   - DONE: DEVELOPMENT.md for build/deploy workflow
   - DONE: SYSTEMD.md for service setup
-
-- TODO: Scrolling text for long instrument/preset names
+- DONE: CLI client mode for development/testing without GFX HAT
+- DONE: MIDI configuration validation and warnings
 - TODO: Display MIDI input events on GFX HAT, with piano graphic
 - TODO: Support custom preset groupings/banks
 - TODO: Extended MIDI mappings (minimalistic vs full featured)
