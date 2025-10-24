@@ -5,6 +5,32 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.0] - 2025-10-24
+
+### Added
+- `--cli` flag to run CLI client without GFX HAT hardware (for development/testing)
+- MIDI configuration validation and startup warning when PI-PTQ device not enabled
+- `pi_pianoteq.util.pianoteq_prefs` module for reading Pianoteq preferences
+- Documentation for MIDI configuration in README.md and DEVELOPMENT.md
+- CLI client controls documented in README.md
+
+### Changed
+- CLI client warning waits for keypress acknowledgment (non-blocking in headless mode)
+- Improved warning messages to accurately describe impact of missing MIDI configuration
+- Updated MIDI configuration instructions to match Pianoteq 9 UI (Edit → Preferences → Devices)
+
+## [1.3.0] - 2025-10-24
+
+### Added
+- Scrolling text support for GFX HAT display (marquee-style for long text)
+- `Preset.get_display_name()` method to strip instrument prefix from preset names
+- Tests for preset display name formatting
+
+### Changed
+- Improved display clarity by removing redundant instrument prefix from preset names
+- Enhanced scrolling text with better threading, configurable delays and wrap gaps
+- Improved code documentation for scrolling text components
+
 ## [1.2.0] - 2025-10-23
 
 ### Added

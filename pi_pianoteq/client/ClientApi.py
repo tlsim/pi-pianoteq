@@ -19,6 +19,10 @@ class ClientApi(ABC):
         raise NotImplemented
 
     @abstractmethod
+    def get_current_preset_display_name(self) -> str:
+        raise NotImplemented
+
+    @abstractmethod
     def set_instrument_next(self):
         raise NotImplemented
 

@@ -97,9 +97,10 @@ You can test commands without deploying:
 ```bash
 pipenv run python -m pi_pianoteq --show-config
 pipenv run python -m pi_pianoteq --init-config
+pipenv run python -m pi_pianoteq --cli  # Run CLI client for local testing
 ```
 
-**Note:** Full testing requires hardware (MIDI, gfxhat) which may not be available on your dev machine.
+**Note:** Full testing requires hardware (MIDI, gfxhat) which may not be available on your dev machine. Use `--cli` flag to run the CLI client for testing without the GFX HAT.
 
 ## What deploy.sh Does
 
@@ -117,8 +118,7 @@ The deployment script:
 When releasing a new version:
 
 1. Update version in `pyproject.toml`
-2. Update version in `deploy.sh` (two locations)
-3. Update `CHANGELOG.md`
+2. Update `CHANGELOG.md`
 4. Build and test
 5. Commit and tag
 

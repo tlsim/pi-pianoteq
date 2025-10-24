@@ -25,7 +25,16 @@ sed "s/{{USER}}/$USER/g" pi_pianoteq.service.template > pi_pianoteq.service
 
 echo "Deploying to $REMOTE..."
 
-scp dist/pi_pianoteq-1.2.0-py3-none-any.whl $REMOTE:/tmp/pi_pianoteq-1.2.0-py3-none-any.whl
+# Find the built wheel file (most recent)
+WHEEL_FILE=$(ls -t dist/pi_pianoteq-*-py3-none-any.whl | head -1)
+if [ -z "$WHEEL_FILE" ]; then
+    echo "Error: No wheel file found in dist/"
+    exit 1
+fi
+WHEEL_BASENAME=$(basename "$WHEEL_FILE")
+echo "Deploying $WHEEL_FILE..."
+
+scp "$WHEEL_FILE" $REMOTE:/tmp/$WHEEL_BASENAME
 scp pi_pianoteq.service $REMOTE:/tmp/pi_pianoteq.service
 
 ssh $REMOTE <<EOF
@@ -38,7 +47,7 @@ fi
 
 # Install/upgrade package in venv (dependencies will use system packages where available)
 echo "Installing pi_pianoteq into virtual environment..."
-"\$VENV_PATH/bin/pip" install --upgrade --force-reinstall --no-deps /tmp/pi_pianoteq-1.2.0-py3-none-any.whl
+"\$VENV_PATH/bin/pip" install --upgrade --force-reinstall --no-deps /tmp/$WHEEL_BASENAME
 
 # Update systemd service
 sudo mv /tmp/pi_pianoteq.service /etc/systemd/system/pi_pianoteq.service

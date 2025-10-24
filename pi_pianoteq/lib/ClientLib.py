@@ -47,6 +47,11 @@ class ClientLib(ClientApi):
     def get_current_preset(self) -> str:
         return self.selector.get_current_preset().name
 
+    def get_current_preset_display_name(self) -> str:
+        preset = self.selector.get_current_preset()
+        instrument = self.selector.get_current_instrument()
+        return preset.get_display_name(instrument.preset_prefix)
+
     def get_current_instrument(self) -> str:
         return self.selector.get_current_instrument().name
 
