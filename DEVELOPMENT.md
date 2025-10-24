@@ -102,19 +102,6 @@ pipenv run python -m pi_pianoteq --cli  # Run CLI client for local testing
 
 **Note:** Full testing requires hardware (MIDI, gfxhat) which may not be available on your dev machine. Use `--cli` flag to run the CLI client for testing without the GFX HAT.
 
-### MIDI Configuration
-
-After installing Pianoteq on your dev machine, enable the PI-PTQ MIDI port:
-
-1. Launch Pianoteq
-2. Go to **Edit → Preferences → Devices**
-3. Under "Active MIDI Inputs", check the box next to **PI-PTQ**
-4. Click OK
-
-This is a one-time setup. The setting persists in your Pianoteq preferences.
-
-**Note:** pi_pianoteq will warn you on startup if this is not configured, but will continue running.
-
 ## What deploy.sh Does
 
 The deployment script:
@@ -132,7 +119,6 @@ When releasing a new version:
 
 1. Update version in `pyproject.toml`
 2. Update `CHANGELOG.md`
-3. Update `todo` file with completed items
 4. Build and test
 5. Commit and tag
 
