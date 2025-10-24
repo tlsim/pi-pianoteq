@@ -30,17 +30,17 @@ class CliClient(Client):
 
         @kb.add('c-k')
         def kb_get_current(event):
-            self.text_area.text = f'Current Preset: {self.api.get_current_preset()}'
+            self.text_area.text = f'Current Preset: {self.api.get_current_preset_display_name()}'
 
         @kb.add('c-n')
         def kb_preset_next(event):
             self.api.set_preset_next()
-            self.text_area.text = f'Current Preset: {self.api.get_current_preset()}'
+            self.text_area.text = f'Current Preset: {self.api.get_current_preset_display_name()}'
 
         @kb.add('c-p')
         def kb_preset_prev(event):
             self.api.set_preset_prev()
-            self.text_area.text = f'Current Preset: {self.api.get_current_preset()}'
+            self.text_area.text = f'Current Preset: {self.api.get_current_preset_display_name()}'
 
         # Build a main application object.
         self.application = Application(
