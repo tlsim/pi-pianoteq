@@ -26,8 +26,23 @@ BUNDLED_CONFIG_PATH = Path(__file__).parent / CONFIG_FILE
 USER_INSTRUMENTS_PATH = USER_CONFIG_DIR / INSTRUMENTS_FILE
 BUNDLED_INSTRUMENTS_PATH = Path(__file__).parent / INSTRUMENTS_FILE
 
-# Default colors if not specified (using common piano colors from bundled config)
-# These provide visible backlight while being neutral
+# Color category mappings - preserves all existing instrument colors
+# Each category maps to (primary, secondary) hex color pairs
+COLOR_CATEGORIES = {
+    'piano': ('#040404', '#2e3234'),              # Modern grand/upright pianos
+    'electric-tines': ('#af2523', '#1b1b1b'),     # Vintage Tines/Reeds
+    'electric-keys': ('#cc481c', '#ea673b'),      # Clavinet, Pianet, Electra
+    'vibraphone': ('#735534', '#a68454'),         # Vibraphone
+    'percussion-mallet': ('#a67247', '#bf814e'),  # Celesta, Glockenspiel, Toy Piano, Kalimba
+    'percussion-wood': ('#732e1f', '#959998'),    # Marimba, Xylophone
+    'percussion-metal': ('#382d2b', '#6c2f1a'),   # Steel Drum, Spacedrum, Hand Pan, Tank Drum
+    'harpsichord': ('#251310', '#4d281b'),        # Harpsichord
+    'harp': ('#743620', '#b95d36'),               # Concert Harp
+    'historical': ('#33150f', '#73422e'),         # Historical pianos
+}
+
+# Default category and colors if not specified
+DEFAULT_CATEGORY = 'piano'
 DEFAULT_PRIMARY_COLOR = '#040404'    # Nearly black but visible
 DEFAULT_SECONDARY_COLOR = '#2e3234'  # Dark gray
 
@@ -126,16 +141,40 @@ class ConfigLoader:
             logger.warning(f"Instrument '{entry['name']}' missing required field 'preset_prefix', skipping")
             return None
 
-        # Optional color fields with defaults
-        primary = entry.get('background_primary', DEFAULT_PRIMARY_COLOR)
-        secondary = entry.get('background_secondary', DEFAULT_SECONDARY_COLOR)
+        # Determine colors: manual colors override category, category overrides defaults
+        primary = None
+        secondary = None
 
-        # Validate color formats
-        if not ConfigLoader._validate_hex_color(primary):
-            logger.warning(f"Instrument '{entry['name']}' has invalid background_primary '{primary}', using default")
+        # First, check if category is specified
+        if 'category' in entry:
+            category = entry['category']
+            if category in COLOR_CATEGORIES:
+                primary, secondary = COLOR_CATEGORIES[category]
+            else:
+                logger.warning(f"Instrument '{entry['name']}' has invalid category '{category}', using default")
+                primary, secondary = COLOR_CATEGORIES[DEFAULT_CATEGORY]
+
+        # Manual colors override category
+        if 'background_primary' in entry:
+            if ConfigLoader._validate_hex_color(entry['background_primary']):
+                primary = entry['background_primary']
+            else:
+                logger.warning(f"Instrument '{entry['name']}' has invalid background_primary '{entry['background_primary']}'")
+                if primary is None:  # Only use default if category didn't set it
+                    primary = DEFAULT_PRIMARY_COLOR
+
+        if 'background_secondary' in entry:
+            if ConfigLoader._validate_hex_color(entry['background_secondary']):
+                secondary = entry['background_secondary']
+            else:
+                logger.warning(f"Instrument '{entry['name']}' has invalid background_secondary '{entry['background_secondary']}'")
+                if secondary is None:  # Only use default if category didn't set it
+                    secondary = DEFAULT_SECONDARY_COLOR
+
+        # If neither category nor manual colors were provided, use defaults
+        if primary is None:
             primary = DEFAULT_PRIMARY_COLOR
-        if not ConfigLoader._validate_hex_color(secondary):
-            logger.warning(f"Instrument '{entry['name']}' has invalid background_secondary '{secondary}', using default")
+        if secondary is None:
             secondary = DEFAULT_SECONDARY_COLOR
 
         return {

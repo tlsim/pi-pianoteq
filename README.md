@@ -87,12 +87,23 @@ Pi-Pianoteq uses an `instruments.json` file to define which Pianoteq instruments
 
 ### Creating Your Custom Instruments File
 
-Initialize a customizable instruments file in your user config:
+**Step 1: See what you have**
+```bash
+python -m pi_pianoteq --show-instruments
+```
+
+This shows:
+- Which instruments are currently mapped
+- Unmapped presets you might want to add
+- Suggested JSON snippets with auto-detected categories
+- Unused instruments you can remove
+
+**Step 2: Initialize template (optional)**
 ```bash
 python -m pi_pianoteq --init-instruments
 ```
 
-This creates `~/.config/pi_pianoteq/instruments.json` as a starting template containing all bundled instruments.
+This creates `~/.config/pi_pianoteq/instruments.json` as a starting template containing all bundled instruments. You can then edit it to add/remove instruments based on the diagnostic report.
 
 ### Instruments File Priority
 
@@ -109,14 +120,12 @@ The `instruments.json` file is a JSON array of instrument objects:
   {
     "name": "Grand C. Bechstein DG",
     "preset_prefix": "C. Bechstein DG",
-    "background_primary": "#040404",
-    "background_secondary": "#2e3234"
+    "category": "piano"
   },
   {
     "name": "Vintage Tines MKI",
     "preset_prefix": "MKI",
-    "background_primary": "#af2523",
-    "background_secondary": "#1b1b1b"
+    "category": "electric-tines"
   }
 ]
 ```
@@ -125,9 +134,33 @@ The `instruments.json` file is a JSON array of instrument objects:
 - `name`: Display name shown in the interface
 - `preset_prefix`: String that must appear at the **start** of Pianoteq preset names to match this instrument
 
-**Optional Fields:**
-- `background_primary`: Hex color (`#RRGGBB`) for main backlight buttons (defaults to `#040404`)
-- `background_secondary`: Hex color (`#RRGGBB`) for edge backlight buttons (defaults to `#2e3234`)
+**Optional Fields (choose one approach):**
+
+**Easy Option - Use a Category:**
+- `category`: One of the predefined color categories (see below)
+
+**Advanced Option - Manual Colors:**
+- `background_primary`: Hex color (`#RRGGBB`) for main backlight buttons
+- `background_secondary`: Hex color (`#RRGGBB`) for edge backlight buttons
+
+**Note:** Manual colors override category. If neither is specified, defaults to `category: "piano"`.
+
+### Color Categories
+
+Instead of picking hex colors manually, use predefined categories that match the Pianoteq interface:
+
+| Category | Description | Primary | Secondary |
+|----------|-------------|---------|-----------|
+| `piano` | Modern grand/upright pianos | `#040404` | `#2e3234` |
+| `electric-tines` | Vintage Tines/Rhodes/Reeds | `#af2523` | `#1b1b1b` |
+| `electric-keys` | Clavinet, Pianet, Electra | `#cc481c` | `#ea673b` |
+| `vibraphone` | Vibraphone | `#735534` | `#a68454` |
+| `percussion-mallet` | Celesta, Glockenspiel, Kalimba | `#a67247` | `#bf814e` |
+| `percussion-wood` | Marimba, Xylophone | `#732e1f` | `#959998` |
+| `percussion-metal` | Steel Drum, Hand Pan, etc. | `#382d2b` | `#6c2f1a` |
+| `harpsichord` | Harpsichord | `#251310` | `#4d281b` |
+| `harp` | Concert Harp | `#743620` | `#b95d36` |
+| `historical` | Historical pianos | `#33150f` | `#73422e` |
 
 ### How Preset Matching Works
 
@@ -165,27 +198,33 @@ This means you can:
 **Only include instruments you own:**
 ```json
 [
-  {"name": "Grand K2", "preset_prefix": "K2", "background_primary": "#040404", "background_secondary": "#2e3234"},
-  {"name": "Vintage Tines MKI", "preset_prefix": "MKI", "background_primary": "#af2523", "background_secondary": "#1b1b1b"}
+  {"name": "Grand K2", "preset_prefix": "K2", "category": "piano"},
+  {"name": "Vintage Tines MKI", "preset_prefix": "MKI", "category": "electric-tines"}
 ]
 ```
 
 **Reorder by preference (e.g., most-used first):**
 ```json
 [
-  {"name": "Vintage Tines MKI", "preset_prefix": "MKI", ...},
-  {"name": "Grand K2", "preset_prefix": "K2", ...},
-  {"name": "Celesta", "preset_prefix": "Celesta", ...}
+  {"name": "Vintage Tines MKI", "preset_prefix": "MKI", "category": "electric-tines"},
+  {"name": "Grand K2", "preset_prefix": "K2", "category": "piano"},
+  {"name": "Celesta", "preset_prefix": "Celesta", "category": "percussion-mallet"}
 ]
 ```
 
-**Custom colors without full customization:**
+**Mix categories and manual colors:**
 ```json
 [
   {
     "name": "Grand K2",
-    "preset_prefix": "K2"
-    // Colors optional - will use defaults (#040404 and #2e3234)
+    "preset_prefix": "K2",
+    "category": "piano"  // Use predefined piano colors
+  },
+  {
+    "name": "Custom Electric",
+    "preset_prefix": "Custom",
+    "background_primary": "#ff0000",  // Custom bright red
+    "background_secondary": "#00ff00"  // Custom bright green
   }
 ]
 ```

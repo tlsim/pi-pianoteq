@@ -9,7 +9,8 @@ from pi_pianoteq.config import (
     BUNDLED_CONFIG_PATH,
     BUNDLED_INSTRUMENTS_PATH,
     DEFAULT_PRIMARY_COLOR,
-    DEFAULT_SECONDARY_COLOR
+    DEFAULT_SECONDARY_COLOR,
+    COLOR_CATEGORIES
 )
 
 
@@ -413,3 +414,107 @@ def test_init_user_instruments():
         assert "Created" in message
     else:
         assert "already exists" in message
+
+
+# Tests for category support
+
+def test_validate_instrument_entry_with_category():
+    """Test validation with category field"""
+    entry = {
+        'name': 'Test Piano',
+        'preset_prefix': 'Test',
+        'category': 'piano'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+
+    assert result is not None
+    assert result['name'] == 'Test Piano'
+    assert result['preset_prefix'] == 'Test'
+    # Should resolve piano category to its colors
+    assert result['background_primary'] == '#040404'
+    assert result['background_secondary'] == '#2e3234'
+
+
+def test_validate_instrument_entry_category_overrides_default():
+    """Test that category overrides defaults"""
+    entry = {
+        'name': 'Test Electric',
+        'preset_prefix': 'Test',
+        'category': 'electric-tines'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+
+    assert result is not None
+    # Should use electric-tines colors, not default piano colors
+    assert result['background_primary'] == '#af2523'
+    assert result['background_secondary'] == '#1b1b1b'
+
+
+def test_validate_instrument_entry_manual_colors_override_category():
+    """Test that manual colors override category"""
+    entry = {
+        'name': 'Test',
+        'preset_prefix': 'Test',
+        'category': 'piano',  # This would give #040404/#2e3234
+        'background_primary': '#ff0000',  # But manual color overrides
+        'background_secondary': '#00ff00'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+
+    assert result is not None
+    # Manual colors should win
+    assert result['background_primary'] == '#ff0000'
+    assert result['background_secondary'] == '#00ff00'
+
+
+def test_validate_instrument_entry_invalid_category():
+    """Test that invalid category falls back to default"""
+    entry = {
+        'name': 'Test',
+        'preset_prefix': 'Test',
+        'category': 'nonexistent-category'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+
+    assert result is not None
+    # Should fall back to default piano colors
+    assert result['background_primary'] == '#040404'
+    assert result['background_secondary'] == '#2e3234'
+
+
+def test_all_color_categories_defined():
+    """Test that all expected color categories are defined"""
+    expected_categories = [
+        'piano', 'electric-tines', 'electric-keys', 'vibraphone',
+        'percussion-mallet', 'percussion-wood', 'percussion-metal',
+        'harpsichord', 'harp', 'historical'
+    ]
+
+    for category in expected_categories:
+        assert category in COLOR_CATEGORIES
+        primary, secondary = COLOR_CATEGORIES[category]
+        # Verify colors are valid hex
+        assert ConfigLoader._validate_hex_color(primary)
+        assert ConfigLoader._validate_hex_color(secondary)
+
+
+def test_migrated_instruments_use_categories():
+    """Test that migrated bundled instruments.json uses categories"""
+    import json
+
+    with open(BUNDLED_INSTRUMENTS_PATH) as f:
+        instruments_json = json.load(f)
+
+    # Check that at least some instruments use the category field
+    categories_found = [inst.get('category') for inst in instruments_json if 'category' in inst]
+
+    assert len(categories_found) > 0, "Bundled instruments.json should use category field"
+
+    # All categories should be valid
+    for category in categories_found:
+        if category is not None:
+            assert category in COLOR_CATEGORIES, f"Invalid category '{category}' in bundled instruments.json"
