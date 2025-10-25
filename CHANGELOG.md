@@ -5,6 +5,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.4.1] - 2025-10-25
+
+### Fixed
+- Race condition in MIDI port detection by adding 2-second delay for Pianoteq to detect virtual port
+- Python output not appearing in systemd/journalctl logs by adding `-u` flag for unbuffered mode
+- Warning message instructions now clarify that pi_pianoteq must be running when enabling MIDI port
+
+### Changed
+- Updated systemd service documentation to include `-u` flag for unbuffered Python output
+- Improved MIDI configuration warning message clarity
+
 ## [1.4.0] - 2025-10-24
 
 ### Added

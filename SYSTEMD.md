@@ -21,7 +21,7 @@ Type=simple
 User=pi
 Group=pi
 ExecStartPre=cpupower frequency-set -g performance
-ExecStart=/usr/bin/python3 -m pi_pianoteq
+ExecStart=/usr/bin/python3 -u -m pi_pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
 PermissionsStartOnly=true
 LimitMEMLOCK=500000
@@ -37,7 +37,7 @@ WantedBy=graphical.target
 
 If you installed pi_pianoteq in a virtual environment, update the `ExecStart` line:
 ```ini
-ExecStart=/home/pi/venv/bin/python -m pi_pianoteq
+ExecStart=/home/pi/venv/bin/python -u -m pi_pianoteq
 ```
 
 ### 2. Enable and Start the Service
