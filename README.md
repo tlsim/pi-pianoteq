@@ -36,17 +36,19 @@ Note: `linux-cpupower` is required if using the systemd service (for CPU perform
 
 ### 3. Install pi_pianoteq
 
-Clone and install from source:
+Download the latest `.whl` file from [Releases](https://github.com/tlsim/pi-pianoteq/releases/latest) and install:
+```bash
+pip install pi_pianoteq-*.whl
+```
+
+Or install from source (for development):
 ```bash
 git clone https://github.com/tlsim/pi-pianoteq.git
 cd pi-pianoteq
 pip install .
 ```
 
-Or using pipenv (recommended for development):
-```bash
-pipenv install
-```
+See [DEVELOPMENT.md](DEVELOPMENT.md) for the full development workflow.
 
 ## Configuration
 
@@ -55,12 +57,7 @@ Initialize your configuration:
 python -m pi_pianoteq --init-config
 ```
 
-Edit the config file:
-```bash
-nano ~/.config/pi_pianoteq/pi_pianoteq.conf
-```
-
-Update the paths to match your Pianoteq installation:
+Edit `~/.config/pi_pianoteq/pi_pianoteq.conf` and update the paths to match your Pianoteq installation:
 
 ```ini
 [Pianoteq]
@@ -144,6 +141,10 @@ For developers who want to build and deploy to a remote Pi, see [DEVELOPMENT.md]
 - [SYSTEMD.md](SYSTEMD.md) - Running as a systemd service
 - [DEVELOPMENT.md](DEVELOPMENT.md) - Development and deployment workflow
 - [CHANGELOG.md](CHANGELOG.md) - Version history
+
+## Disclaimer
+
+This is an independent project and is not affiliated with, endorsed by, or sponsored by Modartt (the creators of Pianoteq). Pianoteq is a registered trademark of Modartt. This software interacts with Pianoteq via standard MIDI protocols.
 
 ## Requirements
 
