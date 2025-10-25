@@ -110,11 +110,18 @@ For usage without GFX HAT hardware, use the CLI client:
 python -m pi_pianoteq --cli
 ```
 
-Controls:
-- `Ctrl-K`: Show current preset
-- `Ctrl-N`: Next preset
-- `Ctrl-P`: Previous preset
-- `Ctrl-C`: Exit
+The CLI client provides a full-featured terminal interface with instrument selection:
+
+**Normal Mode Controls:**
+- `↑/↓` (or `Ctrl-P/N`): Navigate presets
+- `←/→` (or `Ctrl-B/F`): Quick instrument switch
+- `i` (or `Ctrl-I`): Open instrument selection menu
+- `q` (or `Ctrl-C`): Quit
+
+**Instrument Menu Controls:**
+- `↑/↓` (or `Ctrl-P/N`): Navigate menu
+- `Enter`: Select instrument
+- `Esc`, `q`, or `Ctrl-C`: Exit menu
 
 ### Run as a Service (Auto-start on Boot)
 

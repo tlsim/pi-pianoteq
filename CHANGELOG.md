@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.0] - 2025-10-25
+
+### Added
+- Full-featured instrument selection menu in CLI client (feature parity with GFX HAT)
+- Arrow key navigation (Up/Down for presets, Left/Right for instruments)
+- Emacs-style keybindings (Ctrl-P/N for presets, Ctrl-F/B for instruments, Ctrl-I for menu)
+- Two-mode CLI interface: Normal mode and Menu mode with scrollable instrument list
+
+### Changed
+- CLI client now uses prompt_toolkit Frame widget and formatted text tuples
+- Simplified on-screen help to show arrow keys (Emacs bindings still supported)
+
+### Removed
+- "Hello world" placeholder text from CLI client
+
 ## [1.4.1] - 2025-10-25
 
 ### Fixed
