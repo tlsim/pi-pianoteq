@@ -1,9 +1,16 @@
 import os
 import tempfile
+import json
 from pathlib import Path
 import pytest
 
-from pi_pianoteq.config import ConfigLoader, BUNDLED_CONFIG_PATH
+from pi_pianoteq.config import (
+    ConfigLoader,
+    BUNDLED_CONFIG_PATH,
+    BUNDLED_INSTRUMENTS_PATH,
+    DEFAULT_PRIMARY_COLOR,
+    DEFAULT_SECONDARY_COLOR
+)
 
 
 @pytest.fixture
@@ -279,4 +286,130 @@ def test_init_user_config_creates_file(tmp_path):
     else:
         # If not successful, it already existed
         assert USER_CONFIG_PATH.exists()
+        assert "already exists" in message
+
+
+# Tests for instruments loading and validation
+
+def test_bundled_instruments_exists():
+    """Test that bundled instruments.json file exists"""
+    assert BUNDLED_INSTRUMENTS_PATH.exists()
+
+
+def test_load_instruments_from_bundled():
+    """Test loading instruments from bundled default"""
+    instruments = ConfigLoader.load_instruments()
+
+    assert isinstance(instruments, list)
+    assert len(instruments) > 0
+
+    # Check first instrument has expected attributes
+    first = instruments[0]
+    assert hasattr(first, 'name')
+    assert hasattr(first, 'preset_prefix')
+    assert hasattr(first, 'background_primary')
+    assert hasattr(first, 'background_secondary')
+
+
+def test_validate_hex_color():
+    """Test hex color validation"""
+    assert ConfigLoader._validate_hex_color('#000000') is True
+    assert ConfigLoader._validate_hex_color('#FFFFFF') is True
+    assert ConfigLoader._validate_hex_color('#af2523') is True
+    assert ConfigLoader._validate_hex_color('#AF2523') is True
+
+    # Invalid formats
+    assert ConfigLoader._validate_hex_color('000000') is False  # Missing #
+    assert ConfigLoader._validate_hex_color('#00000') is False  # Too short
+    assert ConfigLoader._validate_hex_color('#0000000') is False  # Too long
+    assert ConfigLoader._validate_hex_color('#GGGGGG') is False  # Invalid hex
+    assert ConfigLoader._validate_hex_color('not a color') is False
+
+
+def test_validate_instrument_entry_valid():
+    """Test validation of valid instrument entry"""
+    entry = {
+        'name': 'Test Instrument',
+        'preset_prefix': 'Test',
+        'background_primary': '#000000',
+        'background_secondary': '#FFFFFF'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+
+    assert result is not None
+    assert result['name'] == 'Test Instrument'
+    assert result['preset_prefix'] == 'Test'
+    assert result['background_primary'] == '#000000'
+    assert result['background_secondary'] == '#FFFFFF'
+
+
+def test_validate_instrument_entry_missing_name():
+    """Test validation fails when name is missing"""
+    entry = {
+        'preset_prefix': 'Test',
+        'background_primary': '#000000',
+        'background_secondary': '#FFFFFF'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+    assert result is None
+
+
+def test_validate_instrument_entry_missing_preset_prefix():
+    """Test validation fails when preset_prefix is missing"""
+    entry = {
+        'name': 'Test Instrument',
+        'background_primary': '#000000',
+        'background_secondary': '#FFFFFF'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+    assert result is None
+
+
+def test_validate_instrument_entry_missing_colors():
+    """Test validation succeeds with default colors when colors are missing"""
+    entry = {
+        'name': 'Test Instrument',
+        'preset_prefix': 'Test'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+
+    assert result is not None
+    assert result['name'] == 'Test Instrument'
+    assert result['preset_prefix'] == 'Test'
+    assert result['background_primary'] == DEFAULT_PRIMARY_COLOR
+    assert result['background_secondary'] == DEFAULT_SECONDARY_COLOR
+
+
+def test_validate_instrument_entry_invalid_colors():
+    """Test validation replaces invalid colors with defaults"""
+    entry = {
+        'name': 'Test Instrument',
+        'preset_prefix': 'Test',
+        'background_primary': 'invalid',
+        'background_secondary': '#ZZZ'
+    }
+
+    result = ConfigLoader._validate_instrument_entry(entry, 0)
+
+    assert result is not None
+    assert result['background_primary'] == DEFAULT_PRIMARY_COLOR
+    assert result['background_secondary'] == DEFAULT_SECONDARY_COLOR
+
+
+def test_init_user_instruments():
+    """Test that init_user_instruments returns correct types"""
+    success, message = ConfigLoader.init_user_instruments()
+
+    assert isinstance(success, bool)
+    assert isinstance(message, str)
+
+    # If successful, message should mention created
+    # If not successful, should mention already exists
+    if success:
+        assert "Created" in message
+    else:
         assert "already exists" in message

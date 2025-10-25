@@ -2,7 +2,14 @@ import argparse
 import sys
 import time
 
-from pi_pianoteq.config import Config, ConfigLoader, USER_CONFIG_PATH, BUNDLED_CONFIG_PATH
+from pi_pianoteq.config import (
+    Config,
+    ConfigLoader,
+    USER_CONFIG_PATH,
+    BUNDLED_CONFIG_PATH,
+    USER_INSTRUMENTS_PATH,
+    BUNDLED_INSTRUMENTS_PATH
+)
 
 
 def show_config():
@@ -13,9 +20,16 @@ def show_config():
 
     # Show config file locations
     print("Config file locations:")
-    print(f"  User config:    {USER_CONFIG_PATH}")
-    print(f"                  {'[exists]' if USER_CONFIG_PATH.exists() else '[not found]'}")
+    print(f"  User config:     {USER_CONFIG_PATH}")
+    print(f"                   {'[exists]' if USER_CONFIG_PATH.exists() else '[not found]'}")
     print(f"  Bundled default: {BUNDLED_CONFIG_PATH}")
+    print()
+
+    # Show instruments file locations
+    print("Instruments file locations:")
+    print(f"  User instruments: {USER_INSTRUMENTS_PATH}")
+    print(f"                    {'[exists - using this]' if USER_INSTRUMENTS_PATH.exists() else '[not found]'}")
+    print(f"  Bundled default:  {BUNDLED_INSTRUMENTS_PATH}")
     print()
 
     # Show current values and their sources
@@ -56,6 +70,26 @@ def init_config():
     return 0 if success else 1
 
 
+def init_instruments():
+    """Initialize user instruments file"""
+    success, message = ConfigLoader.init_user_instruments()
+    print(message)
+    if success:
+        print()
+        print("Customize which instruments appear in the interface by editing:")
+        print(f"  {USER_INSTRUMENTS_PATH}")
+        print()
+        print("You can:")
+        print("  - Remove instruments you don't own")
+        print("  - Reorder instruments by preference")
+        print("  - Customize backlight colors")
+        print()
+        print("See README.md for details on the file format and prefix matching.")
+        print()
+        print("Restart pi_pianoteq for changes to take effect.")
+    return 0 if success else 1
+
+
 def main():
     parser = argparse.ArgumentParser(
         description="Pi-Pianoteq: Python/MIDI remote control for Pianoteq"
@@ -69,6 +103,11 @@ def main():
         '--init-config',
         action='store_true',
         help='Initialize user config file at ~/.config/pi_pianoteq/ and exit'
+    )
+    parser.add_argument(
+        '--init-instruments',
+        action='store_true',
+        help='Initialize user instruments.json file at ~/.config/pi_pianoteq/ and exit'
     )
     parser.add_argument(
         '--cli',
@@ -85,6 +124,9 @@ def main():
 
     if args.init_config:
         return init_config()
+
+    if args.init_instruments:
+        return init_instruments()
 
     # Normal startup - import hardware dependencies only when needed
     from rtmidi import MidiOut

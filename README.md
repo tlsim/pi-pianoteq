@@ -81,6 +81,131 @@ Configuration is loaded with the following priority (highest to lowest):
 
 User config persists across package upgrades.
 
+## Customizing Instruments
+
+Pi-Pianoteq uses an `instruments.json` file to define which Pianoteq instruments appear in the interface. You can customize this to match the instruments you own.
+
+### Creating Your Custom Instruments File
+
+Initialize a customizable instruments file in your user config:
+```bash
+python -m pi_pianoteq --init-instruments
+```
+
+This creates `~/.config/pi_pianoteq/instruments.json` as a starting template containing all bundled instruments.
+
+### Instruments File Priority
+
+Like config files, instruments are loaded with priority:
+1. User instruments (`~/.config/pi_pianoteq/instruments.json`) - if exists
+2. Bundled default - fallback
+
+### File Format
+
+The `instruments.json` file is a JSON array of instrument objects:
+
+```json
+[
+  {
+    "name": "Grand C. Bechstein DG",
+    "preset_prefix": "C. Bechstein DG",
+    "background_primary": "#040404",
+    "background_secondary": "#2e3234"
+  },
+  {
+    "name": "Vintage Tines MKI",
+    "preset_prefix": "MKI",
+    "background_primary": "#af2523",
+    "background_secondary": "#1b1b1b"
+  }
+]
+```
+
+**Required Fields:**
+- `name`: Display name shown in the interface
+- `preset_prefix`: String that must appear at the **start** of Pianoteq preset names to match this instrument
+
+**Optional Fields:**
+- `background_primary`: Hex color (`#RRGGBB`) for main backlight buttons (defaults to `#000000`)
+- `background_secondary`: Hex color (`#RRGGBB`) for edge backlight buttons (defaults to `#333333`)
+
+### How Preset Matching Works
+
+Presets are matched to instruments using **case-sensitive prefix matching** at position 0:
+
+- ✅ Preset "C. Bechstein DG Prelude" matches prefix "C. Bechstein DG"
+- ✅ Preset "MKI Classic" matches prefix "MKI"
+- ❌ Preset "My C. Bechstein DG" does NOT match "C. Bechstein DG" (prefix not at start)
+- ❌ Preset "c. bechstein dg" does NOT match "C. Bechstein DG" (case-sensitive)
+
+**⚠️ Critical: Order Matters!**
+
+The **first** matching instrument in the array wins. If you have overlapping prefixes, list more specific ones first:
+
+```json
+[
+  {"name": "C. Bechstein DG", "preset_prefix": "C. Bechstein DG"},  // More specific - list first
+  {"name": "C. Bechstein 1899", "preset_prefix": "C. Bechstein"}    // Less specific - list second
+]
+```
+
+If reversed, "C. Bechstein DG" presets would incorrectly match "C. Bechstein" first.
+
+### What Happens to Unmatched Presets?
+
+Presets that don't match any `preset_prefix` are **silently excluded** from the interface. Only instruments with at least one matched preset appear in the selector.
+
+This means you can:
+- Remove instruments you don't own (they won't appear if no presets match)
+- Add instruments you do own (they'll appear when presets match)
+- Organize instruments in your preferred order
+
+### Common Customization Examples
+
+**Only include instruments you own:**
+```json
+[
+  {"name": "Grand K2", "preset_prefix": "K2", "background_primary": "#040404", "background_secondary": "#2e3234"},
+  {"name": "Vintage Tines MKI", "preset_prefix": "MKI", "background_primary": "#af2523", "background_secondary": "#1b1b1b"}
+]
+```
+
+**Reorder by preference (e.g., most-used first):**
+```json
+[
+  {"name": "Vintage Tines MKI", "preset_prefix": "MKI", ...},
+  {"name": "Grand K2", "preset_prefix": "K2", ...},
+  {"name": "Celesta", "preset_prefix": "Celesta", ...}
+]
+```
+
+**Custom colors without full customization:**
+```json
+[
+  {
+    "name": "Grand K2",
+    "preset_prefix": "K2"
+    // Colors optional - will use defaults (#000000 and #333333)
+  }
+]
+```
+
+### Troubleshooting
+
+**My presets aren't appearing:**
+1. Check that `preset_prefix` exactly matches the start of your preset names (case-sensitive)
+2. Check for overlapping prefixes - more specific ones must come first
+3. Check for typos in the JSON syntax
+
+**Colors aren't working:**
+1. Ensure colors are in `#RRGGBB` format (e.g., `#af2523`, not `af2523` or `#af25`)
+2. If invalid, defaults will be used and a warning logged
+
+**My custom file isn't loading:**
+- Verify it exists at `~/.config/pi_pianoteq/instruments.json`
+- Check JSON syntax with a validator
+- If the file has errors, pi_pianoteq will fall back to the bundled default and log warnings
+
 ## MIDI Configuration
 
 After installing pi_pianoteq, you need to enable the PI-PTQ MIDI port in Pianoteq:
