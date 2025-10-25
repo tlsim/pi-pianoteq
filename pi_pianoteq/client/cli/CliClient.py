@@ -1,9 +1,9 @@
 from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import Layout
-from prompt_toolkit.layout.containers import HSplit, Window
+from prompt_toolkit.layout.containers import HSplit, Window, VSplit
 from prompt_toolkit.layout.controls import FormattedTextControl
-from prompt_toolkit.formatted_text import HTML
+from prompt_toolkit.widgets import Frame
 
 from pi_pianoteq.client.Client import Client
 from pi_pianoteq.client.ClientApi import ClientApi
@@ -41,10 +41,9 @@ class CliClient(Client):
             focusable=False
         )
 
-        # Create layout
-        root_container = HSplit([
-            Window(content=self.display_control, height=None),
-        ])
+        # Create layout with frame
+        content_window = Window(content=self.display_control)
+        root_container = Frame(content_window, title=self._get_title)
         layout = Layout(container=root_container)
 
         # Key bindings
@@ -162,6 +161,13 @@ class CliClient(Client):
             # Middle - center the selection
             self.menu_scroll_offset = self.current_menu_index - mid_point
 
+    def _get_title(self):
+        """Get frame title based on current mode"""
+        if self.menu_mode:
+            return "Select Instrument"
+        else:
+            return "Pi-Pianoteq CLI"
+
     def _get_display_text(self):
         """Generate display text based on current mode"""
         if self.menu_mode:
@@ -170,37 +176,33 @@ class CliClient(Client):
             return self._get_normal_text()
 
     def _get_normal_text(self):
-        """Generate normal mode display"""
+        """Generate normal mode display using formatted text tuples"""
         instrument = self.api.get_current_instrument()
         preset = self.api.get_current_preset_display_name()
 
-        return HTML(
-            f"<b><ansiblue>╔══════════════════════════════════════════════════════════════╗</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>  <ansicyan><u>Pi-Pianoteq CLI</u></ansicyan>                                          <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>╠══════════════════════════════════════════════════════════════╣</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>  <b>Instrument:</b> <ansigreen>{instrument:<45}</ansigreen> <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>  <b>Preset:</b>     <ansiyellow>{preset:<45}</ansiyellow> <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>╠══════════════════════════════════════════════════════════════╣</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>  <u>Controls:</u>                                                  <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>    ↑/↓ or Ctrl-P/N  : Navigate presets                      <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>    ←/→              : Quick instrument switch               <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>    <b>i</b> or Ctrl-I      : Open instrument menu                 <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>    Ctrl-K           : Refresh display                       <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>    <b>q</b> or Ctrl-C      : Quit                                  <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>\n"
-            f"<b><ansiblue>╚══════════════════════════════════════════════════════════════╝</ansiblue></b>\n"
-        )
+        # Use list of (style, text) tuples for proper formatting
+        lines = [
+            ('', '\n'),
+            ('bold cyan', 'Instrument:'), ('', '\n'),
+            ('ansigreen', f'  {instrument}'), ('', '\n'),
+            ('', '\n'),
+            ('bold cyan', 'Preset:'), ('', '\n'),
+            ('ansiyellow', f'  {preset}'), ('', '\n'),
+            ('', '\n'),
+            ('bold underline', 'Controls:'), ('', '\n'),
+            ('', '  Up/Down or Ctrl-P/N  : Navigate presets\n'),
+            ('', '  Left/Right           : Quick instrument switch\n'),
+            ('bold', '  i'), ('', ' or Ctrl-I         : Open instrument menu\n'),
+            ('', '  Ctrl-K               : Refresh display\n'),
+            ('bold', '  q'), ('', ' or Ctrl-C         : Quit\n'),
+            ('', '\n'),
+        ]
+
+        return lines
 
     def _get_menu_text(self):
-        """Generate menu mode display"""
-        lines = [
-            "<b><ansiblue>╔══════════════════════════════════════════════════════════════╗</ansiblue></b>",
-            "<b><ansiblue>║</ansiblue>  <ansicyan><u>Select Instrument</u></ansicyan>                                        <ansiblue>║</ansiblue></b>",
-            "<b><ansiblue>╠══════════════════════════════════════════════════════════════╣</ansiblue></b>",
-        ]
+        """Generate menu mode display using formatted text tuples"""
+        lines = [('', '\n')]
 
         # Calculate visible range
         start_idx = self.menu_scroll_offset
@@ -208,27 +210,21 @@ class CliClient(Client):
 
         # Add scroll indicator if needed
         if start_idx > 0:
-            lines.append("<b><ansiblue>║</ansiblue>  <ansigray>... (↑ for more)</ansigray>                                      <ansiblue>║</ansiblue></b>")
+            lines.append(('ansigray', '  ... (Up for more)\n'))
         else:
-            lines.append("<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>")
+            lines.append(('', '\n'))
 
         # Add visible menu items
         for i in range(start_idx, end_idx):
             instrument = self.instrument_names[i]
-            # Truncate long names
-            display_name = instrument[:52] if len(instrument) > 52 else instrument
+            # Truncate long names to fit in display
+            display_name = instrument[:58] if len(instrument) > 58 else instrument
 
             if i == self.current_menu_index:
                 # Highlight selected item
-                padding = 52 - len(display_name)
-                lines.append(
-                    f"<b><ansiblue>║</ansiblue>  <b><ansicyan>▶ {display_name}</ansicyan></b>{' ' * padding}  <ansiblue>║</ansiblue></b>"
-                )
+                lines.append(('bold cyan', f'  > {display_name}\n'))
             else:
-                padding = 54 - len(display_name)
-                lines.append(
-                    f"<b><ansiblue>║</ansiblue>    {display_name}{' ' * padding}<ansiblue>║</ansiblue></b>"
-                )
+                lines.append(('', f'    {display_name}\n'))
 
         # Fill remaining space if needed
         displayed_items = end_idx - start_idx
@@ -236,25 +232,24 @@ class CliClient(Client):
             displayed_items += 1  # Account for "..." line
 
         for _ in range(self.menu_visible_items - displayed_items):
-            lines.append("<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>")
+            lines.append(('', '\n'))
 
         # Add scroll indicator at bottom if needed
         if end_idx < len(self.instrument_names):
-            lines.append("<b><ansiblue>║</ansiblue>  <ansigray>... (↓ for more)</ansigray>                                      <ansiblue>║</ansiblue></b>")
+            lines.append(('ansigray', '  ... (Down for more)\n'))
         else:
-            lines.append("<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>")
+            lines.append(('', '\n'))
 
         lines.extend([
-            "<b><ansiblue>╠══════════════════════════════════════════════════════════════╣</ansiblue></b>",
-            "<b><ansiblue>║</ansiblue>  <u>Menu Controls:</u>                                            <ansiblue>║</ansiblue></b>",
-            "<b><ansiblue>║</ansiblue>    ↑/↓              : Navigate menu                          <ansiblue>║</ansiblue></b>",
-            "<b><ansiblue>║</ansiblue>    <b>Enter</b>            : Select instrument                      <ansiblue>║</ansiblue></b>",
-            "<b><ansiblue>║</ansiblue>    <b>Esc</b> or <b>q</b> or Ctrl-C: Exit menu                         <ansiblue>║</ansiblue></b>",
-            "<b><ansiblue>║</ansiblue>                                                              <ansiblue>║</ansiblue></b>",
-            "<b><ansiblue>╚══════════════════════════════════════════════════════════════╝</ansiblue></b>",
+            ('', '\n'),
+            ('bold underline', 'Menu Controls:'), ('', '\n'),
+            ('', '  Up/Down              : Navigate menu\n'),
+            ('bold', '  Enter'), ('', '                : Select instrument\n'),
+            ('bold', '  Esc'), ('', ' or '), ('bold', 'q'), ('', ' or Ctrl-C  : Exit menu\n'),
+            ('', '\n'),
         ])
 
-        return HTML("\n".join(lines))
+        return lines
 
     def _update_display(self):
         """Force display refresh"""
