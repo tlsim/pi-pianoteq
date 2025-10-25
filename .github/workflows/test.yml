@@ -29,5 +29,8 @@ jobs:
     - name: Install dependencies
       run: pipenv install --dev --deploy
 
+    - name: Install package in editable mode
+      run: pipenv run pip install -e .
+
     - name: Run tests
       run: pipenv run pytest
