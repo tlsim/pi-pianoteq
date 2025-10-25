@@ -5,6 +5,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.5.1] - 2025-10-25
+
+### Added
+- MIT License and disclaimer
+- GitHub Actions workflows for CI/CD
+- GitHub issues tracking future enhancements
+
+### Changed
+- Updated README with project background and improved documentation
+- Installation now uses releases instead of building from source
+- Archived old research files to separate branch
+
 ## [1.5.0] - 2025-10-25
 
 ### Added
