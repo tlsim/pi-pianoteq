@@ -123,8 +123,6 @@ The CLI client provides a full-featured terminal interface with instrument selec
 - `Enter`: Select instrument
 - `Esc`, `q`, or `Ctrl-C`: Exit menu
 
-> **Note:** Emacs-style keybindings (Ctrl-P/N/F/B/I) are supported for power users, but the on-screen help shows only the simpler arrow key equivalents.
-
 ### Run as a Service (Auto-start on Boot)
 
 See [SYSTEMD.md](SYSTEMD.md) for instructions on setting up a systemd service.
