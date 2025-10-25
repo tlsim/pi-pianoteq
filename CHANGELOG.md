@@ -9,24 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - Full-featured instrument selection menu in CLI client (feature parity with GFX HAT)
-- Arrow key navigation support for CLI client (Up/Down for presets, Left/Right for instruments)
-- Emacs-style keybindings for CLI client (Ctrl-P/N for presets, Ctrl-F/B for instruments)
-- Two-mode CLI interface: Normal mode (display + navigation) and Menu mode (instrument selection)
-- Visual selection indicator and scrollable menu in CLI client
-- Frame-based UI with dynamic titles in CLI client
+- Arrow key navigation (Up/Down for presets, Left/Right for instruments)
+- Emacs-style keybindings (Ctrl-P/N for presets, Ctrl-F/B for instruments, Ctrl-I for menu)
+- Two-mode CLI interface: Normal mode and Menu mode with scrollable instrument list
 
 ### Changed
-- CLI client now uses prompt_toolkit primitives instead of HTML formatting
+- CLI client now uses prompt_toolkit Frame widget and formatted text tuples
 - Simplified on-screen help to show arrow keys (Emacs bindings still supported)
-- Improved CLI client display with proper formatting and alignment
 
 ### Removed
-- Ctrl-K keybinding from CLI client (refresh was redundant)
 - "Hello world" placeholder text from CLI client
-
-### Fixed
-- XML parsing errors in CLI client when navigating instruments with special characters
-- UI alignment issues in CLI client
 
 ## [1.4.1] - 2025-10-25
 
