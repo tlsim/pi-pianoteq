@@ -1,5 +1,6 @@
 import argparse
 import sys
+import time
 
 from pi_pianoteq.config import Config, ConfigLoader, USER_CONFIG_PATH, BUNDLED_CONFIG_PATH
 
@@ -118,15 +119,20 @@ def main():
 
     client_lib = ClientLib(library, selector, program_change)
 
+    # Give Pianoteq time to detect the virtual MIDI port and update its prefs
+    time.sleep(2)
+
     # Check if PI-PTQ MIDI device is enabled in Pianoteq preferences
     if not is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE):
         print("⚠️  WARNING: PI-PTQ MIDI port not enabled in Pianoteq")
         print()
         print("Please enable it in Pianoteq preferences:")
-        print("  1. Open Pianoteq")
+        print("  1. With pi_pianoteq running, open Pianoteq")
         print("  2. Go to Edit → Preferences → Devices")
-        print("  3. Check the box next to \"PI-PTQ\" under Active MIDI Inputs")
-        print("  4. Click OK and restart pi_pianoteq")
+        print("  3. Enable the checkbox next to \"PI-PTQ\" under Active MIDI Inputs")
+        print("  4. Click OK")
+        print()
+        print("Note: You may need to restart the service after enabling the port.")
         print()
         print("Continuing anyway (preset/instrument changes won't work until configured)...")
         print()
