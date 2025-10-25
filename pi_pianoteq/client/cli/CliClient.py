@@ -87,12 +87,14 @@ class CliClient(Client):
             self._update_display()
 
         @kb.add('left')
+        @kb.add('c-b')
         def kb_left(event):
             if not self.menu_mode:
                 self.api.set_instrument_prev()
                 self._update_display()
 
         @kb.add('right')
+        @kb.add('c-f')
         def kb_right(event):
             if not self.menu_mode:
                 self.api.set_instrument_next()
@@ -121,11 +123,6 @@ class CliClient(Client):
                 self.api.set_instrument(selected_instrument)
                 self.menu_mode = False
                 self._update_display()
-
-        # Show current (keep for backwards compatibility)
-        @kb.add('c-k')
-        def kb_get_current(event):
-            self._update_display()
 
         # Build main application
         self.application = Application(
@@ -190,11 +187,10 @@ class CliClient(Client):
             ('ansiyellow', f'  {preset}'), ('', '\n'),
             ('', '\n'),
             ('bold underline', 'Controls:'), ('', '\n'),
-            ('', '  Up/Down or Ctrl-P/N  : Navigate presets\n'),
-            ('', '  Left/Right           : Quick instrument switch\n'),
-            ('bold', '  i'), ('', ' or Ctrl-I         : Open instrument menu\n'),
-            ('', '  Ctrl-K               : Refresh display\n'),
-            ('bold', '  q'), ('', ' or Ctrl-C         : Quit\n'),
+            ('', '  Up/Down     : Navigate presets\n'),
+            ('', '  Left/Right  : Quick instrument switch\n'),
+            ('bold', '  i'), ('', '           : Open instrument menu\n'),
+            ('bold', '  q'), ('', '           : Quit\n'),
             ('', '\n'),
         ]
 
@@ -243,9 +239,9 @@ class CliClient(Client):
         lines.extend([
             ('', '\n'),
             ('bold underline', 'Menu Controls:'), ('', '\n'),
-            ('', '  Up/Down              : Navigate menu\n'),
-            ('bold', '  Enter'), ('', '                : Select instrument\n'),
-            ('bold', '  Esc'), ('', ' or '), ('bold', 'q'), ('', ' or Ctrl-C  : Exit menu\n'),
+            ('', '  Up/Down  : Navigate menu\n'),
+            ('bold', '  Enter'), ('', '    : Select instrument\n'),
+            ('bold', '  Esc'), ('', ' or '), ('bold', 'q'), ('', ' : Exit menu\n'),
             ('', '\n'),
         ])
 

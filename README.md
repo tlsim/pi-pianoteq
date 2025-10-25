@@ -113,16 +113,17 @@ python -m pi_pianoteq --cli
 The CLI client provides a full-featured terminal interface with instrument selection:
 
 **Normal Mode Controls:**
-- `↑/↓` or `Ctrl-P/N`: Navigate presets
-- `←/→`: Quick instrument switch
-- `i` or `Ctrl-I`: Open instrument selection menu
-- `Ctrl-K`: Refresh display
-- `q` or `Ctrl-C`: Quit
+- `↑/↓` (or `Ctrl-P/N`): Navigate presets
+- `←/→` (or `Ctrl-B/F`): Quick instrument switch
+- `i` (or `Ctrl-I`): Open instrument selection menu
+- `q` (or `Ctrl-C`): Quit
 
 **Instrument Menu Controls:**
-- `↑/↓`: Navigate menu
+- `↑/↓` (or `Ctrl-P/N`): Navigate menu
 - `Enter`: Select instrument
-- `Esc` or `q` or `Ctrl-C`: Exit menu
+- `Esc`, `q`, or `Ctrl-C`: Exit menu
+
+> **Note:** Emacs-style keybindings (Ctrl-P/N/F/B/I) are supported for power users, but the on-screen help shows only the simpler arrow key equivalents.
 
 ### Run as a Service (Auto-start on Boot)
 
