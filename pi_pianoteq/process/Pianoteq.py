@@ -32,6 +32,7 @@ class Pianoteq:
         args = [self.executable, '--midimapping', self.mapping_name]
         if self.headless:
             args.append('--headless')
+        args.extend(['--serve', ''])  # Enable JSON-RPC API on localhost:8081 (empty string = default)
         self.process = subprocess.Popen(args,
                                         stdout=subprocess.PIPE,
                                         stderr=subprocess.PIPE)

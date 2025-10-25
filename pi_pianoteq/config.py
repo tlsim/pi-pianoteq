@@ -1,14 +1,18 @@
 import json
+import logging
 import os
+import re
 import shutil
 from configparser import ConfigParser
 from os import path
 from pathlib import Path
 from typing import List, Optional, Dict, Tuple
 from pi_pianoteq.instrument.Instrument import Instrument
+from pi_pianoteq.instrument.Preset import Preset
+
+logger = logging.getLogger(__name__)
 
 CONFIG_FILE = 'pi_pianoteq.conf'
-INSTRUMENTS_FILE = 'instruments.json'
 PTQ_SECTION = 'Pianoteq'
 MIDI_SECTION = 'Midi'
 SYSTEM_SECTION = 'System'
@@ -17,6 +21,126 @@ SYSTEM_SECTION = 'System'
 USER_CONFIG_DIR = Path.home() / '.config' / 'pi_pianoteq'
 USER_CONFIG_PATH = USER_CONFIG_DIR / CONFIG_FILE
 BUNDLED_CONFIG_PATH = Path(__file__).parent / CONFIG_FILE
+
+
+# Color category mappings - preserves all existing instrument colors
+# Each category maps to (primary, secondary) hex color pairs
+COLOR_CATEGORIES = {
+    'piano': ('#040404', '#2e3234'),              # Modern grand/upright pianos
+    'electric-tines': ('#af2523', '#1b1b1b'),     # Vintage Tines/Reeds
+    'electric-keys': ('#cc481c', '#ea673b'),      # Clavinet, Pianet, Electra
+    'vibraphone': ('#735534', '#a68454'),         # Vibraphone
+    'percussion-mallet': ('#a67247', '#bf814e'),  # Celesta, Glockenspiel, Toy Piano, Kalimba
+    'percussion-wood': ('#732e1f', '#959998'),    # Marimba, Xylophone
+    'percussion-metal': ('#382d2b', '#6c2f1a'),   # Steel Drum, Spacedrum, Hand Pan, Tank Drum
+    'harpsichord': ('#251310', '#4d281b'),        # Harpsichord
+    'harp': ('#743620', '#b95d36'),               # Concert Harp
+    'historical': ('#33150f', '#73422e'),         # Historical pianos
+}
+
+# Default category and colors if not specified
+DEFAULT_CATEGORY = 'piano'
+DEFAULT_PRIMARY_COLOR = '#040404'    # Nearly black but visible
+DEFAULT_SECONDARY_COLOR = '#2e3234'  # Dark gray
+
+
+def map_instrument_to_category(instr_name: str, preset_class: str) -> str:
+    """
+    Map Pianoteq API instrument name + class to color category.
+
+    Preserves all 37 existing instrument colors via hardcoded mappings.
+    Uses smart heuristics for new instruments not in the original config.
+
+    Args:
+        instr_name: Instrument name from API 'instr' field
+        preset_class: Instrument class from API 'class' field
+
+    Returns:
+        Color category name (one of COLOR_CATEGORIES keys)
+    """
+    # Preserve all 37 original instrument→category mappings
+    KNOWN_INSTRUMENTS = {
+        'Grand C. Bechstein DG': 'piano',
+        'Grand Ant. Petrof': 'piano',
+        'Grand Steingraeber': 'piano',
+        'Grand Grotrian': 'piano',
+        'Grand Blüthner': 'piano',
+        'Grand YC5': 'piano',
+        'Grand K2': 'piano',
+        'Upright U4': 'piano',
+        'Vintage Tines MKI': 'electric-tines',
+        'Vintage Tines MKII': 'electric-tines',
+        'Vintage Reeds': 'electric-tines',
+        'Clavinet D6': 'electric-keys',
+        'Pianet N': 'electric-keys',
+        'Pianet T': 'electric-keys',
+        'Electra-Piano': 'electric-keys',
+        'Vibraphone V-B': 'vibraphone',
+        'Vibraphone V-M': 'vibraphone',
+        'Celesta': 'percussion-mallet',
+        'Glockenspiel': 'percussion-mallet',
+        'Toy Piano': 'percussion-mallet',
+        'Kalimba': 'percussion-mallet',
+        'Marimba': 'percussion-wood',
+        'Xylophone': 'percussion-wood',
+        'Steel Drum': 'percussion-metal',
+        'Spacedrum': 'percussion-metal',
+        'Hand Pan': 'percussion-metal',
+        'Tank Drum': 'percussion-metal',
+        'H. Ruckers II Harpsichord': 'harpsichord',
+        'Concert Harp': 'harp',
+        'J. Dohnal (1795)': 'historical',
+        'I. Besendorfer (1829)': 'historical',
+        'S. Erard (1849)': 'historical',
+        'J.B. Streicher (1852)': 'historical',
+        'J. Broadwood (1796)': 'historical',
+        'I. Pleyel (1835)': 'historical',
+        'J. Frenzel (1841)': 'historical',
+        'C. Bechstein (1899)': 'historical',
+    }
+
+    # Check if this is a known instrument (preserves original colors)
+    if instr_name in KNOWN_INSTRUMENTS:
+        return KNOWN_INSTRUMENTS[instr_name]
+
+    # Smart detection for new instruments based on API class + name
+    name_lower = instr_name.lower()
+
+    if preset_class == "Acoustic Piano":
+        return "piano"
+
+    elif preset_class == "Historical Piano":
+        return "historical"
+
+    elif preset_class == "Electric Piano":
+        # Distinguish Tines from Keys based on instrument name
+        if any(kw in name_lower for kw in ['tines', 'rhodes', 'reeds', 'wurlitzer']):
+            return "electric-tines"
+        else:
+            return "electric-keys"
+
+    elif preset_class == "Chromatic Percussion":
+        # Smart detection based on instrument name
+        if 'vibraphone' in name_lower or 'vibes' in name_lower:
+            return "vibraphone"
+        elif any(kw in name_lower for kw in ['marimba', 'xylophone']):
+            return "percussion-wood"
+        else:
+            return "percussion-mallet"
+
+    elif preset_class == "Steelpan":
+        return "percussion-metal"
+
+    elif preset_class == "Piano Predecessor":
+        if 'harpsichord' in name_lower:
+            return "harpsichord"
+        elif 'harp' in name_lower:
+            return "harp"
+        else:
+            return "historical"
+
+    # Safe default for unknown types
+    return "piano"
 
 
 class ConfigLoader:
@@ -89,14 +213,83 @@ class ConfigLoader:
         return self._config_sources.copy()
 
     @staticmethod
-    def load_instruments() -> List[Instrument]:
-        """Load instrument definitions from bundled JSON file"""
-        with open(path.join(path.dirname(__file__), INSTRUMENTS_FILE)) as instruments:
-            instruments_json = json.load(instruments)
-            return [
-                Instrument(i["name"], i["preset_prefix"], i["background_primary"], i["background_secondary"])
-                for i in instruments_json
-            ]
+    def discover_instruments_from_api(jsonrpc_client, include_demo: bool = False, skip_fallback: bool = False) -> List[Instrument]:
+        """
+        Discover instruments via Pianoteq JSON-RPC API.
+
+        Automatically groups presets by instrument and assigns colors based on
+        instrument type. Preserves all original color mappings for known instruments.
+
+        Args:
+            jsonrpc_client: PianoteqJsonRpc instance for querying Pianoteq
+            include_demo: If False, filter out demo/trial instruments (default: False)
+
+        Returns:
+            List of Instrument objects with presets already grouped and colors assigned
+
+        Note: If no licensed instruments are found and include_demo=False, will
+        automatically retry with include_demo=True to provide a working first-run
+        experience.
+        """
+        from pi_pianoteq.jsonrpc_client import PianoteqJsonRpcError
+
+        try:
+            presets = jsonrpc_client.get_presets()
+        except PianoteqJsonRpcError as e:
+            logger.error(f"Failed to fetch presets from Pianoteq API: {e}")
+            logger.error("Make sure Pianoteq is running with --serve flag")
+            return []
+
+        # Group presets by 'instr' field (authoritative instrument name from API)
+        # Maintain order as returned by API
+        instruments_dict = {}  # {instr_name: Instrument}
+        preset_order = []  # Track order for maintaining API sorting
+
+        for preset_data in presets:
+            instr_name = preset_data['instr']
+            license_status = preset_data.get('license_status', 'unknown')
+
+            # Filter demos unless requested
+            # license_status values:
+            #   "ok" = fully licensed and usable
+            #   "demo" = limited demo (some keys silenced, not fully functional)
+            # Only include instruments with "ok" status (actually licensed/purchased)
+            if not include_demo and license_status != 'ok':
+                continue
+
+            # Create instrument on first encounter
+            if instr_name not in instruments_dict:
+                # Auto-assign category based on name + class
+                category = map_instrument_to_category(instr_name, preset_data['class'])
+                primary, secondary = COLOR_CATEGORIES[category]
+
+                instrument = Instrument(
+                    name=instr_name,
+                    preset_prefix=instr_name,  # Use exact instrument name for matching
+                    bg_primary=primary,
+                    bg_secondary=secondary
+                )
+                instruments_dict[instr_name] = instrument
+                preset_order.append(instr_name)
+
+                logger.debug(f"Discovered instrument: {instr_name} (category: {category})")
+
+            # Add preset to instrument
+            preset = Preset(preset_data['name'])
+            instruments_dict[instr_name].add_preset(preset)
+
+        # Return instruments in API order (order first encountered)
+        result = [instruments_dict[name] for name in preset_order]
+
+        logger.info(f"Discovered {len(result)} instruments from Pianoteq API")
+
+        # Fallback: If no instruments found (all demos filtered out), retry with demos
+        # But only if skip_fallback is False (not during retry loops)
+        if not result and not include_demo and not skip_fallback:
+            logger.info("No licensed instruments found, including demo instruments")
+            return ConfigLoader.discover_instruments_from_api(jsonrpc_client, include_demo=True, skip_fallback=True)
+
+        return result
 
     @staticmethod
     def init_user_config() -> Tuple[bool, str]:

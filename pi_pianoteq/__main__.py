@@ -3,7 +3,13 @@ import logging
 import sys
 import time
 
-from pi_pianoteq.config import Config, ConfigLoader, USER_CONFIG_PATH, BUNDLED_CONFIG_PATH
+from pi_pianoteq.config import (
+    Config,
+    ConfigLoader,
+    USER_CONFIG_PATH,
+    BUNDLED_CONFIG_PATH
+)
+
 from pi_pianoteq.logging_config import setup_logging
 
 logger = logging.getLogger(__name__)
@@ -17,8 +23,8 @@ def show_config():
 
     # Show config file locations
     print("Config file locations:")
-    print(f"  User config:    {USER_CONFIG_PATH}")
-    print(f"                  {'[exists]' if USER_CONFIG_PATH.exists() else '[not found]'}")
+    print(f"  User config:     {USER_CONFIG_PATH}")
+    print(f"                   {'[exists]' if USER_CONFIG_PATH.exists() else '[not found]'}")
     print(f"  Bundled default: {BUNDLED_CONFIG_PATH}")
     print()
 
@@ -111,14 +117,77 @@ def main():
         from pi_pianoteq.client.gfxhat.GfxhatClient import GfxhatClient
 
     pianoteq = Pianoteq()
-    library = Library(pianoteq.get_presets(), Config.load_instruments())
-    selector = Selector(library.get_instruments())
-    mapping = MappingBuilder(library).build()
-    Writer(mapping).write()
 
     logger.info("Pianoteq version: %s", pianoteq.get_version())
 
+    # Start Pianoteq with --serve flag for JSON-RPC API
     pianoteq.start()
+
+    # Discover instruments via JSON-RPC API with retry logic
+    # Don't wait before first attempt - this reduces startup delay
+    from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
+    jsonrpc = PianoteqJsonRpc()
+
+    # Try multiple times with delay between attempts
+    # Keep trying until we get a stable count (licenses fully loaded)
+    # or we hit max attempts
+    instruments = []
+    last_count = 0
+    stable_count = 0
+
+    for attempt in range(8):  # Increased to 8 attempts for slower Pi startup
+        try:
+            instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=False, skip_fallback=True)
+            current_count = len(instruments)
+
+            # If count is stable for 2 consecutive attempts, consider it loaded
+            if current_count > 0 and current_count == last_count:
+                stable_count += 1
+                if stable_count >= 2:
+                    print(f"✓ Discovered {current_count} instruments from Pianoteq API")
+                    break
+            else:
+                stable_count = 0
+
+            last_count = current_count
+
+            # If no instruments yet, or count changed, try again
+            if attempt < 7:
+                if current_count == 0:
+                    print(f"No licensed instruments found yet, retrying ({attempt + 1}/8)...")
+                else:
+                    print(f"Found {current_count} instruments, waiting for licenses to finish loading...")
+                time.sleep(0.5)
+        except Exception as e:
+            if attempt < 7:
+                print(f"API connection attempt {attempt + 1}/8 failed, retrying...")
+                time.sleep(0.5)
+            else:
+                print(f"Failed to connect after 8 attempts: {e}")
+
+    # Final fallback: if still no instruments, try with demos included
+    if not instruments:
+        print("No licensed instruments found after retries, trying with demos...")
+        instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=True)
+
+    # Check if we successfully discovered any instruments
+    if not instruments:
+        print("ERROR: No instruments discovered from Pianoteq API!")
+        print()
+        print("This usually means:")
+        print("  1. Pianoteq failed to start or crashed during startup")
+        print("  2. Pianoteq's --serve flag didn't enable the JSON-RPC server")
+        print("  3. No instruments are licensed (all show as 'demo' status)")
+        print()
+        print("Please check the logs above for error messages.")
+        pianoteq.terminate()
+        return 1
+
+    # Build library with discovered instruments (already grouped with presets)
+    library = Library(instruments)
+    selector = Selector(library.get_instruments())
+    mapping = MappingBuilder(library).build()
+    Writer(mapping).write()
 
     midiout = MidiOut()
     midiout.open_virtual_port(Config.MIDI_PORT_NAME)
@@ -126,7 +195,7 @@ def main():
 
     client_lib = ClientLib(library, selector, program_change)
 
-    # Give Pianoteq time to detect the virtual MIDI port and update its prefs
+    # Give Pianoteq a bit more time to detect the virtual MIDI port and update its prefs
     time.sleep(2)
 
     # Check if PI-PTQ MIDI device is enabled in Pianoteq preferences
