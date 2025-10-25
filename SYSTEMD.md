@@ -18,8 +18,8 @@ Description = Service for pi_pianoteq
 
 [Service]
 Type=simple
-User=pi
-Group=pi
+User=<username>
+Group=<username>
 ExecStartPre=cpupower frequency-set -g performance
 ExecStart=/usr/bin/python3 -u -m pi_pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
@@ -33,11 +33,11 @@ Nice=-10
 WantedBy=graphical.target
 ```
 
-**Important:** Replace `User=pi` and `Group=pi` with your username if different.
+**Important:** Replace `<username>` with your Raspberry Pi username.
 
 If you installed pi_pianoteq in a virtual environment, update the `ExecStart` line:
 ```ini
-ExecStart=/home/pi/venv/bin/python -u -m pi_pianoteq
+ExecStart=/home/<username>/venv/bin/python -u -m pi_pianoteq
 ```
 
 ### 2. Enable and Start the Service

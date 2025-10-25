@@ -44,11 +44,11 @@ Create `deploy.conf` with your Pi's connection details:
 
 ```ini
 [Deploy]
-USER = pi
-PI_HOST = 192.168.0.169
+USER = <username>
+PI_HOST = <hostname-or-ip>
 ```
 
-Replace with your Pi's username and IP address.
+Replace `<username>` with your Raspberry Pi username and `<hostname-or-ip>` with your Pi's hostname or IP address.
 
 ## Building and Deploying
 

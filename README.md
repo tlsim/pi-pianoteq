@@ -2,10 +2,18 @@
 
 Pi-Pianoteq is a Python/MIDI remote control for Pianoteq on Raspberry Pi.
 
+## About
+
+Pi-Pianoteq provides a simplified hardware interface for controlling Pianoteq on a Raspberry Pi 4B using the [Pimoroni GFX HAT](https://github.com/pimoroni/gfx-hat) - a HAT with 128x64 LCD display, 6 touch buttons and RGB backlight. After configuration, you can run Pianoteq without needing a monitor, using the GFX HAT as your interface.
+
+This project was built in 2019 as a personal learning project, before Pianoteq's jsonRPC API existed. Instead of using the API, it works by generating MIDI mapping files for Pianoteq and sending MIDI control change messages over a virtual rtmidi port. The scope is intentionally limited to instrument and preset selection - it's designed for the Pianoteq STAGE workflow (playing rather than deep customization).
+
+A CLI client is also included for testing and development without the GFX HAT hardware.
+
 ## Features
 
-- Control Pianoteq via MIDI virtual port
-- [GFX HAT](https://github.com/pimoroni/gfx-hat) interface for instrument/preset selection
+- GFX HAT hardware interface (primary) and CLI client (testing/development)
+- MIDI virtual port communication
 - Flexible configuration system
 - Headless operation support
 - Systemd service for auto-start on boot
@@ -140,10 +148,10 @@ For developers who want to build and deploy to a remote Pi, see [DEVELOPMENT.md]
 ## Requirements
 
 - Python 3.13+
-- Pianoteq (any version)
+- Pianoteq (any version, designed for STAGE)
 - Raspberry Pi (tested on Pi 4B) with:
   - python3-rtmidi (system package)
-  - [Pimoroni GFX HAT](https://github.com/pimoroni/gfx-hat) (optional, for hardware interface)
+  - [Pimoroni GFX HAT](https://github.com/pimoroni/gfx-hat) (for primary hardware interface; CLI available for testing without it)
 
 ## License
 
