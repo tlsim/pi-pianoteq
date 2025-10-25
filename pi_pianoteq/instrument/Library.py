@@ -1,9 +1,11 @@
-from sys import stderr
 from typing import List, Dict
+import logging
 
 from pi_pianoteq.instrument.Instrument import Instrument
 from pi_pianoteq.instrument.Preset import Preset
 from pi_pianoteq.midi.util import program_numbers_by_channel
+
+logger = logging.getLogger(__name__)
 
 
 class Library:
@@ -30,6 +32,8 @@ class Library:
                 try:
                     preset.midi_channel, preset.midi_program_number = next(generator)
                 except StopIteration:
-                    print('Failed to assign midi program change number to all presets - '
-                          'there were insufficient channels / program numbers available', file=stderr)
+                    logger.error(
+                        'Failed to assign midi program change number to all presets - '
+                        'there were insufficient channels / program numbers available'
+                    )
                     return
