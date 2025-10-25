@@ -126,8 +126,8 @@ The `instruments.json` file is a JSON array of instrument objects:
 - `preset_prefix`: String that must appear at the **start** of Pianoteq preset names to match this instrument
 
 **Optional Fields:**
-- `background_primary`: Hex color (`#RRGGBB`) for main backlight buttons (defaults to `#000000`)
-- `background_secondary`: Hex color (`#RRGGBB`) for edge backlight buttons (defaults to `#333333`)
+- `background_primary`: Hex color (`#RRGGBB`) for main backlight buttons (defaults to `#040404`)
+- `background_secondary`: Hex color (`#RRGGBB`) for edge backlight buttons (defaults to `#2e3234`)
 
 ### How Preset Matching Works
 
@@ -185,7 +185,7 @@ This means you can:
   {
     "name": "Grand K2",
     "preset_prefix": "K2"
-    // Colors optional - will use defaults (#000000 and #333333)
+    // Colors optional - will use defaults (#040404 and #2e3234)
   }
 ]
 ```

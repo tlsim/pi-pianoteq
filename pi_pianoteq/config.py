@@ -26,9 +26,10 @@ BUNDLED_CONFIG_PATH = Path(__file__).parent / CONFIG_FILE
 USER_INSTRUMENTS_PATH = USER_CONFIG_DIR / INSTRUMENTS_FILE
 BUNDLED_INSTRUMENTS_PATH = Path(__file__).parent / INSTRUMENTS_FILE
 
-# Default colors if not specified
-DEFAULT_PRIMARY_COLOR = '#000000'
-DEFAULT_SECONDARY_COLOR = '#333333'
+# Default colors if not specified (using common piano colors from bundled config)
+# These provide visible backlight while being neutral
+DEFAULT_PRIMARY_COLOR = '#040404'    # Nearly black but visible
+DEFAULT_SECONDARY_COLOR = '#2e3234'  # Dark gray
 
 
 class ConfigLoader:
