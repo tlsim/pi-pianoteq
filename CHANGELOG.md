@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.6.0] - 2025-10-26
+
+### Added
+- Automatic instrument discovery via Pianoteq JSON-RPC API (replaces manual instruments.json configuration)
+- Structured logging system with timestamps, module names, and log levels
+- `--include-demo` CLI flag to include demo instruments with limited functionality
+- Smart retry logic with stable count detection for instrument loading
+- Configurable log level via `PI_PIANOTEQ_LOG_LEVEL` environment variable
+
+### Changed
+- Pianoteq now starts with `--serve` flag to enable JSON-RPC API
+- Instruments and presets automatically discovered from running Pianoteq instance
+- Only licensed instruments shown by default (demo instruments filtered out)
+- INFO/DEBUG logs sent to stdout, WARNING/ERROR logs sent to stderr
+- Simplified command-line options documentation in README
+
+### Removed
+- Manual `instruments.json` configuration file (automatic discovery replaces it)
+- `--init-instruments` and `--show-instruments` CLI commands (no longer needed)
+
 ## [1.5.1] - 2025-10-25
 
 ### Added

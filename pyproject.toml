@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "pi_pianoteq"
-version = "1.5.1"
+version = "1.6.0"
 description = "An rtmidi based remote control for Pianoteq"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -37,4 +37,4 @@ Source = "https://github.com/tlsim/pi-pianoteq"
 packages = ["pi_pianoteq", "pi_pianoteq.client", "pi_pianoteq.client.cli", "pi_pianoteq.client.gfxhat", "pi_pianoteq.instrument", "pi_pianoteq.lib", "pi_pianoteq.mapping", "pi_pianoteq.midi", "pi_pianoteq.process", "pi_pianoteq.util"]
 
 [tool.setuptools.package-data]
-pi_pianoteq = ["instruments.json", "pi_pianoteq.conf"]
+pi_pianoteq = ["pi_pianoteq.conf"]
