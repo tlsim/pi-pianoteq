@@ -194,8 +194,13 @@ class ConfigLoader:
         The JSON should be an array of objects with these fields:
         - name (required): Display name of the instrument
         - preset_prefix (required): String prefix for matching Pianoteq presets
-        - background_primary (optional): Hex color for primary backlight (#RRGGBB)
-        - background_secondary (optional): Hex color for secondary backlight (#RRGGBB)
+        - category (optional): Color category name (e.g., 'piano', 'electric-tines')
+        - background_primary (optional): Hex color for center LED zones (#RRGGBB)
+        - background_secondary (optional): Hex color for edge LED zones (#RRGGBB)
+
+        Note: Manual colors override category. The GFX HAT has 6 RGB LED zones
+        behind the display creating a horizontal gradient from secondary (edges)
+        to primary (center).
 
         Returns:
             List of validated Instrument objects

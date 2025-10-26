@@ -83,119 +83,25 @@ User config persists across package upgrades.
 
 ## Customizing Instruments
 
-Pi-Pianoteq uses an `instruments.json` file to define which Pianoteq instruments appear in the interface. You can customize this to match the instruments you own.
+Pi-Pianoteq allows you to customize which Pianoteq instruments appear in the interface based on which instruments you own.
 
-### Creating Your Custom Instruments File
+### Quick Start
 
-**Step 1: See what you have**
+**1. See what you have:**
 ```bash
 python -m pi_pianoteq --show-instruments
 ```
 
-This shows:
-- Which instruments are currently mapped
-- Unmapped presets you might want to add
-- Suggested JSON snippets with auto-detected categories
-- Unused instruments you can remove
+Shows mapped instruments, unmapped presets, and copy-paste ready JSON suggestions.
 
-**Step 2: Initialize template (optional)**
+**2. Create custom config:**
 ```bash
 python -m pi_pianoteq --init-instruments
 ```
 
-This creates `~/.config/pi_pianoteq/instruments.json` as a starting template containing all bundled instruments. You can then edit it to add/remove instruments based on the diagnostic report.
+Creates `~/.config/pi_pianoteq/instruments.json` for you to edit.
 
-### Instruments File Priority
-
-Like config files, instruments are loaded with priority:
-1. User instruments (`~/.config/pi_pianoteq/instruments.json`) - if exists
-2. Bundled default - fallback
-
-### File Format
-
-The `instruments.json` file is a JSON array of instrument objects:
-
-```json
-[
-  {
-    "name": "Grand C. Bechstein DG",
-    "preset_prefix": "C. Bechstein DG",
-    "category": "piano"
-  },
-  {
-    "name": "Vintage Tines MKI",
-    "preset_prefix": "MKI",
-    "category": "electric-tines"
-  }
-]
-```
-
-**Required Fields:**
-- `name`: Display name shown in the interface
-- `preset_prefix`: String that must appear at the **start** of Pianoteq preset names to match this instrument
-
-**Optional Fields (choose one approach):**
-
-**Easy Option - Use a Category:**
-- `category`: One of the predefined color categories (see below)
-
-**Advanced Option - Manual Colors:**
-- `background_primary`: Hex color (`#RRGGBB`) for main backlight buttons
-- `background_secondary`: Hex color (`#RRGGBB`) for edge backlight buttons
-
-**Note:** Manual colors override category. If neither is specified, defaults to `category: "piano"`.
-
-### Color Categories
-
-Instead of picking hex colors manually, use predefined categories that match the Pianoteq interface:
-
-| Category | Description | Primary | Secondary |
-|----------|-------------|---------|-----------|
-| `piano` | Modern grand/upright pianos | `#040404` | `#2e3234` |
-| `electric-tines` | Vintage Tines/Rhodes/Reeds | `#af2523` | `#1b1b1b` |
-| `electric-keys` | Clavinet, Pianet, Electra | `#cc481c` | `#ea673b` |
-| `vibraphone` | Vibraphone | `#735534` | `#a68454` |
-| `percussion-mallet` | Celesta, Glockenspiel, Kalimba | `#a67247` | `#bf814e` |
-| `percussion-wood` | Marimba, Xylophone | `#732e1f` | `#959998` |
-| `percussion-metal` | Steel Drum, Hand Pan, etc. | `#382d2b` | `#6c2f1a` |
-| `harpsichord` | Harpsichord | `#251310` | `#4d281b` |
-| `harp` | Concert Harp | `#743620` | `#b95d36` |
-| `historical` | Historical pianos | `#33150f` | `#73422e` |
-
-### How Preset Matching Works
-
-Presets are matched to instruments using **case-sensitive prefix matching** at position 0:
-
-- ✅ Preset "C. Bechstein DG Prelude" matches prefix "C. Bechstein DG"
-- ✅ Preset "MKI Classic" matches prefix "MKI"
-- ❌ Preset "My C. Bechstein DG" does NOT match "C. Bechstein DG" (prefix not at start)
-- ❌ Preset "c. bechstein dg" does NOT match "C. Bechstein DG" (case-sensitive)
-
-**⚠️ Critical: Order Matters!**
-
-The **first** matching instrument in the array wins. If you have overlapping prefixes, list more specific ones first:
-
-```json
-[
-  {"name": "C. Bechstein DG", "preset_prefix": "C. Bechstein DG"},  // More specific - list first
-  {"name": "C. Bechstein 1899", "preset_prefix": "C. Bechstein"}    // Less specific - list second
-]
-```
-
-If reversed, "C. Bechstein DG" presets would incorrectly match "C. Bechstein" first.
-
-### What Happens to Unmatched Presets?
-
-Presets that don't match any `preset_prefix` are **silently excluded** from the interface. Only instruments with at least one matched preset appear in the selector.
-
-This means you can:
-- Remove instruments you don't own (they won't appear if no presets match)
-- Add instruments you do own (they'll appear when presets match)
-- Organize instruments in your preferred order
-
-### Common Customization Examples
-
-**Only include instruments you own:**
+**3. Edit the file:**
 ```json
 [
   {"name": "Grand K2", "preset_prefix": "K2", "category": "piano"},
@@ -203,47 +109,23 @@ This means you can:
 ]
 ```
 
-**Reorder by preference (e.g., most-used first):**
-```json
-[
-  {"name": "Vintage Tines MKI", "preset_prefix": "MKI", "category": "electric-tines"},
-  {"name": "Grand K2", "preset_prefix": "K2", "category": "piano"},
-  {"name": "Celesta", "preset_prefix": "Celesta", "category": "percussion-mallet"}
-]
-```
+**4. Restart pi_pianoteq**
 
-**Mix categories and manual colors:**
-```json
-[
-  {
-    "name": "Grand K2",
-    "preset_prefix": "K2",
-    "category": "piano"  // Use predefined piano colors
-  },
-  {
-    "name": "Custom Electric",
-    "preset_prefix": "Custom",
-    "background_primary": "#ff0000",  // Custom bright red
-    "background_secondary": "#00ff00"  // Custom bright green
-  }
-]
-```
+### Features
 
-### Troubleshooting
+- **Easy color selection**: Use categories like `"piano"`, `"electric-tines"` instead of hex codes
+- **Diagnostic tool**: See exactly which presets are unmapped
+- **Auto-suggestions**: Get copy-paste ready JSON with detected categories
+- **User config priority**: `~/.config/pi_pianoteq/instruments.json` overrides bundled default
+- **Validation**: Invalid entries fall back to sensible defaults
 
-**My presets aren't appearing:**
-1. Check that `preset_prefix` exactly matches the start of your preset names (case-sensitive)
-2. Check for overlapping prefixes - more specific ones must come first
-3. Check for typos in the JSON syntax
+### Available Categories
 
-**Colors aren't working:**
-1. Ensure colors are in `#RRGGBB` format (e.g., `#af2523`, not `af2523` or `#af25`)
-2. If invalid, defaults will be used and a warning logged
+`piano`, `electric-tines`, `electric-keys`, `vibraphone`, `percussion-mallet`, `percussion-wood`, `percussion-metal`, `harpsichord`, `harp`, `historical`
 
-**My custom file isn't loading:**
-- Verify it exists at `~/.config/pi_pianoteq/instruments.json`
-- Check JSON syntax with a validator
-- If the file has errors, pi_pianoteq will fall back to the bundled default and log warnings
+Each category sets LED backlight colors behind the display to match the Pianoteq interface.
+
+**For complete documentation, see [INSTRUMENTS.md](INSTRUMENTS.md)**
 
 ## MIDI Configuration
 
@@ -302,6 +184,7 @@ For developers who want to build and deploy to a remote Pi, see [DEVELOPMENT.md]
 
 ## Documentation
 
+- [INSTRUMENTS.md](INSTRUMENTS.md) - Customizing instruments configuration
 - [SYSTEMD.md](SYSTEMD.md) - Running as a systemd service
 - [DEVELOPMENT.md](DEVELOPMENT.md) - Development and deployment workflow
 - [CHANGELOG.md](CHANGELOG.md) - Version history
