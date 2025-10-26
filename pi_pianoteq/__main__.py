@@ -131,17 +131,12 @@ def main():
 
     # Check if PI-PTQ MIDI device is enabled in Pianoteq preferences
     if not is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE):
-        warning_msg = (
+        logger.warning(
             "PI-PTQ MIDI port not enabled in Pianoteq. "
             "Please enable it in Pianoteq preferences: "
-            "1. With pi_pianoteq running, open Pianoteq "
-            "2. Go to Edit → Preferences → Devices "
-            "3. Enable the checkbox next to 'PI-PTQ' under Active MIDI Inputs "
-            "4. Click OK. "
-            "Note: You may need to restart the service after enabling the port. "
-            "Continuing anyway (preset/instrument changes won't work until configured)."
+            "Edit → Preferences → Devices, then enable 'PI-PTQ' under Active MIDI Inputs. "
+            "You may need to restart the service after enabling the port."
         )
-        logger.warning(warning_msg)
 
         # Only wait for keypress in CLI mode (not in headless/systemd service)
         if args.cli:
