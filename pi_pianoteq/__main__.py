@@ -42,7 +42,6 @@ def show_config():
         ("PIANOTEQ_HEADLESS", Config.PIANOTEQ_HEADLESS),
         ("MIDI_PORT_NAME", Config.MIDI_PORT_NAME),
         ("MIDI_MAPPING_NAME", Config.MIDI_MAPPING_NAME),
-        ("MIDI_PIANOTEQ_STARTUP_DELAY", Config.MIDI_PIANOTEQ_STARTUP_DELAY),
         ("SHUTDOWN_COMMAND", Config.SHUTDOWN_COMMAND),
     ]
 
@@ -84,6 +83,11 @@ def main():
         '--cli',
         action='store_true',
         help='Use CLI client instead of GFX HAT client (for development/testing)'
+    )
+    parser.add_argument(
+        '--include-demo',
+        action='store_true',
+        help='Include demo instruments (with limited functionality)'
     )
 
     args = parser.parse_args()
@@ -131,7 +135,7 @@ def main():
 
     for attempt in range(8):
         try:
-            instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=False, skip_fallback=True)
+            instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=args.include_demo, skip_fallback=True)
             current_count = len(instruments)
 
             if current_count > 0 and current_count == last_count:

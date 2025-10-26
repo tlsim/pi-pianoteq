@@ -182,9 +182,6 @@ class ConfigLoader:
         self.MIDI_PORT_NAME = self._get_config('MIDI_PORT_NAME', MIDI_SECTION, user_parser, default_parser, user_config_loaded)
         self.MIDI_MAPPING_NAME = self._get_config('MIDI_MAPPING_NAME', MIDI_SECTION, user_parser, default_parser, user_config_loaded)
 
-        startup_delay_str = self._get_config('MIDI_PIANOTEQ_STARTUP_DELAY', MIDI_SECTION, user_parser, default_parser, user_config_loaded)
-        self.MIDI_PIANOTEQ_STARTUP_DELAY = int(startup_delay_str)
-
         self.SHUTDOWN_COMMAND = self._get_config('SHUTDOWN_COMMAND', SYSTEM_SECTION, user_parser, default_parser, user_config_loaded)
 
     def _get_config(self, key: str, section: str, user_parser: ConfigParser,

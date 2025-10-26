@@ -111,6 +111,13 @@ Or with pipenv:
 pipenv run python -m pi_pianoteq
 ```
 
+### Command Line Options
+
+- `--cli`: Use CLI client instead of GFX HAT (for testing/development)
+- `--include-demo`: Include demo instruments with limited functionality
+- `--show-config`: Display current configuration and exit
+- `--init-config`: Initialize user config file and exit
+
 ### Run with CLI Client (for testing/development)
 
 For usage without GFX HAT hardware, use the CLI client:
@@ -142,7 +149,6 @@ For developers who want to build and deploy to a remote Pi, see [DEVELOPMENT.md]
 
 ## Documentation
 
-- [INSTRUMENTS.md](INSTRUMENTS.md) - Customizing instruments configuration
 - [SYSTEMD.md](SYSTEMD.md) - Running as a systemd service
 - [DEVELOPMENT.md](DEVELOPMENT.md) - Development and deployment workflow
 - [CHANGELOG.md](CHANGELOG.md) - Version history
