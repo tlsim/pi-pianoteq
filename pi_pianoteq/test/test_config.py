@@ -1,9 +1,17 @@
 import os
 import tempfile
+import json
 from pathlib import Path
 import pytest
 
-from pi_pianoteq.config import ConfigLoader, BUNDLED_CONFIG_PATH
+from pi_pianoteq.config import (
+    ConfigLoader,
+    BUNDLED_CONFIG_PATH,
+    DEFAULT_PRIMARY_COLOR,
+    DEFAULT_SECONDARY_COLOR,
+    COLOR_CATEGORIES,
+    map_instrument_to_category
+)
 
 
 @pytest.fixture
@@ -247,17 +255,99 @@ def test_boolean_parsing_variations(env_value, expected):
         del os.environ['PIANOTEQ_HEADLESS']
 
 
-def test_load_instruments():
-    """Test that instruments can be loaded"""
-    instruments = ConfigLoader.load_instruments()
+def test_map_instrument_to_category_known_instruments():
+    """Test that known instruments map to correct categories"""
+    # Test piano
+    assert map_instrument_to_category('Grand K2', 'Acoustic Piano') == 'piano'
+    assert map_instrument_to_category('Upright U4', 'Acoustic Piano') == 'piano'
 
-    assert isinstance(instruments, list)
-    assert len(instruments) > 0
+    # Test electric tines
+    assert map_instrument_to_category('Vintage Tines MKI', 'Electric Piano') == 'electric-tines'
+    assert map_instrument_to_category('Vintage Tines MKII', 'Electric Piano') == 'electric-tines'
 
-    # Check first instrument has expected attributes
-    first = instruments[0]
-    assert hasattr(first, 'name')
-    assert hasattr(first, 'preset_prefix')
+    # Test electric keys
+    assert map_instrument_to_category('Clavinet D6', 'Electric Piano') == 'electric-keys'
+    assert map_instrument_to_category('Pianet N', 'Electric Piano') == 'electric-keys'
+
+    # Test percussion
+    assert map_instrument_to_category('Vibraphone V-B', 'Chromatic Percussion') == 'vibraphone'
+    assert map_instrument_to_category('Celesta', 'Chromatic Percussion') == 'percussion-mallet'
+    assert map_instrument_to_category('Marimba', 'Chromatic Percussion') == 'percussion-wood'
+    assert map_instrument_to_category('Steel Drum', 'Steelpan') == 'percussion-metal'
+
+    # Test historical
+    assert map_instrument_to_category('C. Bechstein (1899)', 'Historical Piano') == 'historical'
+
+    # Test harpsichord and harp
+    assert map_instrument_to_category('H. Ruckers II Harpsichord', 'Piano Predecessor') == 'harpsichord'
+    assert map_instrument_to_category('Concert Harp', 'Piano Predecessor') == 'harp'
+
+
+def test_map_instrument_to_category_new_instruments():
+    """Test that new/unknown instruments get sensible defaults based on class"""
+    # Unknown acoustic piano should default to piano
+    assert map_instrument_to_category('Unknown Grand Piano', 'Acoustic Piano') == 'piano'
+
+    # Unknown historical piano should default to historical
+    assert map_instrument_to_category('Unknown Fortepiano', 'Historical Piano') == 'historical'
+
+    # Electric pianos with tines keywords should be electric-tines
+    assert map_instrument_to_category('New Rhodes Model', 'Electric Piano') == 'electric-tines'
+
+    # Electric pianos without tines keywords should be electric-keys
+    assert map_instrument_to_category('New Electric Keyboard', 'Electric Piano') == 'electric-keys'
+
+    # Unknown chromatic percussion should default to percussion-mallet
+    assert map_instrument_to_category('Unknown Bell', 'Chromatic Percussion') == 'percussion-mallet'
+
+
+def test_map_instrument_to_category_preserves_colors():
+    """Test that all 37 original instruments are preserved"""
+    # This ensures no color is lost in migration
+    known_mappings = {
+        'Grand C. Bechstein DG': 'piano',
+        'Grand Ant. Petrof': 'piano',
+        'Grand Steingraeber': 'piano',
+        'Grand Grotrian': 'piano',
+        'Grand Blüthner': 'piano',
+        'Grand YC5': 'piano',
+        'Grand K2': 'piano',
+        'Upright U4': 'piano',
+        'Vintage Tines MKI': 'electric-tines',
+        'Vintage Tines MKII': 'electric-tines',
+        'Vintage Reeds': 'electric-tines',
+        'Clavinet D6': 'electric-keys',
+        'Pianet N': 'electric-keys',
+        'Pianet T': 'electric-keys',
+        'Electra-Piano': 'electric-keys',
+        'Vibraphone V-B': 'vibraphone',
+        'Vibraphone V-M': 'vibraphone',
+        'Celesta': 'percussion-mallet',
+        'Glockenspiel': 'percussion-mallet',
+        'Toy Piano': 'percussion-mallet',
+        'Kalimba': 'percussion-mallet',
+        'Marimba': 'percussion-wood',
+        'Xylophone': 'percussion-wood',
+        'Steel Drum': 'percussion-metal',
+        'Spacedrum': 'percussion-metal',
+        'Hand Pan': 'percussion-metal',
+        'Tank Drum': 'percussion-metal',
+        'H. Ruckers II Harpsichord': 'harpsichord',
+        'Concert Harp': 'harp',
+        'J. Dohnal (1795)': 'historical',
+        'I. Besendorfer (1829)': 'historical',
+        'S. Erard (1849)': 'historical',
+        'J.B. Streicher (1852)': 'historical',
+        'J. Broadwood (1796)': 'historical',
+        'I. Pleyel (1835)': 'historical',
+        'J. Frenzel (1841)': 'historical',
+        'C. Bechstein (1899)': 'historical',
+    }
+
+    for instr_name, expected_category in known_mappings.items():
+        # Use dummy class since known instruments are looked up by name
+        result = map_instrument_to_category(instr_name, 'Dummy Class')
+        assert result == expected_category, f"Instrument '{instr_name}' should map to '{expected_category}' but got '{result}'"
 
 
 def test_init_user_config_creates_file(tmp_path):

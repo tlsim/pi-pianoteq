@@ -29,7 +29,7 @@ class Pianoteq:
         return ' '.join(output.splitlines())
 
     def start(self):
-        args = [self.executable, '--midimapping', self.mapping_name]
+        args = [self.executable, '--midimapping', self.mapping_name, '--serve', '']
         if self.headless:
             args.append('--headless')
         self.process = subprocess.Popen(args,

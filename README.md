@@ -81,6 +81,10 @@ Configuration is loaded with the following priority (highest to lowest):
 
 User config persists across package upgrades.
 
+## Instruments
+
+Instruments are automatically discovered from Pianoteq via its JSON-RPC API. Only licensed instruments are shown; demos are filtered out. Display colors are assigned automatically based on instrument type.
+
 ## MIDI Configuration
 
 After installing pi_pianoteq, you need to enable the PI-PTQ MIDI port in Pianoteq:
@@ -106,6 +110,13 @@ Or with pipenv:
 ```bash
 pipenv run python -m pi_pianoteq
 ```
+
+### Command Line Options
+
+- `--cli`: Use CLI client instead of GFX HAT (for testing/development)
+- `--include-demo`: Include demo instruments with limited functionality
+- `--show-config`: Display current configuration and exit
+- `--init-config`: Initialize user config file and exit
 
 ### Run with CLI Client (for testing/development)
 

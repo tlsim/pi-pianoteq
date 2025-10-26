@@ -9,18 +9,16 @@ logger = logging.getLogger(__name__)
 
 
 class Library:
-    def __init__(self, preset_names: List[str], instruments: List[Instrument]):
-        self.preset_names = preset_names
-        self.presets: List[Preset] = [Preset(name) for name in preset_names]
-        self.instruments: List[Instrument] = instruments
-        self.group_presets_by_instrument()
-        self.assign_midi_program_numbers()
+    def __init__(self, instruments: List[Instrument]):
+        """
+        Initialize Library with pre-grouped instruments.
 
-    def group_presets_by_instrument(self) -> None:
-        for preset in self.presets:
-            inst = next((i for i in self.instruments if preset.name.find(i.preset_prefix) == 0), None)
-            if inst is not None:
-                inst.add_preset(preset)
+        Args:
+            instruments: List of Instrument objects with presets already added
+                        (typically from Config.discover_instruments_from_api())
+        """
+        self.instruments: List[Instrument] = instruments
+        self.assign_midi_program_numbers()
 
     def get_instruments(self) -> List[Instrument]:
         return [i for i in self.instruments if len(i.presets) > 0]
