@@ -88,19 +88,13 @@ class PianoteqJsonRpc:
 
         Returns:
             List of preset dictionaries with fields:
-            - name: Preset name (str)
-            - instr: Instrument name (str) - authoritative grouping
-            - class: Instrument class (str) - e.g. "Acoustic Piano", "Electric Piano"
-            - license: License name (str)
-            - license_status: Status (str) - "demo", "full", "trial", etc.
-            - bank: Bank name (str)
-            - collection: Collection name (str)
-            - author: Author name (str)
-            - comment: Description (str)
-            - file: File path (str)
-
-        Raises:
-            PianoteqJsonRpcError: If the call fails
+            - name: Preset name
+            - instr: Instrument name (authoritative grouping)
+            - class: Instrument class (e.g. "Acoustic Piano", "Electric Piano")
+            - license: License name
+            - license_status: "ok" (licensed) or "demo" (limited functionality)
+            - bank: Bank name
+            - collection: Collection name
         """
         logger.debug("Fetching preset list from Pianoteq JSON-RPC API")
         result = self._call('getListOfPresets')

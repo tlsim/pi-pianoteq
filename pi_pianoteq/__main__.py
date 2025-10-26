@@ -120,27 +120,20 @@ def main():
 
     logger.info("Pianoteq version: %s", pianoteq.get_version())
 
-    # Start Pianoteq with --serve flag for JSON-RPC API
     pianoteq.start()
 
     # Discover instruments via JSON-RPC API with retry logic
-    # Don't wait before first attempt - this reduces startup delay
     from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
     jsonrpc = PianoteqJsonRpc()
-
-    # Try multiple times with delay between attempts
-    # Keep trying until we get a stable count (licenses fully loaded)
-    # or we hit max attempts
     instruments = []
     last_count = 0
     stable_count = 0
 
-    for attempt in range(8):  # Increased to 8 attempts for slower Pi startup
+    for attempt in range(8):
         try:
             instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=False, skip_fallback=True)
             current_count = len(instruments)
 
-            # If count is stable for 2 consecutive attempts, consider it loaded
             if current_count > 0 and current_count == last_count:
                 stable_count += 1
                 if stable_count >= 2:
@@ -151,7 +144,6 @@ def main():
 
             last_count = current_count
 
-            # If no instruments yet, or count changed, try again
             if attempt < 7:
                 if current_count == 0:
                     print(f"No licensed instruments found yet, retrying ({attempt + 1}/8)...")
@@ -164,8 +156,6 @@ def main():
                 time.sleep(0.5)
             else:
                 print(f"Failed to connect after 8 attempts: {e}")
-
-    # Final fallback: if still no instruments, try with demos included
     if not instruments:
         print("No licensed instruments found after retries, trying with demos...")
         instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=True)

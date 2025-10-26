@@ -215,21 +215,9 @@ class ConfigLoader:
     @staticmethod
     def discover_instruments_from_api(jsonrpc_client, include_demo: bool = False, skip_fallback: bool = False) -> List[Instrument]:
         """
-        Discover instruments via Pianoteq JSON-RPC API.
+        Discover instruments from Pianoteq JSON-RPC API.
 
-        Automatically groups presets by instrument and assigns colors based on
-        instrument type. Preserves all original color mappings for known instruments.
-
-        Args:
-            jsonrpc_client: PianoteqJsonRpc instance for querying Pianoteq
-            include_demo: If False, filter out demo/trial instruments (default: False)
-
-        Returns:
-            List of Instrument objects with presets already grouped and colors assigned
-
-        Note: If no licensed instruments are found and include_demo=False, will
-        automatically retry with include_demo=True to provide a working first-run
-        experience.
+        Groups presets by instrument and assigns colors based on type.
         """
         from pi_pianoteq.jsonrpc_client import PianoteqJsonRpcError
 
@@ -249,42 +237,31 @@ class ConfigLoader:
             instr_name = preset_data['instr']
             license_status = preset_data.get('license_status', 'unknown')
 
-            # Filter demos unless requested
-            # license_status values:
-            #   "ok" = fully licensed and usable
-            #   "demo" = limited demo (some keys silenced, not fully functional)
-            # Only include instruments with "ok" status (actually licensed/purchased)
+            # Filter: only include licensed instruments (license_status == "ok")
+            # Demos (license_status == "demo") have limited functionality
             if not include_demo and license_status != 'ok':
                 continue
 
-            # Create instrument on first encounter
             if instr_name not in instruments_dict:
-                # Auto-assign category based on name + class
                 category = map_instrument_to_category(instr_name, preset_data['class'])
                 primary, secondary = COLOR_CATEGORIES[category]
 
                 instrument = Instrument(
                     name=instr_name,
-                    preset_prefix=instr_name,  # Use exact instrument name for matching
+                    preset_prefix=instr_name,
                     bg_primary=primary,
                     bg_secondary=secondary
                 )
                 instruments_dict[instr_name] = instrument
                 preset_order.append(instr_name)
 
-                logger.debug(f"Discovered instrument: {instr_name} (category: {category})")
-
-            # Add preset to instrument
             preset = Preset(preset_data['name'])
             instruments_dict[instr_name].add_preset(preset)
 
-        # Return instruments in API order (order first encountered)
         result = [instruments_dict[name] for name in preset_order]
-
         logger.info(f"Discovered {len(result)} instruments from Pianoteq API")
 
-        # Fallback: If no instruments found (all demos filtered out), retry with demos
-        # But only if skip_fallback is False (not during retry loops)
+        # Fallback to demos if no licensed instruments found
         if not result and not include_demo and not skip_fallback:
             logger.info("No licensed instruments found, including demo instruments")
             return ConfigLoader.discover_instruments_from_api(jsonrpc_client, include_demo=True, skip_fallback=True)

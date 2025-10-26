@@ -81,33 +81,9 @@ Configuration is loaded with the following priority (highest to lowest):
 
 User config persists across package upgrades.
 
-## Instrument Discovery
+## Instruments
 
-Instruments are **automatically discovered** from Pianoteq via its JSON-RPC API - no manual configuration required!
-
-### How It Works
-
-When pi-pianoteq starts:
-1. Pianoteq launches with `--serve` flag (enables JSON-RPC API)
-2. Pi-pianoteq queries the API for all available presets
-3. Instruments are automatically grouped and assigned display colors based on type
-4. Only licensed instruments appear in the selector (demos are filtered out)
-
-### First Run Experience
-
-If you're running Pianoteq trial/demo with no licensed instruments:
-- Demo instruments will automatically be shown so you can try pi-pianoteq
-- Once you purchase instruments, only those will appear
-
-### Display Colors
-
-Each instrument gets LED backlight colors automatically assigned based on its type:
-- **Pianos** → Dark theme (`piano`, `historical`)
-- **Electric Pianos** → Vintage reds/oranges (`electric-tines`, `electric-keys`)
-- **Percussion** → Browns/grays (`vibraphone`, `percussion-mallet`, `percussion-wood`, `percussion-metal`)
-- **Other** → Theme-appropriate colors (`harpsichord`, `harp`)
-
-Colors match the visual style of the Pianoteq interface and create a horizontal gradient effect on the GFX HAT's 6-zone RGB backlight.
+Instruments are automatically discovered from Pianoteq via its JSON-RPC API. Only licensed instruments are shown; demos are filtered out. Display colors are assigned automatically based on instrument type.
 
 ## MIDI Configuration
 
