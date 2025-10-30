@@ -7,17 +7,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.7.0] - 2025-10-30
+
 ### Added
-- Loading screen with visual feedback during startup (#13)
-  - GFX HAT: Blue backlight with centered loading messages on LCD
-  - CLI: Console-based loading messages
-  - Shows "Starting Pianoteq...", "Connecting to API...", "Loading..."
-- Two-phase client initialization to support loading mode before API availability
+- Loading screen with visual feedback during ~8 second startup (#13)
+  - GFX HAT: Blue backlight with loading messages
+  - CLI: Full-screen interface with live log window
+  - Messages: "Starting Pianoteq...", "Connecting to API...", "Loading..."
 
 ### Changed
-- Client base class now accepts optional API parameter for loading mode
-- Clients can be instantiated early and receive API via `set_api()` method
-- Loading messages replace silent ~8 second startup delay
+- Clients now support two-phase initialization (loading mode → normal mode)
+- CLI displays logs within UI instead of mixed console output
+- GFX HAT uses unified display architecture for loading and normal modes
 
 ## [1.6.0] - 2025-10-26
 
