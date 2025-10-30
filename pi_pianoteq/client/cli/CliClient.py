@@ -4,18 +4,22 @@ from prompt_toolkit.layout import Layout
 from prompt_toolkit.layout.containers import HSplit, Window, VSplit
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.widgets import Frame
+from prompt_toolkit.output import Output
 from typing import Optional
+import threading
+import os
 
 from pi_pianoteq.client.Client import Client
 from pi_pianoteq.client.ClientApi import ClientApi
+from pi_pianoteq.logging_config import BufferedLoggingHandler
 
 
 class CliClient(Client):
     """
     CLI client for Pianoteq with instrument selection menu and arrow key navigation.
 
-    Loading mode (api=None): Simple console output for loading messages
-    Normal mode (after set_api): Full interactive CLI
+    Loading mode (api=None): Full-screen loading display
+    Normal mode (after set_api): Full interactive CLI with instrument/preset display
 
     Modes during normal operation:
     - Normal mode: Display current instrument/preset, navigate with arrows
@@ -27,20 +31,121 @@ class CliClient(Client):
 
         # Loading mode state
         self.loading_mode = (api is None)
-        self.application = None
+        self.loading_message = "Initializing..."
+        self.app_thread = None
+        self.app_running = False
 
-        # Initialize interactive CLI if API provided
-        if api is not None:
-            self._init_interactive_cli()
+        # Create log buffer for displaying logs in UI
+        self.log_buffer = BufferedLoggingHandler(maxlen=50)
 
-    def _init_interactive_cli(self):
-        """Initialize the interactive CLI (requires API)"""
+        # Initialize application (should always start with loading mode now)
+        if api is None:
+            self._init_loading_app()
+        else:
+            # Shouldn't reach here in normal flow, but handle gracefully
+            raise RuntimeError("CliClient should be initialized with api=None for loading mode")
+
+    def _init_loading_app(self):
+        """Initialize the loading screen Application"""
+        # Create loading message control
+        self.loading_control = FormattedTextControl(
+            text=self._get_loading_text,
+            focusable=False
+        )
+
+        # Create log display control
+        self.log_control = FormattedTextControl(
+            text=self._get_log_text,
+            focusable=False
+        )
+
+        # Create layout with message at top and logs below
+        loading_message_window = Window(content=self.loading_control, height=6)
+        log_window = Window(
+            content=self.log_control,
+            wrap_lines=False,
+            always_hide_cursor=True,
+            scroll_offsets=None  # Allow natural scrolling to bottom
+        )
+
+        content = HSplit([
+            loading_message_window,
+            log_window,
+        ])
+
+        loading_container = Frame(content, title="Pi-Pianoteq")
+        loading_layout = Layout(container=loading_container)
+
+        # Simple key bindings for loading mode (just Ctrl-C to exit)
+        loading_kb = KeyBindings()
+
+        @loading_kb.add('c-c')
+        def kb_exit(event):
+            event.app.exit()
+
+        # Create application
+        self.application = Application(
+            layout=loading_layout,
+            key_bindings=loading_kb,
+            full_screen=True
+        )
+
+        # Set callback to update UI when new log messages arrive
+        self.log_buffer.set_callback(self.application.invalidate)
+
+    def _get_loading_text(self):
+        """Generate loading text display"""
+        return [
+            ('', '\n'),
+            ('bold cyan', '  Loading Pi-Pianoteq\n'),
+            ('', '\n'),
+            ('', f'  {self.loading_message}\n'),
+        ]
+
+    def _get_log_text(self):
+        """Generate log text display from buffered messages"""
+        messages = self.log_buffer.get_messages()
+        if not messages:
+            return [('ansigray', '  Initializing...\n')]
+
+        # Calculate how many lines can fit on screen
+        # Terminal height minus loading message area (6 lines) minus frame (3 lines) minus padding
+        try:
+            terminal_height = os.get_terminal_size().lines
+            max_log_lines = max(10, terminal_height - 12)  # At least 10, otherwise height - 12
+        except (OSError, AttributeError):
+            max_log_lines = 20  # Default if can't detect terminal size
+
+        # Return last N messages that fit
+        lines = []
+        visible_messages = messages[-max_log_lines:]
+        for msg in visible_messages:
+            lines.append(('ansibrightblack', f'  {msg}\n'))
+        return lines
+
+    def set_api(self, api: ClientApi):
+        """Provide API and switch to normal layout"""
+        self.api = api
+        self.loading_mode = False
+
+        # Build normal layout
+        self._build_normal_layout()
+
+        # Switch to normal layout
+        self.application.layout = self.normal_layout
+        self.application.key_bindings = self.normal_kb
+
+        # Trigger redraw (thread-safe)
+        self.application.invalidate()
+
+    def _build_normal_layout(self):
+        """Build the normal interactive layout (requires API)"""
         # State management
         self.menu_mode = False
         self.instrument_names = self.api.get_instrument_names()
         self.current_menu_index = 0
         self.menu_scroll_offset = 0
-        self.menu_visible_items = 10  # Number of menu items to show at once
+        self.menu_visible_items = 10
 
         # Set initial menu index to current instrument
         current_instrument = self.api.get_current_instrument()
@@ -58,9 +163,13 @@ class CliClient(Client):
         # Create layout with frame
         content_window = Window(content=self.display_control)
         root_container = Frame(content_window, title=self._get_title)
-        layout = Layout(container=root_container)
+        self.normal_layout = Layout(container=root_container)
 
-        # Key bindings
+        # Key bindings for normal mode
+        self.normal_kb = self._build_normal_keybindings()
+
+    def _build_normal_keybindings(self):
+        """Build key bindings for normal operation"""
         kb = KeyBindings()
 
         # Exit bindings
@@ -138,26 +247,24 @@ class CliClient(Client):
                 self.menu_mode = False
                 self._update_display()
 
-        # Build main application
-        self.application = Application(
-            layout=layout,
-            key_bindings=kb,
-            full_screen=True
-        )
-        self.loading_mode = False
-
-    def set_api(self, api: ClientApi):
-        """Provide API and initialize interactive CLI"""
-        self.api = api
-        self._init_interactive_cli()
+        return kb
 
     def show_loading_message(self, message: str):
-        """Display a loading message (simple console print in CLI mode)"""
-        print(f"  {message}")
+        """Update loading message and trigger redraw (thread-safe)"""
+        self.loading_message = message
+
+        # Start app in background thread if not already running
+        if not self.app_running:
+            self.app_running = True
+            self.app_thread = threading.Thread(target=self.application.run, daemon=True)
+            self.app_thread.start()
+
+        # Trigger redraw (thread-safe!)
+        self.application.invalidate()
 
     def clear_loading_screen(self):
-        """Clear loading screen (just print a separator)"""
-        print()
+        """Clear loading screen (no-op, we switch layouts instead)"""
+        pass
 
     def _menu_next(self):
         """Navigate to next menu item"""
@@ -280,7 +387,11 @@ class CliClient(Client):
         self.application.invalidate()
 
     def start(self):
-        """Start the interactive CLI application (requires API)"""
-        if self.loading_mode:
-            raise RuntimeError("Cannot start client in loading mode. Call set_api() first.")
-        self.application.run()
+        """Start or join the application"""
+        if self.app_running:
+            # App already running in background thread, just wait for it
+            if self.app_thread:
+                self.app_thread.join()
+        else:
+            # Start app normally (blocking)
+            self.application.run()

@@ -101,9 +101,6 @@ def main():
     if args.init_config:
         return init_config()
 
-    # Initialize logging for normal operation
-    setup_logging()
-
     # Normal startup - import hardware dependencies only when needed
     from rtmidi import MidiOut
     from pi_pianoteq.instrument.Library import Library
@@ -126,6 +123,10 @@ def main():
         client = CliClient(api=None)
     else:
         client = GfxhatClient(api=None)
+
+    # Setup logging - use buffered handler for CLI mode
+    log_buffer = client.log_buffer if args.cli else None
+    setup_logging(cli_mode=args.cli, log_buffer=log_buffer)
 
     pianoteq = Pianoteq()
 
@@ -173,19 +174,17 @@ def main():
             else:
                 logger.error(f"Failed to connect after 8 attempts: {e}")
     if not instruments:
-        print("No licensed instruments found after retries, trying with demos...")
+        logger.info("No licensed instruments found after retries, trying with demos...")
         instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=True)
 
     # Check if we successfully discovered any instruments
     if not instruments:
-        print("ERROR: No instruments discovered from Pianoteq API!")
-        print()
-        print("This usually means:")
-        print("  1. Pianoteq failed to start or crashed during startup")
-        print("  2. Pianoteq's --serve flag didn't enable the JSON-RPC server")
-        print("  3. No instruments are licensed (all show as 'demo' status)")
-        print()
-        print("Please check the logs above for error messages.")
+        logger.error("No instruments discovered from Pianoteq API!")
+        logger.error("This usually means:")
+        logger.error("  1. Pianoteq failed to start or crashed during startup")
+        logger.error("  2. Pianoteq's --serve flag didn't enable the JSON-RPC server")
+        logger.error("  3. No instruments are licensed (all show as 'demo' status)")
+        logger.error("Please check the logs for error messages.")
         pianoteq.terminate()
         return 1
 
@@ -212,24 +211,8 @@ def main():
             "Edit → Preferences → Devices, then enable 'PI-PTQ' under Active MIDI Inputs. "
             "You may need to restart the service after enabling the port."
         )
-
-        # Only wait for keypress in CLI mode (not in headless/systemd service)
-        if args.cli:
-            # Also print to console in CLI mode for immediate visibility
-            print("⚠️  WARNING: PI-PTQ MIDI port not enabled in Pianoteq")
-            print()
-            print("Please enable it in Pianoteq preferences:")
-            print("  1. With pi_pianoteq running, open Pianoteq")
-            print("  2. Go to Edit → Preferences → Devices")
-            print("  3. Enable the checkbox next to \"PI-PTQ\" under Active MIDI Inputs")
-            print("  4. Click OK")
-            print()
-            print("Note: You may need to restart the service after enabling the port.")
-            print()
-            print("Continuing anyway (preset/instrument changes won't work until configured)...")
-            print()
-            input("Press Enter to continue...")
-            print()
+        # Note: Skipping interactive warning for CLI mode since it would conflict
+        # with the running prompt_toolkit Application
 
     # Transition from loading to normal operation
     client.clear_loading_screen()

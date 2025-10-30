@@ -1,12 +1,13 @@
 import signal
 
 from gfxhat import touch, lcd, backlight, fonts
-from PIL import ImageFont, Image, ImageDraw
+from PIL import ImageFont
 import time
 from typing import Optional
 
 from pi_pianoteq.client.gfxhat.InstrumentDisplay import InstrumentDisplay
 from pi_pianoteq.client.gfxhat.InstrumentMenuDisplay import InstrumentMenuDisplay
+from pi_pianoteq.client.gfxhat.LoadingDisplay import LoadingDisplay
 from pi_pianoteq.client.Client import Client
 from pi_pianoteq.client.ClientApi import ClientApi
 
@@ -19,9 +20,6 @@ class GfxhatClient(Client):
     Normal mode (after set_api): Full instrument/preset display
     """
 
-    # Loading screen colors
-    LOADING_BACKLIGHT_COLOR = '#1e3a5f'  # Calming blue
-
     def __init__(self, api: Optional[ClientApi]):
         super().__init__(api)
         self.interrupt = False
@@ -31,9 +29,9 @@ class GfxhatClient(Client):
 
         # Loading mode state
         self.loading_mode = (api is None)
-        self.loading_message = ""
-        self.loading_image = Image.new('P', (self.width, self.height))
-        self.loading_draw = ImageDraw.Draw(self.loading_image)
+
+        # Create loading display (used during startup)
+        self.loading_display = LoadingDisplay(self.width, self.height, self.font)
 
         # Normal mode displays (initialized later if api provided)
         self.instrument_display = None
@@ -60,26 +58,10 @@ class GfxhatClient(Client):
 
     def show_loading_message(self, message: str):
         """Display a loading message on the LCD with blue backlight"""
-        self.loading_message = message
-
-        # Clear display
-        self.loading_image.paste(0, (0, 0, self.width, self.height))
-
-        # Draw centered text
-        bbox = self.font.getbbox(message)
-        text_width = bbox[2] - bbox[0]
-        text_height = bbox[3] - bbox[1]
-        x = (self.width - text_width) // 2
-        y = (self.height - text_height) // 2
-        self.loading_draw.text((x, y), message, 1, self.font)
-
-        # Set blue backlight
-        r, g, b = self._hex_to_rgb(self.LOADING_BACKLIGHT_COLOR)
-        for i in range(6):
-            backlight.set_pixel(i, r, g, b)
-
-        # Display
-        self._blit_loading_image()
+        self.loading_display.set_message(message)
+        # Force immediate display update
+        self.loading_display.get_backlight().apply_backlight()
+        self.blit_image()
         backlight.show()
         lcd.show()
 
@@ -90,12 +72,6 @@ class GfxhatClient(Client):
         for i in range(6):
             backlight.set_pixel(i, 0, 0, 0)
         backlight.show()
-
-    @staticmethod
-    def _hex_to_rgb(hex_color):
-        """Convert hex color to RGB tuple"""
-        h = hex_color.lstrip('#')
-        return tuple(int(h[i:i + 2], 16) for i in (0, 2, 4))
 
     def start(self):
         """Start normal client operation (requires API)"""
@@ -141,7 +117,10 @@ class GfxhatClient(Client):
             touch.on(index, handler)
 
     def get_display(self):
-        if self.menu_open:
+        """Get current active display (loading, menu, or instrument)"""
+        if self.loading_mode:
+            return self.loading_display
+        elif self.menu_open:
             return self.menu_display
         else:
             return self.instrument_display
@@ -150,13 +129,6 @@ class GfxhatClient(Client):
         for x in range(128):
             for y in range(64):
                 pixel = self.get_display().get_image().getpixel((x, y))
-                lcd.set_pixel(x, y, pixel)
-
-    def _blit_loading_image(self):
-        """Blit loading image to LCD"""
-        for x in range(128):
-            for y in range(64):
-                pixel = self.loading_image.getpixel((x, y))
                 lcd.set_pixel(x, y, pixel)
 
     def cleanup(self):
