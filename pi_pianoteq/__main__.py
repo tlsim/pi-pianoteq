@@ -204,15 +204,18 @@ def main():
     time.sleep(2)
 
     # Check if PI-PTQ MIDI device is enabled in Pianoteq preferences
-    if not is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE):
+    midi_port_enabled = is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE)
+    if not midi_port_enabled:
         logger.warning(
             "PI-PTQ MIDI port not enabled in Pianoteq. "
             "Please enable it in Pianoteq preferences: "
             "Edit → Preferences → Devices, then enable 'PI-PTQ' under Active MIDI Inputs. "
             "You may need to restart the service after enabling the port."
         )
-        # Note: Skipping interactive warning for CLI mode since it would conflict
-        # with the running prompt_toolkit Application
+        # Show warning in loading screen for CLI mode
+        if args.cli:
+            client.show_loading_message("⚠️  MIDI port not configured - see logs")
+            time.sleep(3)  # Give user time to see the warning
 
     # Transition from loading to normal operation
     client.clear_loading_screen()
