@@ -4,6 +4,7 @@ from prompt_toolkit.layout import Layout
 from prompt_toolkit.layout.containers import HSplit, Window, VSplit
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.widgets import Frame
+from typing import Optional
 
 from pi_pianoteq.client.Client import Client
 from pi_pianoteq.client.ClientApi import ClientApi
@@ -13,14 +14,27 @@ class CliClient(Client):
     """
     CLI client for Pianoteq with instrument selection menu and arrow key navigation.
 
-    Modes:
+    Loading mode (api=None): Simple console output for loading messages
+    Normal mode (after set_api): Full interactive CLI
+
+    Modes during normal operation:
     - Normal mode: Display current instrument/preset, navigate with arrows
     - Menu mode: Select instruments from a scrollable list
     """
 
-    def __init__(self, api: ClientApi):
+    def __init__(self, api: Optional[ClientApi]):
         super().__init__(api)
 
+        # Loading mode state
+        self.loading_mode = (api is None)
+        self.application = None
+
+        # Initialize interactive CLI if API provided
+        if api is not None:
+            self._init_interactive_cli()
+
+    def _init_interactive_cli(self):
+        """Initialize the interactive CLI (requires API)"""
         # State management
         self.menu_mode = False
         self.instrument_names = self.api.get_instrument_names()
@@ -130,6 +144,20 @@ class CliClient(Client):
             key_bindings=kb,
             full_screen=True
         )
+        self.loading_mode = False
+
+    def set_api(self, api: ClientApi):
+        """Provide API and initialize interactive CLI"""
+        self.api = api
+        self._init_interactive_cli()
+
+    def show_loading_message(self, message: str):
+        """Display a loading message (simple console print in CLI mode)"""
+        print(f"  {message}")
+
+    def clear_loading_screen(self):
+        """Clear loading screen (just print a separator)"""
+        print()
 
     def _menu_next(self):
         """Navigate to next menu item"""
@@ -252,4 +280,7 @@ class CliClient(Client):
         self.application.invalidate()
 
     def start(self):
+        """Start the interactive CLI application (requires API)"""
+        if self.loading_mode:
+            raise RuntimeError("Cannot start client in loading mode. Call set_api() first.")
         self.application.run()

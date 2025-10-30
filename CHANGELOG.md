@@ -5,6 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Loading screen with visual feedback during startup (#13)
+  - GFX HAT: Blue backlight with centered loading messages on LCD
+  - CLI: Console-based loading messages
+  - Shows "Starting Pianoteq...", "Connecting to API...", "Loading..."
+- Two-phase client initialization to support loading mode before API availability
+
+### Changed
+- Client base class now accepts optional API parameter for loading mode
+- Clients can be instantiated early and receive API via `set_api()` method
+- Loading messages replace silent ~8 second startup delay
+
 ## [1.6.0] - 2025-10-26
 
 ### Added

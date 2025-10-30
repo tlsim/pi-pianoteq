@@ -121,28 +121,44 @@ def main():
     else:
         from pi_pianoteq.client.gfxhat.GfxhatClient import GfxhatClient
 
+    # Instantiate client early (in loading mode, api=None)
+    if args.cli:
+        client = CliClient(api=None)
+    else:
+        client = GfxhatClient(api=None)
+
     pianoteq = Pianoteq()
 
     logger.info("Pianoteq version: %s", pianoteq.get_version())
 
+    # Start Pianoteq with loading feedback
+    client.show_loading_message("Starting Pianoteq...")
     pianoteq.start()
 
     # Discover instruments via JSON-RPC API with retry logic
     from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
+    client.show_loading_message("Connecting to API...")
+
     jsonrpc = PianoteqJsonRpc()
     instruments = []
     last_count = 0
     stable_count = 0
+    api_connected = False
 
     for attempt in range(8):
         try:
             instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=args.include_demo, skip_fallback=True)
             current_count = len(instruments)
 
+            # Show "Loading..." once API connects
+            if not api_connected:
+                api_connected = True
+                client.show_loading_message("Loading...")
+
             if current_count > 0 and current_count == last_count:
                 stable_count += 1
                 if stable_count >= 2:
-                    print(f"✓ Discovered {current_count} instruments from Pianoteq API")
+                    logger.info(f"Discovered {current_count} instruments from Pianoteq API")
                     break
             else:
                 stable_count = 0
@@ -150,17 +166,12 @@ def main():
             last_count = current_count
 
             if attempt < 7:
-                if current_count == 0:
-                    print(f"No licensed instruments found yet, retrying ({attempt + 1}/8)...")
-                else:
-                    print(f"Found {current_count} instruments, waiting for licenses to finish loading...")
                 time.sleep(0.5)
         except Exception as e:
             if attempt < 7:
-                print(f"API connection attempt {attempt + 1}/8 failed, retrying...")
                 time.sleep(0.5)
             else:
-                print(f"Failed to connect after 8 attempts: {e}")
+                logger.error(f"Failed to connect after 8 attempts: {e}")
     if not instruments:
         print("No licensed instruments found after retries, trying with demos...")
         instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=True)
@@ -220,11 +231,11 @@ def main():
             input("Press Enter to continue...")
             print()
 
-    if args.cli:
-        client = CliClient(client_lib)
-    else:
-        client = GfxhatClient(client_lib)
+    # Transition from loading to normal operation
+    client.clear_loading_screen()
 
+    # Provide API and start normal operation
+    client.set_api(client_lib)
     client.start()
     pianoteq.terminate()
 
