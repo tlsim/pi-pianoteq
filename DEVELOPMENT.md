@@ -104,16 +104,30 @@ pipenv run pi-pianoteq --cli  # Run CLI client for local testing
 
 ## What deploy.sh Does
 
-The deployment script is designed for **developer workflows** (remote deployment to a Pi):
+The deployment script automates remote deployment to a Pi:
 
 1. Builds the wheel file (if not already built)
 2. Copies the wheel to the Pi
-3. Creates a virtual environment on the Pi with `--system-site-packages` (for python3-rtmidi)
+3. Creates a virtual environment at `~/pi-pianoteq-venv` with `--system-site-packages`
 4. Installs the package with `--force-reinstall --no-deps`
-5. Generates and installs the systemd service file (configured for the venv path)
+5. Generates and installs a systemd service file pointing to the venv
 6. Enables and restarts the service
 
-**Note:** This is different from the normal user installation (which uses `pip install --user`). The venv approach used here isolates the development deployment and allows rapid iteration without affecting system packages.
+## Development Pattern: Dual Install
+
+The venv install from `deploy.sh` can coexist with a stable `--user` install:
+
+**Venv (development):**
+- Path: `~/pi-pianoteq-venv/bin/pi-pianoteq`
+- Used by systemd service (auto-starts your test version)
+- Easy to nuke (`rm -rf ~/pi-pianoteq-venv`) and recreate
+
+**User install (stable fallback):**
+- Path: `~/.local/bin/pi-pianoteq`
+- Install with: `pip install --user pi_pianoteq-*.whl`
+- Run manually when the dev version breaks
+
+This allows rapid iteration in the venv while keeping a working version available.
 
 ## Updating the Version
 

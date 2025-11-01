@@ -1,16 +1,12 @@
 # Running pi-pianoteq as a Systemd Service (Optional)
 
-This guide is **optional** and only needed if you want pi-pianoteq to start automatically when your Pi boots.
+This guide is for users who want pi-pianoteq to start automatically on boot as a background service.
 
-Most users can simply run `pi-pianoteq` manually when needed. Set up systemd only if you want the application to run as a background service on boot.
+If you prefer to run `pi-pianoteq` manually when needed, you can skip this guide.
 
-## Automatic Setup (via deploy.sh)
+## Setup
 
-If you used the `deploy.sh` script (developers), the systemd service is already configured. Skip to [Managing the Service](#managing-the-service).
-
-## Manual Setup
-
-**Prerequisites:** Follow the installation instructions in [README.md](README.md) first (the standard `pip install --user` method).
+**Prerequisites:** Complete the installation in [README.md](README.md) first.
 
 ### 1. Create the Service File
 
@@ -39,9 +35,7 @@ WantedBy=graphical.target
 
 **Important:** Replace `<username>` with your Raspberry Pi username (e.g., `pi`).
 
-This matches the standard `pip install --user` installation from the README.
-
-### 2. Enable and Start the Service
+### 2. Enable and Start
 
 ```bash
 sudo systemctl daemon-reload
