@@ -20,8 +20,27 @@ fi
 
 REMOTE="$USER@$PI_HOST"
 
-# Generate service file from template
-sed "s/{{USER}}/$USER/g" pi-pianoteq.service.template > pi-pianoteq.service
+# Generate service file for venv deployment (deploy.sh uses venv, not --user install)
+cat > pi-pianoteq.service <<EOF
+[Unit]
+Description = Service for pi-pianoteq
+
+[Service]
+Type=simple
+User=$USER
+Group=$USER
+ExecStartPre=cpupower frequency-set -g performance
+ExecStart=/home/$USER/pi-pianoteq-venv/bin/pi-pianoteq
+ExecStopPost=cpupower frequency-set -g ondemand
+PermissionsStartOnly=true
+LimitMEMLOCK=500000
+LimitRTPRIO=90
+LimitNICE=-10
+Nice=-10
+
+[Install]
+WantedBy=graphical.target
+EOF
 
 echo "Deploying to $REMOTE..."
 

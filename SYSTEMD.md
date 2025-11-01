@@ -1,14 +1,16 @@
-# Running pi-pianoteq as a Systemd Service
+# Running pi-pianoteq as a Systemd Service (Optional)
 
-This guide explains how to set up pi-pianoteq to run automatically on boot using systemd.
+This guide is **optional** and only needed if you want pi-pianoteq to start automatically when your Pi boots.
+
+Most users can simply run `pi-pianoteq` manually when needed. Set up systemd only if you want the application to run as a background service on boot.
 
 ## Automatic Setup (via deploy.sh)
 
-If you used the `deploy.sh` script, the systemd service is already configured. Skip to [Managing the Service](#managing-the-service).
+If you used the `deploy.sh` script (developers), the systemd service is already configured. Skip to [Managing the Service](#managing-the-service).
 
 ## Manual Setup
 
-**Prerequisites:** Follow the installation instructions in [README.md](README.md) first. If you plan to use systemd, use **Option A** (venv install) from the README.
+**Prerequisites:** Follow the installation instructions in [README.md](README.md) first (the standard `pip install --user` method).
 
 ### 1. Create the Service File
 
@@ -23,7 +25,7 @@ Type=simple
 User=<username>
 Group=<username>
 ExecStartPre=cpupower frequency-set -g performance
-ExecStart=/home/<username>/pi-pianoteq-venv/bin/pi-pianoteq
+ExecStart=/home/<username>/.local/bin/pi-pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
 PermissionsStartOnly=true
 LimitMEMLOCK=500000
@@ -35,14 +37,9 @@ Nice=-10
 WantedBy=graphical.target
 ```
 
-**Important:**
-- Replace `<username>` with your Raspberry Pi username
-- This assumes you installed using **Option A** from README.md (venv at `~/pi-pianoteq-venv`)
+**Important:** Replace `<username>` with your Raspberry Pi username (e.g., `pi`).
 
-**If you used a different installation method**, adjust the `ExecStart` line:
-- **System-wide install (Option C)**: `ExecStart=/usr/local/bin/pi-pianoteq`
-- **User install (Option B)**: `ExecStart=/home/<username>/.local/bin/pi-pianoteq`
-- **Custom venv location**: `ExecStart=/path/to/your/venv/bin/pi-pianoteq`
+This matches the standard `pip install --user` installation from the README.
 
 ### 2. Enable and Start the Service
 
