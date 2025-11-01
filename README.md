@@ -49,7 +49,7 @@ For source installation or development, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 Initialize your configuration:
 ```bash
-python -m pi_pianoteq --init-config
+pi-pianoteq --init-config
 ```
 
 Edit `~/.config/pi_pianoteq/pi_pianoteq.conf` and update the paths to match your Pianoteq installation:
@@ -64,7 +64,7 @@ PIANOTEQ_HEADLESS = true
 
 View your active configuration:
 ```bash
-python -m pi_pianoteq --show-config
+pi-pianoteq --show-config
 ```
 
 ### Configuration Priority
@@ -98,12 +98,12 @@ This is a one-time setup. The setting persists in your Pianoteq preferences.
 ### Run Manually
 
 ```bash
-python -m pi_pianoteq
+pi-pianoteq
 ```
 
-Or with pipenv:
+Or with pipenv (development):
 ```bash
-pipenv run python -m pi_pianoteq
+pipenv run pi-pianoteq
 ```
 
 ### Command Line Options
@@ -118,7 +118,7 @@ pipenv run python -m pi_pianoteq
 For usage without GFX HAT hardware, use the CLI client:
 
 ```bash
-python -m pi_pianoteq --cli
+pi-pianoteq --cli
 ```
 
 The CLI client provides a full-featured terminal interface with instrument selection:
