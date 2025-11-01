@@ -102,10 +102,6 @@ This is a one-time setup. The setting persists in your Pianoteq preferences.
 pi-pianoteq
 ```
 
-Or with pipenv (development):
-```bash
-pipenv run pi-pianoteq
-```
 
 ### Command Line Options
 
@@ -135,9 +131,9 @@ The CLI client provides a full-featured terminal interface with instrument selec
 - `Enter`: Select instrument
 - `Esc`, `q`, or `Ctrl-C`: Exit menu
 
-### Run as a Service (Auto-start on Boot)
+### Run as a Service (Optional)
 
-See [SYSTEMD.md](SYSTEMD.md) for instructions on setting up a systemd service.
+To have pi-pianoteq start automatically on boot, see [SYSTEMD.md](SYSTEMD.md).
 
 ## Development
 
