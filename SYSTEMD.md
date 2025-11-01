@@ -21,7 +21,7 @@ Type=simple
 User=<username>
 Group=<username>
 ExecStartPre=cpupower frequency-set -g performance
-ExecStart=/usr/local/bin/pi-pianoteq
+ExecStart=/home/<username>/pi-pianoteq-venv/bin/pi-pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
 PermissionsStartOnly=true
 LimitMEMLOCK=500000
@@ -35,9 +35,11 @@ WantedBy=graphical.target
 
 **Important:** Replace `<username>` with your Raspberry Pi username.
 
-If you installed pi-pianoteq in a virtual environment, update the `ExecStart` line:
+**Note:** This assumes installation in a virtual environment at `~/pi-pianoteq-venv` (recommended).
+
+If you installed system-wide instead, update the `ExecStart` line:
 ```ini
-ExecStart=/home/<username>/venv/bin/pi-pianoteq
+ExecStart=/usr/local/bin/pi-pianoteq
 ```
 
 ### 2. Enable and Start the Service
