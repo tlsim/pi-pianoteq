@@ -21,7 +21,7 @@ Type=simple
 User=<username>
 Group=<username>
 ExecStartPre=cpupower frequency-set -g performance
-ExecStart=/usr/bin/python3 -u -m pi_pianoteq
+ExecStart=/usr/local/bin/pi-pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
 PermissionsStartOnly=true
 LimitMEMLOCK=500000
@@ -37,7 +37,7 @@ WantedBy=graphical.target
 
 If you installed pi-pianoteq in a virtual environment, update the `ExecStart` line:
 ```ini
-ExecStart=/home/<username>/venv/bin/python -u -m pi_pianoteq
+ExecStart=/home/<username>/venv/bin/pi-pianoteq
 ```
 
 ### 2. Enable and Start the Service
@@ -85,7 +85,7 @@ The systemd service runs Pianoteq in headless mode by default (`PIANOTEQ_HEADLES
 **Or run manually (without the service):**
 ```bash
 sudo systemctl stop pi-pianoteq
-PIANOTEQ_HEADLESS=false python -m pi_pianoteq
+PIANOTEQ_HEADLESS=false pi-pianoteq
 ```
 
 Note: You'll need a display (VNC, HDMI, etc.) to see the Pianoteq GUI.
