@@ -38,28 +38,12 @@ Notes:
 
 ### 3. Install pi_pianoteq
 
-**Option A: Install from Release (Recommended)**
-
 Download the latest `.whl` file from [Releases](https://github.com/tlsim/pi-pianoteq/releases/latest) and install:
 ```bash
 pip install pi_pianoteq-*.whl
 ```
 
-**Option B: Install from Source**
-
-Requires Python 3.13+. If your system's default `python3` is older, use `python3.13` explicitly:
-
-```bash
-git clone https://github.com/tlsim/pi-pianoteq.git
-cd pi-pianoteq
-python3.13 -m venv --system-site-packages venv
-source venv/bin/activate
-pip install .
-```
-
-The `--system-site-packages` flag allows the venv to access system packages like `python3-rtmidi`.
-
-**For Development:** See [DEVELOPMENT.md](DEVELOPMENT.md) for the development workflow using pipenv.
+For source installation or development, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Configuration
 

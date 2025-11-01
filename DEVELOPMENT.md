@@ -1,8 +1,46 @@
 # Development Guide
 
-This guide is for developers who want to build, test, and deploy pi_pianoteq.
+This guide covers installing from source and the full development workflow for pi_pianoteq.
 
-## Prerequisites
+## Installing from Source (Non-Development Use)
+
+If you want to install from source without setting up a development environment:
+
+### Prerequisites
+
+Install system dependencies:
+```bash
+sudo apt install python3-rtmidi python3-pip python3-venv
+```
+
+Note: `python3-rtmidi` is required to avoid compiling rtmidi from source (which requires ALSA development headers).
+
+### Installation Steps
+
+```bash
+git clone https://github.com/tlsim/pi-pianoteq.git
+cd pi-pianoteq
+python3.13 -m venv --system-site-packages venv
+source venv/bin/activate
+pip install .
+```
+
+**Important notes:**
+- Requires Python 3.13+ (use `python3.13` explicitly if your system default is older)
+- The `--system-site-packages` flag allows the venv to access system packages like `python3-rtmidi`
+- Remember to activate the venv before running: `source venv/bin/activate`
+
+Then run with:
+```bash
+source venv/bin/activate
+python -m pi_pianoteq
+```
+
+## Development Workflow
+
+For developers who want to build, test, and deploy pi_pianoteq.
+
+### Prerequisites
 
 ### On Your Development Machine
 
