@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide covers both installing from source and the full development workflow for pi_pianoteq.
+This guide is for developers who want to build, test, and deploy pi_pianoteq.
 
 ## Prerequisites
 
@@ -23,35 +23,7 @@ sudo apt install python3-rtmidi linux-cpupower
 
 Other Python dependencies will be installed automatically into a virtual environment during deployment.
 
-## Installing from Source (Non-Development)
-
-If you want to install from source without setting up a development environment:
-
-### On Your Raspberry Pi or Target Machine
-
-1. Install system dependencies:
-```bash
-sudo apt install python3-rtmidi python3-pip python3-venv
-```
-
-2. Clone and install:
-```bash
-git clone https://github.com/tlsim/pi-pianoteq.git
-cd pi-pianoteq
-python3 -m venv venv
-source venv/bin/activate
-pip install .
-```
-
-3. The `pi_pianoteq` command will now be available in the virtual environment. Remember to activate the venv before running:
-```bash
-source venv/bin/activate
-python -m pi_pianoteq
-```
-
-**Note:** For development workflows (building, testing, deploying), continue to the sections below.
-
-## Development Setup
+## Setup
 
 ### 1. Clone the Repository
 
