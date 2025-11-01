@@ -48,12 +48,8 @@ pip install pi_pianoteq-*.whl
 ```bash
 git clone https://github.com/tlsim/pi-pianoteq.git
 cd pi-pianoteq
-python3 -m venv venv
-source venv/bin/activate
 pip install .
 ```
-
-Remember to activate the venv before running: `source venv/bin/activate`
 
 **For Development:** See [DEVELOPMENT.md](DEVELOPMENT.md) for the development workflow using pipenv.
 
