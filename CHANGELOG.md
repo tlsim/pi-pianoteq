@@ -5,7 +5,51 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - Unreleased
+
+### Breaking Changes
+
+**Migration required for existing installations.** See TESTING.md for migration guide.
+
+- Package distribution name changed from `pi_pianoteq` to `pi-pianoteq` for consistency with project name
+- Systemd service name changed from `pi_pianoteq.service` to `pi-pianoteq.service`
+- Virtual environment path in deploy.sh changed from `~/pi_pianoteq_venv` to `~/pi-pianoteq-venv`
+- Installation method simplified to `pip install --user` for normal users
+
+### Added
+
+- Console script entry point: users can now run `pi-pianoteq` command directly
+- Src-layout directory structure (`src/pi_pianoteq/`) for cleaner project organization
+- Dual-install pattern documentation for developers (venv + user install coexistence)
+- TESTING.md guide for migration and testing new structure
+- Loading screen with visual feedback during startup (#13)
+  - GFX HAT: Blue backlight with loading messages
+  - CLI: Full-screen interface with live log window
+  - Messages: "Starting...", "Loading..."
+- License detection using `getActivationInfo()` API endpoint
+- CLI log window showing real-time startup messages
+
+### Changed
+
+- Adopted application-oriented packaging (console script vs library imports)
+- Systemd service uses `~/.local/bin/pi-pianoteq` for user installations
+- deploy.sh generates service file dynamically instead of using template
+- Simplified installation documentation: single command for users, separate workflow for developers
+- Systemd setup now clearly marked as optional (not required for normal use)
+
+### Fixed
+
+- Licensed versions no longer incorrectly fall back to demo instruments
+
+### Migration Notes
+
+Existing users must:
+1. Stop and remove old systemd service (`pi_pianoteq.service`)
+2. Remove old installation (venv or pip uninstall)
+3. Follow updated installation instructions in README.md
+4. Recreate systemd service with new name if needed
+
+See TESTING.md for detailed migration steps.
 
 ## [1.7.0] - 2025-10-30
 
