@@ -36,11 +36,11 @@ Notes:
 - `python3-rtmidi`: Required to avoid compiling rtmidi from source
 - `linux-cpupower`: Required if using the systemd service (for CPU performance management)
 
-### 3. Install pi_pianoteq
+### 3. Install pi-pianoteq
 
 Download the latest `.whl` file from [Releases](https://github.com/tlsim/pi-pianoteq/releases/latest) and install:
 ```bash
-pip install pi_pianoteq-*.whl
+pip install pi-pianoteq-*.whl
 ```
 
 For source installation or development, see [DEVELOPMENT.md](DEVELOPMENT.md).
@@ -82,7 +82,7 @@ Instruments are automatically discovered from Pianoteq via its JSON-RPC API. Onl
 
 ## MIDI Configuration
 
-After installing pi_pianoteq, you need to enable the PI-PTQ MIDI port in Pianoteq:
+After installing pi-pianoteq, you need to enable the PI-PTQ MIDI port in Pianoteq:
 
 1. Launch Pianoteq
 2. Go to **Edit → Preferences → Devices**
@@ -91,7 +91,7 @@ After installing pi_pianoteq, you need to enable the PI-PTQ MIDI port in Pianote
 
 This is a one-time setup. The setting persists in your Pianoteq preferences.
 
-**Note:** pi_pianoteq will warn you on startup if this is not configured, but will continue running.
+**Note:** pi-pianoteq will warn you on startup if this is not configured, but will continue running.
 
 ## Running
 

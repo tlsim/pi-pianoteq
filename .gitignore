@@ -13,7 +13,7 @@ dist/
 build/
 *.egg-info
 .DS_Store
-pi_pianoteq.service
+pi-pianoteq.service
 
 pi-pianoteq/*
 backup-*/

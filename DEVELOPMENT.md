@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide is for developers who want to build pi_pianoteq on a development machine and deploy it to a remote Raspberry Pi.
+This guide is for developers who want to build pi-pianoteq on a development machine and deploy it to a remote Raspberry Pi.
 
 ## Prerequisites
 
