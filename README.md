@@ -32,7 +32,9 @@ Download and install Pianoteq on your Raspberry Pi:
 sudo apt install python3-rtmidi python3-pip python3-venv linux-cpupower
 ```
 
-Note: `linux-cpupower` is required if using the systemd service (for CPU performance management).
+Notes:
+- `python3-rtmidi`: Required to avoid compiling rtmidi from source
+- `linux-cpupower`: Required if using the systemd service (for CPU performance management)
 
 ### 3. Install pi_pianoteq
 
@@ -41,14 +43,7 @@ Download the latest `.whl` file from [Releases](https://github.com/tlsim/pi-pian
 pip install pi_pianoteq-*.whl
 ```
 
-Or install from source (for development):
-```bash
-git clone https://github.com/tlsim/pi-pianoteq.git
-cd pi-pianoteq
-pip install .
-```
-
-See [DEVELOPMENT.md](DEVELOPMENT.md) for the full development workflow.
+For source installation or development, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Configuration
 
