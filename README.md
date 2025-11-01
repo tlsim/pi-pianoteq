@@ -41,14 +41,7 @@ Download the latest `.whl` file from [Releases](https://github.com/tlsim/pi-pian
 pip install pi_pianoteq-*.whl
 ```
 
-Or install from source (for development):
-```bash
-git clone https://github.com/tlsim/pi-pianoteq.git
-cd pi-pianoteq
-pip install .
-```
-
-See [DEVELOPMENT.md](DEVELOPMENT.md) for the full development workflow.
+For development or installing from source, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Configuration
 
