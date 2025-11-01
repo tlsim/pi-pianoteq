@@ -8,6 +8,8 @@ If you used the `deploy.sh` script, the systemd service is already configured. S
 
 ## Manual Setup
 
+**Prerequisites:** Follow the installation instructions in [README.md](README.md) first. If you plan to use systemd, use **Option A** (venv install) from the README.
+
 ### 1. Create the Service File
 
 Create `/etc/systemd/system/pi-pianoteq.service`:
@@ -33,14 +35,14 @@ Nice=-10
 WantedBy=graphical.target
 ```
 
-**Important:** Replace `<username>` with your Raspberry Pi username.
+**Important:**
+- Replace `<username>` with your Raspberry Pi username
+- This assumes you installed using **Option A** from README.md (venv at `~/pi-pianoteq-venv`)
 
-**Note:** This assumes installation in a virtual environment at `~/pi-pianoteq-venv` (recommended).
-
-If you installed system-wide instead, update the `ExecStart` line:
-```ini
-ExecStart=/usr/local/bin/pi-pianoteq
-```
+**If you used a different installation method**, adjust the `ExecStart` line:
+- **System-wide install (Option C)**: `ExecStart=/usr/local/bin/pi-pianoteq`
+- **User install (Option B)**: `ExecStart=/home/<username>/.local/bin/pi-pianoteq`
+- **Custom venv location**: `ExecStart=/path/to/your/venv/bin/pi-pianoteq`
 
 ### 2. Enable and Start the Service
 
