@@ -2,7 +2,7 @@
 
 import unittest
 import logging
-from pi_pianoteq.logging_config import BufferedLoggingHandler
+from pi_pianoteq.logging.logging_config import BufferedLoggingHandler
 
 
 class TestBufferedLoggingHandler(unittest.TestCase):

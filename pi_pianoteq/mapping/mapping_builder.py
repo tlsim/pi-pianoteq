@@ -1,4 +1,4 @@
-from pi_pianoteq.instrument.Library import Library
+from pi_pianoteq.instrument.library import Library
 from pi_pianoteq.mapping.mapping import Mapping, ProgramChangeLoadPresetRow
 
 

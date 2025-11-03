@@ -5,11 +5,11 @@ from PIL import ImageFont
 import time
 from typing import Optional
 
-from pi_pianoteq.client.gfxhat.InstrumentDisplay import InstrumentDisplay
-from pi_pianoteq.client.gfxhat.InstrumentMenuDisplay import InstrumentMenuDisplay
-from pi_pianoteq.client.gfxhat.LoadingDisplay import LoadingDisplay
-from pi_pianoteq.client.Client import Client
-from pi_pianoteq.client.ClientApi import ClientApi
+from pi_pianoteq.client.gfxhat.instrument_display import InstrumentDisplay
+from pi_pianoteq.client.gfxhat.instrument_menu_display import InstrumentMenuDisplay
+from pi_pianoteq.client.gfxhat.loading_display import LoadingDisplay
+from pi_pianoteq.client.client import Client
+from pi_pianoteq.client.client_api import ClientApi
 
 
 class GfxhatClient(Client):

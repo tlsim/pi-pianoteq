@@ -1,6 +1,6 @@
 from typing import List
 
-from pi_pianoteq.instrument.Preset import Preset
+from pi_pianoteq.instrument.preset import Preset
 
 
 class Instrument:

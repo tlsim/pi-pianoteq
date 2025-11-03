@@ -1,8 +1,8 @@
 from PIL import Image, ImageDraw
 
-from pi_pianoteq.client.gfxhat.MenuOption import MenuOption
-from pi_pianoteq.client.gfxhat.Backlight import Backlight
-from pi_pianoteq.client.gfxhat.ScrollingText import ScrollingText
+from pi_pianoteq.client.gfxhat.menu_option import MenuOption
+from pi_pianoteq.client.gfxhat.backlight import Backlight
+from pi_pianoteq.client.gfxhat.scrolling_text import ScrollingText
 
 from gfxhat import touch
 

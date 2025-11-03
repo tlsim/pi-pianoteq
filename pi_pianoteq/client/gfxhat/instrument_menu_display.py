@@ -1,10 +1,10 @@
 from PIL import Image, ImageDraw
 
-from pi_pianoteq.client.ClientApi import ClientApi
-from pi_pianoteq.client.gfxhat.Backlight import Backlight
-from pi_pianoteq.client.gfxhat.MenuOption import MenuOption
-from pi_pianoteq.client.gfxhat.MenuDisplay import MenuDisplay
-from pi_pianoteq.client.gfxhat.ShutdownDisplay import ShutdownDisplay
+from pi_pianoteq.client.client_api import ClientApi
+from pi_pianoteq.client.gfxhat.backlight import Backlight
+from pi_pianoteq.client.gfxhat.menu_option import MenuOption
+from pi_pianoteq.client.gfxhat.menu_display import MenuDisplay
+from pi_pianoteq.client.gfxhat.shutdown_display import ShutdownDisplay
 from gfxhat import touch
 
 

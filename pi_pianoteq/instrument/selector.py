@@ -1,5 +1,5 @@
 from typing import List
-from pi_pianoteq.instrument.Instrument import Instrument, Preset
+from pi_pianoteq.instrument.instrument import Instrument, Preset
 
 
 class Selector:

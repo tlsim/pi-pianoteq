@@ -1,7 +1,7 @@
 from os.path import expanduser
 from pathlib import Path
 
-from pi_pianoteq.config import Config
+from pi_pianoteq.config.config import Config
 from pi_pianoteq.mapping.mapping import Mapping
 
 

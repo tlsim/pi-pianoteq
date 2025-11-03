@@ -9,9 +9,9 @@ from typing import Optional
 import threading
 import os
 
-from pi_pianoteq.client.Client import Client
-from pi_pianoteq.client.ClientApi import ClientApi
-from pi_pianoteq.logging_config import BufferedLoggingHandler
+from pi_pianoteq.client.client import Client
+from pi_pianoteq.client.client_api import ClientApi
+from pi_pianoteq.logging.logging_config import BufferedLoggingHandler
 
 
 class CliClient(Client):

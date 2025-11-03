@@ -1,10 +1,10 @@
 from PIL import Image, ImageDraw
 
-from pi_pianoteq.client.ClientApi import ClientApi
+from pi_pianoteq.client.client_api import ClientApi
 
 from gfxhat import touch
-from pi_pianoteq.client.gfxhat.Backlight import Backlight
-from pi_pianoteq.client.gfxhat.ScrollingText import ScrollingText
+from pi_pianoteq.client.gfxhat.backlight import Backlight
+from pi_pianoteq.client.gfxhat.scrolling_text import ScrollingText
 
 
 class InstrumentDisplay:

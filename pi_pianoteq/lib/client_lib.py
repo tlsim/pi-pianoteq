@@ -1,8 +1,8 @@
-from pi_pianoteq.client.ClientApi import ClientApi
-from pi_pianoteq.instrument.Library import Library
-from pi_pianoteq.instrument.Selector import Selector
-from pi_pianoteq.midi.ProgramChange import ProgramChange
-from pi_pianoteq.config import Config
+from pi_pianoteq.client.client_api import ClientApi
+from pi_pianoteq.instrument.library import Library
+from pi_pianoteq.instrument.selector import Selector
+from pi_pianoteq.midi.program_change import ProgramChange
+from pi_pianoteq.config.config import Config
 
 from typing import List
 from time import sleep

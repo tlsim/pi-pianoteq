@@ -7,8 +7,8 @@ from configparser import ConfigParser
 from os import path
 from pathlib import Path
 from typing import List, Optional, Dict, Tuple
-from pi_pianoteq.instrument.Instrument import Instrument
-from pi_pianoteq.instrument.Preset import Preset
+from pi_pianoteq.instrument.instrument import Instrument
+from pi_pianoteq.instrument.preset import Preset
 
 logger = logging.getLogger(__name__)
 
@@ -219,7 +219,7 @@ class ConfigLoader:
 
         Groups presets by instrument and assigns colors based on type.
         """
-        from pi_pianoteq.jsonrpc_client import PianoteqJsonRpcError
+        from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpcError
 
         try:
             presets = jsonrpc_client.get_presets()
