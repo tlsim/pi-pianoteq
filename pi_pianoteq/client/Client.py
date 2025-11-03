@@ -35,17 +35,9 @@ class Client(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def clear_loading_screen(self):
-        """
-        Clear the loading screen and prepare for normal operation.
-        Called after api is provided and before transitioning to normal UI.
-        """
-        raise NotImplemented
-
-    @abstractmethod
     def start(self):
         """
         Start normal client operation.
-        Called after set_api() and clear_loading_screen().
+        Called after set_api().
         """
         raise NotImplemented

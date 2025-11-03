@@ -10,7 +10,7 @@ class LoadingDisplay:
     Follows the same pattern as InstrumentDisplay/InstrumentMenuDisplay for consistency.
     """
 
-    LOADING_BACKLIGHT_COLOR = '#1e3a5f'  # Calming blue
+    LOADING_BACKLIGHT_COLOR = '#1e3a5f'
 
     def __init__(self, width, height, font):
         self.width = width

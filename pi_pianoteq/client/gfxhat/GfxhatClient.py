@@ -65,14 +65,6 @@ class GfxhatClient(Client):
         backlight.show()
         lcd.show()
 
-    def clear_loading_screen(self):
-        """Clear loading screen (prepare for normal display)"""
-        lcd.clear()
-        lcd.show()
-        for i in range(6):
-            backlight.set_pixel(i, 0, 0, 0)
-        backlight.show()
-
     def start(self):
         """Start normal client operation (requires API)"""
         if self.loading_mode:

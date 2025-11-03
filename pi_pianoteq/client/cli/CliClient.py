@@ -135,7 +135,7 @@ class CliClient(Client):
         self.application.layout = self.normal_layout
         self.application.key_bindings = self.normal_kb
 
-        # Trigger redraw (thread-safe)
+        # Trigger redraw
         self.application.invalidate()
 
     def _build_normal_layout(self):
@@ -250,7 +250,7 @@ class CliClient(Client):
         return kb
 
     def show_loading_message(self, message: str):
-        """Update loading message and trigger redraw (thread-safe)"""
+        """Update loading message and trigger redraw"""
         self.loading_message = message
 
         # Start app in background thread if not already running
@@ -259,12 +259,8 @@ class CliClient(Client):
             self.app_thread = threading.Thread(target=self.application.run, daemon=True)
             self.app_thread.start()
 
-        # Trigger redraw (thread-safe!)
+        # Trigger redraw
         self.application.invalidate()
-
-    def clear_loading_screen(self):
-        """Clear loading screen (no-op, we switch layouts instead)"""
-        pass
 
     def _menu_next(self):
         """Navigate to next menu item"""

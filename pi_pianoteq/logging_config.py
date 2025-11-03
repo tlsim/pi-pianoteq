@@ -27,7 +27,7 @@ class BufferedLoggingHandler(logging.Handler):
         try:
             msg = self.format(record)
             self.buffer.append(msg)
-            # Trigger callback to update UI (thread-safe)
+            # Trigger callback to update UI
             if self.on_message_callback:
                 self.on_message_callback()
         except Exception:

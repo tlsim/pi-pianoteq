@@ -105,6 +105,7 @@ def main():
     from rtmidi import MidiOut
     from pi_pianoteq.instrument.Library import Library
     from pi_pianoteq.instrument.Selector import Selector
+    from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
     from pi_pianoteq.lib.ClientLib import ClientLib
     from pi_pianoteq.mapping.MappingBuilder import MappingBuilder
     from pi_pianoteq.mapping.Writer import Writer
@@ -137,8 +138,7 @@ def main():
     pianoteq.start()
 
     # Discover instruments via JSON-RPC API with retry logic
-    from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
-    client.show_loading_message("Connecting to API...")
+    client.show_loading_message("Connecting...")
 
     jsonrpc = PianoteqJsonRpc()
     instruments = []
@@ -216,9 +216,6 @@ def main():
         if args.cli:
             client.show_loading_message("⚠️  MIDI port not configured - see logs")
             time.sleep(3)  # Give user time to see the warning
-
-    # Transition from loading to normal operation
-    client.clear_loading_screen()
 
     # Provide API and start normal operation
     client.set_api(client_lib)
