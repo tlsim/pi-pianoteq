@@ -118,6 +118,39 @@ class PianoteqJsonRpc:
         logger.debug("Fetching Pianoteq state info")
         return self._call('getInfo')
 
+    def get_activation_info(self) -> Dict:
+        """
+        Get activation/license information from Pianoteq.
+
+        Returns:
+            Dictionary with activation info including:
+            - addons: List of licensed addon names
+            - error_msg: "Demo" if unlicensed, "" if licensed
+            - status: License status code (present if licensed)
+            - name, email, hwname: License holder info (if licensed)
+
+        Raises:
+            PianoteqJsonRpcError: If the call fails
+        """
+        logger.debug("Fetching Pianoteq activation info")
+        result = self._call('getActivationInfo')
+        # getActivationInfo returns a list with one element
+        return result[0] if result else {}
+
+    def is_licensed(self) -> bool:
+        """
+        Check if Pianoteq is licensed (not demo/trial).
+
+        Returns:
+            True if licensed, False if demo/trial
+
+        Raises:
+            PianoteqJsonRpcError: If the call fails
+        """
+        activation_info = self.get_activation_info()
+        # Demo/trial version has error_msg="Demo", licensed has error_msg=""
+        return activation_info.get('error_msg', 'Demo') != 'Demo'
+
     def load_preset(self, name: str, bank: str = "") -> None:
         """
         Load a preset by name.

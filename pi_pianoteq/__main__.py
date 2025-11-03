@@ -101,13 +101,11 @@ def main():
     if args.init_config:
         return init_config()
 
-    # Initialize logging for normal operation
-    setup_logging()
-
     # Normal startup - import hardware dependencies only when needed
     from rtmidi import MidiOut
     from pi_pianoteq.instrument.Library import Library
     from pi_pianoteq.instrument.Selector import Selector
+    from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
     from pi_pianoteq.lib.ClientLib import ClientLib
     from pi_pianoteq.mapping.MappingBuilder import MappingBuilder
     from pi_pianoteq.mapping.Writer import Writer
@@ -121,60 +119,69 @@ def main():
     else:
         from pi_pianoteq.client.gfxhat.GfxhatClient import GfxhatClient
 
+    # Instantiate client early (in loading mode, api=None)
+    if args.cli:
+        client = CliClient(api=None)
+    else:
+        client = GfxhatClient(api=None)
+
+    # Setup logging - use buffered handler for CLI mode
+    log_buffer = client.log_buffer if args.cli else None
+    setup_logging(cli_mode=args.cli, log_buffer=log_buffer)
+
     pianoteq = Pianoteq()
 
     logger.info("Pianoteq version: %s", pianoteq.get_version())
 
+    # Start Pianoteq and wait for API
+    client.show_loading_message("Starting...")
     pianoteq.start()
 
-    # Discover instruments via JSON-RPC API with retry logic
-    from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
     jsonrpc = PianoteqJsonRpc()
     instruments = []
     last_count = 0
     stable_count = 0
+    api_connected = False
+    is_licensed = False
 
+    # First, wait for API to be available and check license status
     for attempt in range(8):
         try:
-            instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=args.include_demo, skip_fallback=True)
-            current_count = len(instruments)
-
-            if current_count > 0 and current_count == last_count:
-                stable_count += 1
-                if stable_count >= 2:
-                    print(f"✓ Discovered {current_count} instruments from Pianoteq API")
-                    break
-            else:
-                stable_count = 0
-
-            last_count = current_count
-
-            if attempt < 7:
-                if current_count == 0:
-                    print(f"No licensed instruments found yet, retrying ({attempt + 1}/8)...")
-                else:
-                    print(f"Found {current_count} instruments, waiting for licenses to finish loading...")
-                time.sleep(0.5)
+            is_licensed = jsonrpc.is_licensed()
+            api_connected = True
+            logger.info(f"Pianoteq license status: {'Licensed' if is_licensed else 'Demo/Trial'}")
+            break
         except Exception as e:
             if attempt < 7:
-                print(f"API connection attempt {attempt + 1}/8 failed, retrying...")
                 time.sleep(0.5)
             else:
-                print(f"Failed to connect after 8 attempts: {e}")
-    if not instruments:
-        print("No licensed instruments found after retries, trying with demos...")
+                logger.error(f"Failed to connect to API after 8 attempts: {e}")
+                # If we can't connect at all, can't proceed
+                print("ERROR: Could not connect to Pianoteq JSON-RPC API!")
+                pianoteq.terminate()
+                return 1
+
+    client.show_loading_message("Loading...")
+
+    # Discover instruments based on license status
+    if is_licensed:
+        # Licensed version - get licensed instruments
+        instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=args.include_demo, skip_fallback=True)
+        logger.info(f"Discovered {len(instruments)} licensed instruments from Pianoteq API")
+    else:
+        # Demo/trial version - use demo instruments
+        logger.info("Demo/trial version detected, loading with demo instruments...")
         instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=True)
+        logger.info(f"Discovered {len(instruments)} demo instruments from Pianoteq API")
 
     # Check if we successfully discovered any instruments
     if not instruments:
-        print("ERROR: No instruments discovered from Pianoteq API!")
-        print()
-        print("This usually means:")
-        print("  1. Pianoteq failed to start or crashed during startup")
-        print("  2. Pianoteq's --serve flag didn't enable the JSON-RPC server")
-        print("  3. No instruments are licensed (all show as 'demo' status)")
-        print()
-        print("Please check the logs above for error messages.")
+        logger.error("No instruments discovered from Pianoteq API!")
+        logger.error("This usually means:")
+        logger.error("  1. Pianoteq failed to start or crashed during startup")
+        logger.error("  2. Pianoteq's --serve flag didn't enable the JSON-RPC server")
+        logger.error("  3. No instruments are licensed (all show as 'demo' status)")
+        logger.error("Please check the logs for error messages.")
         pianoteq.terminate()
         return 1
 
@@ -194,37 +201,21 @@ def main():
     time.sleep(2)
 
     # Check if PI-PTQ MIDI device is enabled in Pianoteq preferences
-    if not is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE):
+    midi_port_enabled = is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE)
+    if not midi_port_enabled:
         logger.warning(
             "PI-PTQ MIDI port not enabled in Pianoteq. "
             "Please enable it in Pianoteq preferences: "
             "Edit → Preferences → Devices, then enable 'PI-PTQ' under Active MIDI Inputs. "
             "You may need to restart the service after enabling the port."
         )
-
-        # Only wait for keypress in CLI mode (not in headless/systemd service)
+        # Show warning in loading screen for CLI mode
         if args.cli:
-            # Also print to console in CLI mode for immediate visibility
-            print("⚠️  WARNING: PI-PTQ MIDI port not enabled in Pianoteq")
-            print()
-            print("Please enable it in Pianoteq preferences:")
-            print("  1. With pi_pianoteq running, open Pianoteq")
-            print("  2. Go to Edit → Preferences → Devices")
-            print("  3. Enable the checkbox next to \"PI-PTQ\" under Active MIDI Inputs")
-            print("  4. Click OK")
-            print()
-            print("Note: You may need to restart the service after enabling the port.")
-            print()
-            print("Continuing anyway (preset/instrument changes won't work until configured)...")
-            print()
-            input("Press Enter to continue...")
-            print()
+            client.show_loading_message("⚠️  MIDI port not configured - see logs")
+            time.sleep(3)  # Give user time to see the warning
 
-    if args.cli:
-        client = CliClient(client_lib)
-    else:
-        client = GfxhatClient(client_lib)
-
+    # Provide API and start normal operation
+    client.set_api(client_lib)
     client.start()
     pianoteq.terminate()
 
