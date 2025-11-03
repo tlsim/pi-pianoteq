@@ -41,6 +41,10 @@ class CliClient(Client):
         # Initialize application (should always start with loading mode now)
         if api is None:
             self._init_loading_app()
+            # Start application in background thread immediately
+            self.app_running = True
+            self.app_thread = threading.Thread(target=self.application.run, daemon=True)
+            self.app_thread.start()
         else:
             # Shouldn't reach here in normal flow, but handle gracefully
             raise RuntimeError("CliClient should be initialized with api=None for loading mode")
@@ -252,14 +256,6 @@ class CliClient(Client):
     def show_loading_message(self, message: str):
         """Update loading message and trigger redraw"""
         self.loading_message = message
-
-        # Start app in background thread if not already running
-        if not self.app_running:
-            self.app_running = True
-            self.app_thread = threading.Thread(target=self.application.run, daemon=True)
-            self.app_thread.start()
-
-        # Trigger redraw
         self.application.invalidate()
 
     def _menu_next(self):
@@ -383,11 +379,7 @@ class CliClient(Client):
         self.application.invalidate()
 
     def start(self):
-        """Start or join the application"""
-        if self.app_running:
-            # App already running in background thread, just wait for it
-            if self.app_thread:
-                self.app_thread.join()
-        else:
-            # Start app normally (blocking)
-            self.application.run()
+        """Wait for the application to exit"""
+        # App is already running in background thread, just wait for it
+        if self.app_thread:
+            self.app_thread.join()

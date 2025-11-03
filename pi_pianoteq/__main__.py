@@ -133,12 +133,9 @@ def main():
 
     logger.info("Pianoteq version: %s", pianoteq.get_version())
 
-    # Start Pianoteq with loading feedback
-    client.show_loading_message("Starting Pianoteq...")
+    # Start Pianoteq and wait for API
+    client.show_loading_message("Starting...")
     pianoteq.start()
-
-    # Discover instruments via JSON-RPC API with retry logic
-    client.show_loading_message("Connecting...")
 
     jsonrpc = PianoteqJsonRpc()
     instruments = []

@@ -13,7 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Loading screen with visual feedback during startup (#13)
   - GFX HAT: Blue backlight with loading messages
   - CLI: Full-screen interface with live log window
-  - Messages: "Starting Pianoteq...", "Connecting...", "Loading..."
+  - Messages: "Starting...", "Loading..."
 - License detection via `getActivationInfo()` for smarter instrument discovery
 
 ### Changed
