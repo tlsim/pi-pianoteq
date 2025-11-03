@@ -10,15 +10,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [1.7.0] - 2025-10-30
 
 ### Added
-- Loading screen with visual feedback during ~8 second startup (#13)
+- Loading screen with visual feedback during startup (#13)
   - GFX HAT: Blue backlight with loading messages
   - CLI: Full-screen interface with live log window
   - Messages: "Starting Pianoteq...", "Connecting to API...", "Loading..."
+- License detection via `getActivationInfo()` for smarter instrument discovery
 
 ### Changed
 - Clients now support two-phase initialization (loading mode → normal mode)
 - CLI displays logs within UI instead of mixed console output
 - GFX HAT uses unified display architecture for loading and normal modes
+- Instrument discovery uses license status to avoid false demo fallback
+
+### Fixed
+- Licensed versions no longer incorrectly fall back to demo instruments
 
 ## [1.6.0] - 2025-10-26
 

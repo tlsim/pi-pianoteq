@@ -145,37 +145,37 @@ def main():
     last_count = 0
     stable_count = 0
     api_connected = False
+    is_licensed = False
 
+    # First, wait for API to be available and check license status
     for attempt in range(8):
         try:
-            instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=args.include_demo, skip_fallback=True)
-            current_count = len(instruments)
-
-            # Show "Loading..." once API connects
-            if not api_connected:
-                api_connected = True
-                client.show_loading_message("Loading...")
-
-            if current_count > 0 and current_count == last_count:
-                stable_count += 1
-                if stable_count >= 2:
-                    logger.info(f"Discovered {current_count} instruments from Pianoteq API")
-                    break
-            else:
-                stable_count = 0
-
-            last_count = current_count
-
-            if attempt < 7:
-                time.sleep(0.5)
+            is_licensed = jsonrpc.is_licensed()
+            api_connected = True
+            logger.info(f"Pianoteq license status: {'Licensed' if is_licensed else 'Demo/Trial'}")
+            break
         except Exception as e:
             if attempt < 7:
                 time.sleep(0.5)
             else:
-                logger.error(f"Failed to connect after 8 attempts: {e}")
-    if not instruments:
-        logger.info("No licensed instruments found after retries, trying with demos...")
+                logger.error(f"Failed to connect to API after 8 attempts: {e}")
+                # If we can't connect at all, can't proceed
+                print("ERROR: Could not connect to Pianoteq JSON-RPC API!")
+                pianoteq.terminate()
+                return 1
+
+    client.show_loading_message("Loading...")
+
+    # Discover instruments based on license status
+    if is_licensed:
+        # Licensed version - get licensed instruments
+        instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=args.include_demo, skip_fallback=True)
+        logger.info(f"Discovered {len(instruments)} licensed instruments from Pianoteq API")
+    else:
+        # Demo/trial version - use demo instruments
+        logger.info("Demo/trial version detected, loading with demo instruments...")
         instruments = Config.discover_instruments_from_api(jsonrpc, include_demo=True)
+        logger.info(f"Discovered {len(instruments)} demo instruments from Pianoteq API")
 
     # Check if we successfully discovered any instruments
     if not instruments:
