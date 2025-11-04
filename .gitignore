@@ -14,6 +14,7 @@ build/
 *.egg-info
 .DS_Store
 pi-pianoteq.service
+pi_pianoteq.service
 
 pi-pianoteq/*
 backup-*/

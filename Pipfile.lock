@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "020001e005721d1066402467e78a2d256583df67f19005261b869f01f729a8fc"
+            "sha256": "3e49a682365286bd6ba8e30e859186b9bd700dd21e0079aadfc2c18e6edbf187"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -31,6 +31,10 @@
             ],
             "index": "pypi",
             "version": "==0.0.1"
+        },
+        "pi-pianoteq": {
+            "editable": true,
+            "file": "."
         },
         "pillow": {
             "hashes": [
@@ -217,11 +221,10 @@
         },
         "wcwidth": {
             "hashes": [
-                "sha256:4d478375d31bc5395a3c55c40ccdf3354688364cd61c4f6adacaa9215d0b3605",
-                "sha256:a7bb560c8aee30f9957e5f9895805edd20602f2d7f720186dfd906e82b4982e1"
+                "sha256:cafe2186b3c009a04067022ce1dcd79cb38d8d65ee4f4791b8888d6599d1bbe1",
+                "sha256:ee73862862a156bf77ff92b09034fc4825dd3af9cf81bc5b360668d425f3c5f1"
             ],
-            "markers": "python_version >= '3.6'",
-            "version": "==0.2.14"
+            "version": "==0.1.9"
         }
     },
     "develop": {

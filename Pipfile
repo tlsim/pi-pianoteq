@@ -12,6 +12,7 @@ python-rtmidi = "~=1.5"
 prompt-toolkit = "~=3.0"
 pillow = "~=11.1"
 gfxhat = "==0.0.1"
+pi-pianoteq = {file = ".", editable = true}
 
 [requires]
 python_version = "3.13"
