@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import pytest
 
-from pi_pianoteq.config import (
+from pi_pianoteq.config.config import (
     ConfigLoader,
     BUNDLED_CONFIG_PATH,
     DEFAULT_PRIMARY_COLOR,
@@ -352,7 +352,7 @@ def test_map_instrument_to_category_preserves_colors():
 
 def test_init_user_config_creates_file(tmp_path):
     """Test that init_user_config creates a config file"""
-    from pi_pianoteq.config import USER_CONFIG_PATH
+    from pi_pianoteq.config.config import USER_CONFIG_PATH
 
     # This test would need to mock USER_CONFIG_PATH to avoid affecting real config
     # For now, just test that the method exists and returns the right type

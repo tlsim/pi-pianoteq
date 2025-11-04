@@ -3,14 +3,14 @@ import logging
 import sys
 import time
 
-from pi_pianoteq.config import (
+from pi_pianoteq.config.config import (
     Config,
     ConfigLoader,
     USER_CONFIG_PATH,
     BUNDLED_CONFIG_PATH
 )
 
-from pi_pianoteq.logging_config import setup_logging
+from pi_pianoteq.logging.logging_config import setup_logging
 
 logger = logging.getLogger(__name__)
 
@@ -103,21 +103,21 @@ def main():
 
     # Normal startup - import hardware dependencies only when needed
     from rtmidi import MidiOut
-    from pi_pianoteq.instrument.Library import Library
-    from pi_pianoteq.instrument.Selector import Selector
-    from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
-    from pi_pianoteq.lib.ClientLib import ClientLib
-    from pi_pianoteq.mapping.MappingBuilder import MappingBuilder
-    from pi_pianoteq.mapping.Writer import Writer
-    from pi_pianoteq.midi.ProgramChange import ProgramChange
-    from pi_pianoteq.process.Pianoteq import Pianoteq
+    from pi_pianoteq.instrument.library import Library
+    from pi_pianoteq.instrument.selector import Selector
+    from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
+    from pi_pianoteq.lib.client_lib import ClientLib
+    from pi_pianoteq.mapping.mapping_builder import MappingBuilder
+    from pi_pianoteq.mapping.writer import Writer
+    from pi_pianoteq.midi.program_change import ProgramChange
+    from pi_pianoteq.process.pianoteq import Pianoteq
     from pi_pianoteq.util.pianoteq_prefs import is_midi_device_enabled
 
     # Import appropriate client based on mode
     if args.cli:
-        from pi_pianoteq.client.cli.CliClient import CliClient
+        from pi_pianoteq.client.cli.cli_client import CliClient
     else:
-        from pi_pianoteq.client.gfxhat.GfxhatClient import GfxhatClient
+        from pi_pianoteq.client.gfxhat.gfxhat_client import GfxhatClient
 
     # Instantiate client early (in loading mode, api=None)
     if args.cli:

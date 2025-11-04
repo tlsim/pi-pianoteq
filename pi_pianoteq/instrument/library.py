@@ -1,8 +1,8 @@
 from typing import List, Dict
 import logging
 
-from pi_pianoteq.instrument.Instrument import Instrument
-from pi_pianoteq.instrument.Preset import Preset
+from pi_pianoteq.instrument.instrument import Instrument
+from pi_pianoteq.instrument.preset import Preset
 from pi_pianoteq.midi.util import program_numbers_by_channel
 
 logger = logging.getLogger(__name__)

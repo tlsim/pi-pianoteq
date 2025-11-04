@@ -1,6 +1,6 @@
 from PIL import Image, ImageDraw
 
-from pi_pianoteq.client.gfxhat.Backlight import Backlight
+from pi_pianoteq.client.gfxhat.backlight import Backlight
 
 
 class LoadingDisplay:

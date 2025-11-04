@@ -2,7 +2,7 @@ import subprocess
 from os.path import expanduser
 from typing import List
 
-from pi_pianoteq.config import Config
+from pi_pianoteq.config.config import Config
 
 
 class Pianoteq:

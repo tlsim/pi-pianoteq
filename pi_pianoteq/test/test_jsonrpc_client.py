@@ -2,7 +2,7 @@
 
 import unittest
 from unittest.mock import Mock, patch
-from pi_pianoteq.jsonrpc_client import PianoteqJsonRpc
+from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
 
 
 class TestLicenseDetection(unittest.TestCase):

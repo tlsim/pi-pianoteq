@@ -1,8 +1,8 @@
 import unittest
 
-from pi_pianoteq.instrument.Library import Library
-from pi_pianoteq.instrument.Instrument import Instrument
-from pi_pianoteq.instrument.Preset import Preset
+from pi_pianoteq.instrument.library import Library
+from pi_pianoteq.instrument.instrument import Instrument
+from pi_pianoteq.instrument.preset import Preset
 
 s1 = 'Steinway D Prelude'
 s2 = 'Steinway D Jazz'
@@ -15,9 +15,13 @@ i2 = 'Ant. Petrof'
 
 class InstrumentTestCase(unittest.TestCase):
     def test_preset_instrument_grouping(self):
-        preset_names = [a1, s1, s2, a2]
-        instruments = [Instrument(i1, i1, '#000000', '#FFFFFF'), Instrument(i2, i2, '#000000', '#FFFFFF')]
-        library = Library(preset_names, instruments)
+        # Create instruments with presets already added
+        inst1 = Instrument(i1, i1, '#000000', '#FFFFFF')
+        inst1.presets = [Preset(s1), Preset(s2)]
+        inst2 = Instrument(i2, i2, '#000000', '#FFFFFF')
+        inst2.presets = [Preset(a1), Preset(a2)]
+
+        library = Library([inst1, inst2])
         grouped = library.get_instruments()
         self.assertEqual(2, len(grouped))
         self.assertEqual(2, len(grouped[0].presets))
