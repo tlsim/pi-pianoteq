@@ -7,6 +7,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.8.0] - 2025-11-04
+
+### Changed
+- Renamed all Python modules to snake_case for PEP 8 consistency
+- Reorganized internal structure with dedicated subdirectories (config/, logging/, rpc/)
+- Updated test filenames to follow pytest conventions (test_*.py)
+
 ## [1.7.0] - 2025-10-30
 
 ### Added
