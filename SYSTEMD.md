@@ -10,7 +10,7 @@ If you used the `deploy.sh` script, the systemd service is already configured. S
 
 ### 1. Create the Service File
 
-Create `/etc/systemd/system/pi_pianoteq.service`:
+Create `/etc/systemd/system/pi-pianoteq.service`:
 
 ```ini
 [Unit]
@@ -85,7 +85,7 @@ The systemd service runs Pianoteq in headless mode by default (`PIANOTEQ_HEADLES
 **Or run manually (without the service):**
 ```bash
 sudo systemctl stop pi_pianoteq
-PIANOTEQ_HEADLESS=false python -m pi_pianoteq
+PIANOTEQ_HEADLESS=false pi-pianoteq
 ```
 
 Note: You'll need a display (VNC, HDMI, etc.) to see the Pianoteq GUI.

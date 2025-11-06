@@ -95,9 +95,9 @@ pipenv run check
 You can test commands without deploying:
 
 ```bash
-pipenv run python -m pi_pianoteq --show-config
-pipenv run python -m pi_pianoteq --init-config
-pipenv run python -m pi_pianoteq --cli  # Run CLI client for local testing
+pipenv run pi-pianoteq --show-config
+pipenv run pi-pianoteq --init-config
+pipenv run pi-pianoteq --cli  # Run CLI client for local testing
 ```
 
 **Note:** Full testing requires hardware (MIDI, gfxhat) which may not be available on your dev machine. Use `--cli` flag to run the CLI client for testing without the GFX HAT.

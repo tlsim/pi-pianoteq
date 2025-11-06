@@ -7,6 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+
+**Migration required for existing installations.** See [TESTING.md](TESTING.md) for migration guide.
+
+- Package distribution name changed from `pi_pianoteq` to `pi-pianoteq` for consistency
+- Systemd service name changed from `pi_pianoteq.service` to `pi-pianoteq.service`
+- Virtual environment path changed from `~/pi_pianoteq_venv` to `~/pi-pianoteq-venv`
+- Installation method changed to `pip install --user` for normal users
+
+### Added
+
+- Console script entry point: `pi-pianoteq` command (instead of `python -m pi_pianoteq`)
+- Src-layout directory structure (`src/pi_pianoteq/`) for cleaner project organization
+- [TESTING.md](TESTING.md) migration guide for upgrading from v1.x
+
+### Changed
+
+- Adopted application-oriented packaging (console script)
+- Systemd service uses console script from venv: `~/pi-pianoteq-venv/bin/pi-pianoteq`
+- Simplified user installation workflow
+
+### Migration Notes
+
+Existing users upgrading from v1.8.0 or earlier must:
+1. Stop and remove old systemd service: `sudo systemctl stop pi_pianoteq && sudo systemctl disable pi_pianoteq`
+2. Remove old service file: `sudo rm /etc/systemd/system/pi_pianoteq.service && sudo systemctl daemon-reload`
+3. Remove old venv: `rm -rf ~/pi_pianoteq_venv`
+4. Follow new installation instructions in [README.md](README.md)
+
+See [TESTING.md](TESTING.md) for detailed migration steps.
+
 ## [1.8.0] - 2025-11-04
 
 ### Changed
