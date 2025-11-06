@@ -5,38 +5,33 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [Unreleased]
+## [2.0.0] - 2025-11-06
 
 ### Breaking Changes
 
-**Migration required for existing installations.** See [TESTING.md](TESTING.md) for migration guide.
+**Migration required for existing installations.**
 
-- Package distribution name changed from `pi_pianoteq` to `pi-pianoteq` for consistency
-- Systemd service name changed from `pi_pianoteq.service` to `pi-pianoteq.service`
-- Virtual environment path changed from `~/pi_pianoteq_venv` to `~/pi-pianoteq-venv`
-- Installation method changed to `pip install --user` for normal users
+- Package name: `pi_pianoteq` → `pi-pianoteq`
+- Service name: `pi_pianoteq.service` → `pi-pianoteq.service`
+- Venv path: `~/pi_pianoteq_venv` → `~/pi-pianoteq-venv`
 
 ### Added
 
-- Console script entry point: `pi-pianoteq` command (instead of `python -m pi_pianoteq`)
-- Src-layout directory structure (`src/pi_pianoteq/`) for cleaner project organization
-- [TESTING.md](TESTING.md) migration guide for upgrading from v1.x
+- Console script: `pi-pianoteq` command replaces `python -m pi_pianoteq`
+- Src-layout directory structure for cleaner project organization
 
 ### Changed
 
-- Adopted application-oriented packaging (console script)
-- Systemd service uses console script from venv: `~/pi-pianoteq-venv/bin/pi-pianoteq`
-- Simplified user installation workflow
+- Systemd service uses console script from venv
+- User installation via `pip install --user`
 
 ### Migration Notes
 
-Existing users upgrading from v1.8.0 or earlier must:
-1. Stop and remove old systemd service: `sudo systemctl stop pi_pianoteq && sudo systemctl disable pi_pianoteq`
+Existing users must:
+1. Stop old service: `sudo systemctl stop pi_pianoteq && sudo systemctl disable pi_pianoteq`
 2. Remove old service file: `sudo rm /etc/systemd/system/pi_pianoteq.service && sudo systemctl daemon-reload`
 3. Remove old venv: `rm -rf ~/pi_pianoteq_venv`
 4. Follow new installation instructions in [README.md](README.md)
-
-See [TESTING.md](TESTING.md) for detailed migration steps.
 
 ## [1.8.0] - 2025-11-04
 
