@@ -21,7 +21,7 @@ fi
 REMOTE="$USER@$PI_HOST"
 
 # Generate service file from template
-sed "s/{{USER}}/$USER/g" pi_pianoteq.service.template > pi_pianoteq.service
+sed "s/{{USER}}/$USER/g" pi-pianoteq.service.template > pi-pianoteq.service
 
 echo "Deploying to $REMOTE..."
 
@@ -35,31 +35,31 @@ WHEEL_BASENAME=$(basename "$WHEEL_FILE")
 echo "Deploying $WHEEL_FILE..."
 
 scp "$WHEEL_FILE" $REMOTE:/tmp/$WHEEL_BASENAME
-scp pi_pianoteq.service $REMOTE:/tmp/pi_pianoteq.service
+scp pi-pianoteq.service $REMOTE:/tmp/pi-pianoteq.service
 
 ssh $REMOTE <<EOF
 # Create virtual environment if it doesn't exist
-VENV_PATH="/home/$USER/pi_pianoteq_venv"
+VENV_PATH="/home/$USER/pi-pianoteq-venv"
 if [ ! -d "\$VENV_PATH" ]; then
     echo "Creating virtual environment at \$VENV_PATH..."
     python3 -m venv --system-site-packages "\$VENV_PATH"
 fi
 
 # Install/upgrade package in venv (dependencies will use system packages where available)
-echo "Installing pi_pianoteq into virtual environment..."
+echo "Installing pi-pianoteq into virtual environment..."
 "\$VENV_PATH/bin/pip" install --upgrade --force-reinstall --no-deps /tmp/$WHEEL_BASENAME
 
 # Update systemd service
-sudo mv /tmp/pi_pianoteq.service /etc/systemd/system/pi_pianoteq.service
-sudo chmod 644 /etc/systemd/system/pi_pianoteq.service
+sudo mv /tmp/pi-pianoteq.service /etc/systemd/system/pi-pianoteq.service
+sudo chmod 644 /etc/systemd/system/pi-pianoteq.service
 
 # Restart service
 sudo systemctl daemon-reload
-sudo systemctl enable pi_pianoteq
-sudo systemctl restart pi_pianoteq
+sudo systemctl enable pi-pianoteq
+sudo systemctl restart pi-pianoteq
 
 # Cleanup
-rm /tmp/pi_pianoteq*
+rm /tmp/pi-pianoteq*
 
 EOF
 
