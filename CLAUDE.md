@@ -15,19 +15,27 @@ This file contains development context and conventions for AI assistants working
 - **Python**: System Python with virtual environment
 - **Hardware**: Raspberry Pi 4B with Pimoroni GFX HAT (128x64 LCD, 6 buttons, RGB backlight)
 - **Pianoteq**: STAGE version 8.4.3 (licensed with 5 instruments)
-- **Service**: Runs as systemd service `pi_pianoteq.service`
+- **Service**: Runs as systemd service `pi-pianoteq.service`
 
 ## Build & Deploy Workflow
+
+### Initial Setup (Development Environment)
+```bash
+# Install dependencies and package in editable mode
+pipenv install -e .
+```
+
+### Local Testing & Deployment
 
 Use pipenv for Python operations; run build/deploy scripts directly (NOT with `pipenv run`):
 
 ```bash
 # Local testing
-pipenv run python -m pi_pianoteq --cli
+pipenv run pi-pianoteq --cli
 
 # Build and deploy to Pi
 python3 -m build
-./deploy.sh  # Auto-restarts pi_pianoteq.service, runs GFX HAT client
+./deploy.sh  # Auto-restarts pi-pianoteq.service, runs GFX HAT client
 ```
 
 **Important**: Don't use `timeout` with CLI client on Pi via SSH - causes terminal issues.
@@ -83,16 +91,16 @@ python3 -m build
 ```bash
 python3 -m build && ./deploy.sh
 # Wait ~15 seconds, then check logs
-ssh tom@192.168.0.169 "sudo journalctl -u pi_pianoteq.service -n 30"
+ssh tom@192.168.0.169 "sudo journalctl -u pi-pianoteq.service -n 30"
 ```
 
 ### Service Management
 ```bash
 # Status
-ssh tom@192.168.0.169 "sudo systemctl status pi_pianoteq.service"
+ssh tom@192.168.0.169 "sudo systemctl status pi-pianoteq.service"
 
 # Logs (use -n 50, --since '5 minutes ago', etc.)
-ssh tom@192.168.0.169 "sudo journalctl -u pi_pianoteq.service -n 50"
+ssh tom@192.168.0.169 "sudo journalctl -u pi-pianoteq.service -n 50"
 ```
 
 ### Test JSON-RPC API
@@ -130,9 +138,9 @@ Release notes format:
 
 ## File Structure Notes
 
-- `pi_pianoteq/client/` - Client implementations (GFX HAT, CLI)
-- `pi_pianoteq/jsonrpc_client.py` - Pianoteq JSON-RPC wrapper
-- `pi_pianoteq/config.py` - Configuration and instrument discovery
-- `pi_pianoteq/__main__.py` - Main entry point with loading sequence
+- `src/pi_pianoteq/client/` - Client implementations (GFX HAT, CLI)
+- `src/pi_pianoteq/rpc/jsonrpc_client.py` - Pianoteq JSON-RPC wrapper
+- `src/pi_pianoteq/config/config.py` - Configuration and instrument discovery
+- `src/pi_pianoteq/__main__.py` - Main entry point with loading sequence
 - `deploy.sh` - Deployment script (reads `deploy.conf` for Pi connection details)
 

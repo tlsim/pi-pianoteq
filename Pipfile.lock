@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "020001e005721d1066402467e78a2d256583df67f19005261b869f01f729a8fc"
+            "sha256": "3e49a682365286bd6ba8e30e859186b9bd700dd21e0079aadfc2c18e6edbf187"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -31,6 +31,10 @@
             ],
             "index": "pypi",
             "version": "==0.0.1"
+        },
+        "pi-pianoteq": {
+            "editable": true,
+            "file": "."
         },
         "pillow": {
             "hashes": [

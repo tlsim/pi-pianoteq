@@ -25,7 +25,7 @@ dependencies = [
     "python-rtmidi~=1.5.8",
     "pillow~=11.1",
     "gfxhat==0.0.1",
-    "wcwidth~=0.1.9",
+    "wcwidth>=0.2.0",
 ]
 
 [project.urls]
