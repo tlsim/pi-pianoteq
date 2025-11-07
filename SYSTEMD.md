@@ -1,6 +1,6 @@
-# Running pi_pianoteq as a Systemd Service
+# Running pi-pianoteq as a Systemd Service
 
-This guide explains how to set up pi_pianoteq to run automatically on boot using systemd.
+This guide explains how to set up pi-pianoteq to run automatically on boot using systemd.
 
 ## Automatic Setup (via deploy.sh)
 
@@ -10,18 +10,18 @@ If you used the `deploy.sh` script, the systemd service is already configured. S
 
 ### 1. Create the Service File
 
-Create `/etc/systemd/system/pi_pianoteq.service`:
+Create `/etc/systemd/system/pi-pianoteq.service`:
 
 ```ini
 [Unit]
-Description = Service for pi_pianoteq
+Description = Service for pi-pianoteq
 
 [Service]
 Type=simple
 User=<username>
 Group=<username>
 ExecStartPre=cpupower frequency-set -g performance
-ExecStart=/usr/bin/python3 -u -m pi_pianoteq
+ExecStart=/home/<username>/.local/bin/pi-pianoteq
 ExecStopPost=cpupower frequency-set -g ondemand
 PermissionsStartOnly=true
 LimitMEMLOCK=500000
@@ -35,37 +35,37 @@ WantedBy=graphical.target
 
 **Important:** Replace `<username>` with your Raspberry Pi username.
 
-If you installed pi_pianoteq in a virtual environment, update the `ExecStart` line:
+If you installed pi-pianoteq in a virtual environment, update the `ExecStart` line:
 ```ini
-ExecStart=/home/<username>/venv/bin/python -u -m pi_pianoteq
+ExecStart=/home/<username>/pi-pianoteq-venv/bin/pi-pianoteq
 ```
 
 ### 2. Enable and Start the Service
 
 ```bash
 sudo systemctl daemon-reload
-sudo systemctl enable pi_pianoteq
-sudo systemctl start pi_pianoteq
+sudo systemctl enable pi-pianoteq
+sudo systemctl start pi-pianoteq
 ```
 
 ## Managing the Service
 
 Check the service status:
 ```bash
-systemctl status pi_pianoteq
+systemctl status pi-pianoteq
 ```
 
 View logs:
 ```bash
-sudo journalctl -u pi_pianoteq -f
+sudo journalctl -u pi-pianoteq -f
 ```
 
 Manage the service:
 ```bash
-sudo systemctl stop pi_pianoteq      # Stop the service
-sudo systemctl start pi_pianoteq     # Start the service
-sudo systemctl restart pi_pianoteq   # Restart after config changes
-sudo systemctl disable pi_pianoteq   # Disable auto-start on boot
+sudo systemctl stop pi-pianoteq      # Stop the service
+sudo systemctl start pi-pianoteq     # Start the service
+sudo systemctl restart pi-pianoteq   # Restart after config changes
+sudo systemctl disable pi-pianoteq   # Disable auto-start on boot
 ```
 
 ## Pianoteq Headless Mode
@@ -78,14 +78,14 @@ The systemd service runs Pianoteq in headless mode by default (`PIANOTEQ_HEADLES
 - Ideal for headless operation without a display connected
 
 **To enable Pianoteq's GUI:**
-1. Stop the service: `sudo systemctl stop pi_pianoteq`
+1. Stop the service: `sudo systemctl stop pi-pianoteq`
 2. Set `PIANOTEQ_HEADLESS=false` in `~/.config/pi_pianoteq/pi_pianoteq.conf`
-3. Restart: `sudo systemctl start pi_pianoteq`
+3. Restart: `sudo systemctl start pi-pianoteq`
 
 **Or run manually (without the service):**
 ```bash
-sudo systemctl stop pi_pianoteq
-PIANOTEQ_HEADLESS=false python -m pi_pianoteq
+sudo systemctl stop pi-pianoteq
+PIANOTEQ_HEADLESS=false pi-pianoteq
 ```
 
 Note: You'll need a display (VNC, HDMI, etc.) to see the Pianoteq GUI.

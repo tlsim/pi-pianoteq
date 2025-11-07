@@ -3,8 +3,8 @@ requires = ["setuptools>=61.0", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "pi_pianoteq"
-version = "1.8.0"
+name = "pi-pianoteq"
+version = "2.0.0"
 description = "An rtmidi based remote control for Pianoteq"
 readme = "README.md"
 requires-python = ">=3.13"
@@ -25,7 +25,7 @@ dependencies = [
     "python-rtmidi~=1.5.8",
     "pillow~=11.1",
     "gfxhat==0.0.1",
-    "wcwidth~=0.1.9",
+    "wcwidth>=0.2.0",
 ]
 
 [project.urls]
@@ -33,7 +33,11 @@ Homepage = "https://github.com/tlsim/pi-pianoteq"
 "Bug Reports" = "https://github.com/tlsim/pi-pianoteq/issues"
 Source = "https://github.com/tlsim/pi-pianoteq"
 
+[project.scripts]
+pi-pianoteq = "pi_pianoteq.__main__:main"
+
 [tool.setuptools]
+package-dir = {"" = "src"}
 packages = ["pi_pianoteq", "pi_pianoteq.client", "pi_pianoteq.client.cli", "pi_pianoteq.client.gfxhat", "pi_pianoteq.config", "pi_pianoteq.instrument", "pi_pianoteq.lib", "pi_pianoteq.logging", "pi_pianoteq.mapping", "pi_pianoteq.midi", "pi_pianoteq.process", "pi_pianoteq.rpc", "pi_pianoteq.util"]
 
 [tool.setuptools.package-data]

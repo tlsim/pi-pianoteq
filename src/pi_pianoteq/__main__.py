@@ -134,7 +134,7 @@ def main():
     logger.info("Pianoteq version: %s", pianoteq.get_version())
 
     # Start Pianoteq and wait for API
-    client.show_loading_message("Starting...")
+    client.show_loading_message("Starting Pianoteq...")
     pianoteq.start()
 
     jsonrpc = PianoteqJsonRpc()

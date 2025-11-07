@@ -1,6 +1,6 @@
 # Development Guide
 
-This guide is for developers who want to build pi_pianoteq on a development machine and deploy it to a remote Raspberry Pi.
+This guide is for developers who want to build pi-pianoteq on a development machine and deploy it to a remote Raspberry Pi.
 
 ## Prerequisites
 
@@ -38,7 +38,17 @@ cd pi-pianoteq
 pipenv install --dev
 ```
 
-### 3. Configure Deployment
+### 3. Install Package in Editable Mode
+
+Install the package in editable mode so the `pi-pianoteq` console script is available:
+
+```bash
+pipenv install -e .
+```
+
+This allows you to run `pipenv run pi-pianoteq` commands and have changes immediately reflected without reinstalling.
+
+### 4. Configure Deployment
 
 Create `deploy.conf` with your Pi's connection details:
 
@@ -71,9 +81,9 @@ pipenv run deploy
 ```
 
 The `deploy.sh` script will:
-- Create a virtual environment on the Pi (if needed)
+- Create a virtual environment at `~/pi-pianoteq-venv` on the Pi (if needed)
 - Install the package
-- Set up the systemd service
+- Set up the systemd service `pi-pianoteq.service`
 - Start the service
 
 ## Development Workflow
@@ -95,9 +105,9 @@ pipenv run check
 You can test commands without deploying:
 
 ```bash
-pipenv run python -m pi_pianoteq --show-config
-pipenv run python -m pi_pianoteq --init-config
-pipenv run python -m pi_pianoteq --cli  # Run CLI client for local testing
+pipenv run pi-pianoteq --show-config
+pipenv run pi-pianoteq --init-config
+pipenv run pi-pianoteq --cli  # Run CLI client for local testing
 ```
 
 **Note:** Full testing requires hardware (MIDI, gfxhat) which may not be available on your dev machine. Use `--cli` flag to run the CLI client for testing without the GFX HAT.
