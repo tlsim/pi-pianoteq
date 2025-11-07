@@ -1,0 +1,3 @@
+[Deploy]
+USER = <username>
+PI_HOST = <hostname-or-ip>

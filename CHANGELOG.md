@@ -9,8 +9,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Breaking Changes
 
-**Migration required for existing installations.**
-
 - Package name: `pi_pianoteq` → `pi-pianoteq`
 - Service name: `pi_pianoteq.service` → `pi-pianoteq.service`
 - Venv path: `~/pi_pianoteq_venv` → `~/pi-pianoteq-venv`
@@ -18,20 +16,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - Console script: `pi-pianoteq` command replaces `python -m pi_pianoteq`
-- Src-layout directory structure for cleaner project organization
+- Src-layout directory structure
 
 ### Changed
 
 - Systemd service uses console script from venv
 - User installation via `pip install --user`
-
-### Migration Notes
-
-Existing users must:
-1. Stop old service: `sudo systemctl stop pi_pianoteq && sudo systemctl disable pi_pianoteq`
-2. Remove old service file: `sudo rm /etc/systemd/system/pi_pianoteq.service && sudo systemctl daemon-reload`
-3. Remove old venv: `rm -rf ~/pi_pianoteq_venv`
-4. Follow new installation instructions in [README.md](README.md)
 
 ## [1.8.0] - 2025-11-04
 

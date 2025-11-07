@@ -19,7 +19,7 @@ python_version = "3.13"
 
 [scripts]
 check = "python3 -m compileall src/pi_pianoteq"
-test = "pytest src/pi_pianoteq/test -v"
+test = "pytest tests -v"
 package = "python3 -m build"
 deploy = "sh deploy.sh"
 build-and-deploy = "bash -c 'python3 -m build && sh deploy.sh'"
