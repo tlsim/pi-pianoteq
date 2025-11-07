@@ -59,7 +59,7 @@ sudo systemctl enable pi-pianoteq
 sudo systemctl restart pi-pianoteq
 
 # Cleanup
-rm /tmp/pi-pianoteq*
+rm -f /tmp/pi_pianoteq*.whl /tmp/pi-pianoteq.service
 
 EOF
 
