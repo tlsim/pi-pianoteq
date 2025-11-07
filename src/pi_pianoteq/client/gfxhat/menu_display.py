@@ -20,7 +20,7 @@ class MenuDisplay:
     MENU_TEXT_MARGIN = 5
     MENU_ITEM_HEIGHT = 12
     WRAP_GAP = 20
-    NAV_BUTTON_DEBOUNCE_MS = 200
+    NAV_BUTTON_DEBOUNCE_MS = 300
 
     def __init__(self, api, width, height, font, on_exit):
         self.api = api

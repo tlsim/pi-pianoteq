@@ -18,7 +18,7 @@ class InstrumentDisplay:
     TEXT_START_X = 2
     TEXT_MARGIN = 5
     WRAP_GAP = 20
-    NAV_BUTTON_DEBOUNCE_MS = 200
+    NAV_BUTTON_DEBOUNCE_MS = 300
 
     def __init__(self, api: ClientApi, width, height, font, on_enter):
         self.api = api
