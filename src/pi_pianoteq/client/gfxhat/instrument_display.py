@@ -1,4 +1,5 @@
 from PIL import Image, ImageDraw
+import time
 
 from pi_pianoteq.client.client_api import ClientApi
 
@@ -17,6 +18,7 @@ class InstrumentDisplay:
     TEXT_START_X = 2
     TEXT_MARGIN = 5
     WRAP_GAP = 20
+    NAV_BUTTON_DEBOUNCE_MS = 200
 
     def __init__(self, api: ClientApi, width, height, font, on_enter):
         self.api = api
@@ -24,6 +26,7 @@ class InstrumentDisplay:
         self.height = height
         self.font = font
         self.on_enter = on_enter
+        self.last_nav_press_time = 0
         self.preset = self.api.get_current_preset_display_name()
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
@@ -88,15 +91,21 @@ class InstrumentDisplay:
             if event != 'press':
                 return
             if ch == touch.DOWN:
+                self.last_nav_press_time = time.time()
                 self.api.set_preset_next()
             if ch == touch.UP:
+                self.last_nav_press_time = time.time()
                 self.api.set_preset_prev()
             if ch == touch.LEFT:
+                self.last_nav_press_time = time.time()
                 self.api.set_instrument_prev()
             if ch == touch.RIGHT:
+                self.last_nav_press_time = time.time()
                 self.api.set_instrument_next()
             if ch == touch.ENTER:
-                self.on_enter()
+                elapsed_ms = (time.time() - self.last_nav_press_time) * 1000
+                if elapsed_ms >= self.NAV_BUTTON_DEBOUNCE_MS:
+                    self.on_enter()
             self.update_display()
 
         return handler
