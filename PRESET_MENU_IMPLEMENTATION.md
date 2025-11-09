@@ -366,6 +366,108 @@ Test with `pipenv run pi-pianoteq --cli` to verify API changes don't break CLI c
 
 ## Future Enhancements
 
-- Add preset menu highlight on currently loaded preset (if viewing current instrument)
 - Consider showing preset count in instrument menu (e.g., "Grand K2 (8)")
 - Explore typeahead/search for CLI (issue #27)
+
+---
+
+## Appendix: Preset Highlighting Enhancement
+
+This section details how to highlight the currently loaded preset when opening the preset menu, similar to how the instrument menu highlights the current instrument.
+
+### Existing Pattern
+
+The instrument menu already implements this feature (src/pi_pianoteq/client/gfxhat/instrument_menu_display.py:28-34):
+
+```python
+def update_instrument(self):
+    current_instrument = self.api.get_current_instrument()
+    current_option = next((o for o in self.menu_options if o.name == current_instrument), None)
+    if current_option is not None:
+        self.current_menu_option = self.menu_options.index(current_option)
+        self._update_selected_option()
+        self.draw_image()
+```
+
+When the instrument menu opens, it finds the currently playing instrument and positions the menu selection on it.
+
+### Implementation for Presets
+
+**Step 1:** Update `PresetMenuDisplay.__init__()` to call a new method:
+
+```python
+def __init__(self, api: ClientApi, width, height, font, on_exit, instrument_name: str):
+    """
+    Initialize preset menu for a specific instrument.
+
+    Args:
+        api: Client API instance
+        width: Display width in pixels
+        height: Display height in pixels
+        font: Font for rendering text
+        on_exit: Callback when exiting menu
+        instrument_name: Name of instrument whose presets to display
+    """
+    self.instrument_name = instrument_name
+    super().__init__(api, width, height, font, on_exit)
+    self.update_preset()  # Position on current preset if applicable
+```
+
+**Step 2:** Add the `update_preset()` method to `PresetMenuDisplay`:
+
+```python
+def update_preset(self):
+    """Highlight currently loaded preset if viewing current instrument's presets."""
+    # Only highlight if we're viewing the current instrument's presets
+    if self.instrument_name == self.api.get_current_instrument():
+        current_preset = self.api.get_current_preset()
+        current_option = next((o for o in self.menu_options if o.name == current_preset), None)
+        if current_option is not None:
+            self.current_menu_option = self.menu_options.index(current_option)
+            self._update_selected_option()
+            self.draw_image()
+```
+
+### User Experience Examples
+
+**Scenario 1: Long press from main display**
+- Currently playing "Grand K2 - Classical"
+- Long press ENTER → Opens preset menu
+- Menu opens with "Classical" already highlighted ✓
+- User can immediately see their position in the preset list
+- Navigate to "Jazz" and select it
+
+**Scenario 2: Long press from instrument menu (different instrument)**
+- Currently playing "Grand K2 - Classical"
+- Navigate instrument menu to "Vibraphone V-B"
+- Long press ENTER → Opens preset menu for Vibraphone
+- Menu opens with first preset highlighted (not "Classical", since that's a K2 preset)
+- User browses Vibraphone presets without confusion
+
+**Scenario 3: After switching presets**
+- Select "Vibraphone V-B - Soft" from preset menu
+- Returns to main display
+- Long press ENTER again → Opens preset menu
+- Now "Soft" is highlighted (the new current preset) ✓
+
+**Scenario 4: Browsing other instruments**
+- Currently playing "Grand K2 - Classical"
+- Open instrument menu, navigate to "Vibraphone V-B"
+- Long press ENTER → Opens Vibraphone preset menu
+- First preset highlighted (we're not on Vibraphone currently)
+- This avoids confusion - only highlights when viewing current instrument's presets
+
+### Why Context-Aware Highlighting Matters
+
+The highlighting only activates when `self.instrument_name == self.api.get_current_instrument()` because:
+
+1. **Clarity**: If you're browsing a different instrument's presets, highlighting would be misleading
+2. **Consistency**: The first preset being highlighted when browsing other instruments matches the "switching instruments loads preset 0" behavior
+3. **User Intent**: If you're exploring other instruments, you're not looking for your current position
+
+### Benefits
+
+- **Immediate Context**: User knows where they are in the preset list
+- **Faster Navigation**: Can quickly jump to nearby presets without counting
+- **Familiar Pattern**: Matches existing instrument menu behavior
+- **No Confusion**: Smart enough to only highlight when contextually relevant
