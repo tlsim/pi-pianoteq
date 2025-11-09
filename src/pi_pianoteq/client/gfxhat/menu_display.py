@@ -1,9 +1,9 @@
 from PIL import Image, ImageDraw
-import time
 
 from pi_pianoteq.client.gfxhat.menu_option import MenuOption
 from pi_pianoteq.client.gfxhat.backlight import Backlight
 from pi_pianoteq.client.gfxhat.scrolling_text import ScrollingText
+from pi_pianoteq.util.button_debouncer import NavigationDebouncer
 
 from gfxhat import touch
 
@@ -20,7 +20,6 @@ class MenuDisplay:
     MENU_TEXT_MARGIN = 5
     MENU_ITEM_HEIGHT = 12
     WRAP_GAP = 20
-    NAV_BUTTON_DEBOUNCE_MS = 300
 
     def __init__(self, api, width, height, font, on_exit):
         self.api = api
@@ -28,7 +27,7 @@ class MenuDisplay:
         self.height = height
         self.font = font
         self.on_exit = on_exit
-        self.last_nav_press_time = 0
+        self.debouncer = NavigationDebouncer(300)
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
         self.menu_options = self.get_menu_options()
@@ -112,20 +111,19 @@ class MenuDisplay:
             prev_option = self.current_menu_option
 
             if ch == touch.UP:
-                self.last_nav_press_time = time.time()
+                self.debouncer.on_navigation()
                 self.current_menu_option -= 1
             if ch == touch.DOWN:
-                self.last_nav_press_time = time.time()
+                self.debouncer.on_navigation()
                 self.current_menu_option += 1
             if ch == touch.LEFT:
-                self.last_nav_press_time = time.time()
+                self.debouncer.on_navigation()
                 self.current_menu_option -= 1
             if ch == touch.RIGHT:
-                self.last_nav_press_time = time.time()
+                self.debouncer.on_navigation()
                 self.current_menu_option += 1
             if ch == touch.ENTER:
-                elapsed_ms = (time.time() - self.last_nav_press_time) * 1000
-                if elapsed_ms >= self.NAV_BUTTON_DEBOUNCE_MS:
+                if self.debouncer.allow_action():
                     self.menu_options[self.current_menu_option].trigger()
                     self.selected_menu_option = self.current_menu_option
             self.current_menu_option %= len(self.menu_options)
