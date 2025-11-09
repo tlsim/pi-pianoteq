@@ -45,7 +45,7 @@ pip install --user pi-pianoteq-*.whl
 
 The `pi-pianoteq` command will be installed to `~/.local/bin/pi-pianoteq`.
 
-**For developers:** See [DEVELOPMENT.md](DEVELOPMENT.md) for the development workflow.
+**For developers:** See [docs/development.md](docs/development.md) for the development workflow.
 
 ## Configuration
 
@@ -133,16 +133,17 @@ The CLI client provides a full-featured terminal interface with instrument selec
 
 ### Run as a Service (Auto-start on Boot)
 
-See [SYSTEMD.md](SYSTEMD.md) for instructions on setting up a systemd service.
+See [docs/systemd.md](docs/systemd.md) for instructions on setting up a systemd service.
 
 ## Development
 
-For developers who want to build and deploy to a remote Pi, see [DEVELOPMENT.md](DEVELOPMENT.md).
+For developers who want to build and deploy to a remote Pi, see [docs/development.md](docs/development.md).
 
 ## Documentation
 
-- [SYSTEMD.md](SYSTEMD.md) - Running as a systemd service
-- [DEVELOPMENT.md](DEVELOPMENT.md) - Development and deployment workflow
+- [docs/systemd.md](docs/systemd.md) - Running as a systemd service
+- [docs/development.md](docs/development.md) - Development and deployment workflow
+- [docs/pianoteq-api.md](docs/pianoteq-api.md) - Pianoteq JSON-RPC API reference
 - [CHANGELOG.md](CHANGELOG.md) - Version history
 
 ## Disclaimer
