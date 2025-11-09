@@ -8,7 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Button suppression window to prevent accidental menu activation when navigating with arrow buttons (#26)
+- Button suppression window to prevent accidental menu activation when navigating with arrow buttons
 
 ## [2.0.0] - 2025-11-06
 
