@@ -101,10 +101,13 @@ class InstrumentDisplay:
                 if ch == touch.RIGHT:
                     self.suppression.record()
                     self.api.set_instrument_next()
+
+                self.update_display()
+
+            elif event == 'release':
                 if ch == touch.ENTER:
                     if self.suppression.allow_action():
                         self.on_enter()
-                self.update_display()
 
             elif event == 'held':
                 if ch == touch.ENTER:

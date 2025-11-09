@@ -101,37 +101,39 @@ class MenuDisplay:
 
     def get_handler(self):
         def handler(ch, event):
-            if event != 'press':
-                return
-            if ch == touch.BACK:
-                self.current_menu_option = self.selected_menu_option
-                self.on_exit()
-                return
+            if event == 'press':
+                if ch == touch.BACK:
+                    self.current_menu_option = self.selected_menu_option
+                    self.on_exit()
+                    return
 
-            prev_option = self.current_menu_option
+                prev_option = self.current_menu_option
 
-            if ch == touch.UP:
-                self.suppression.record()
-                self.current_menu_option -= 1
-            if ch == touch.DOWN:
-                self.suppression.record()
-                self.current_menu_option += 1
-            if ch == touch.LEFT:
-                self.suppression.record()
-                self.current_menu_option -= 1
-            if ch == touch.RIGHT:
-                self.suppression.record()
-                self.current_menu_option += 1
-            if ch == touch.ENTER:
-                if self.suppression.allow_action():
-                    self.menu_options[self.current_menu_option].trigger()
-                    self.selected_menu_option = self.current_menu_option
-            self.current_menu_option %= len(self.menu_options)
+                if ch == touch.UP:
+                    self.suppression.record()
+                    self.current_menu_option -= 1
+                if ch == touch.DOWN:
+                    self.suppression.record()
+                    self.current_menu_option += 1
+                if ch == touch.LEFT:
+                    self.suppression.record()
+                    self.current_menu_option -= 1
+                if ch == touch.RIGHT:
+                    self.suppression.record()
+                    self.current_menu_option += 1
 
-            if prev_option != self.current_menu_option:
-                self._update_selected_option()
+                self.current_menu_option %= len(self.menu_options)
 
-            self.draw_image()
+                if prev_option != self.current_menu_option:
+                    self._update_selected_option()
+
+                self.draw_image()
+
+            elif event == 'release':
+                if ch == touch.ENTER:
+                    if self.suppression.allow_action():
+                        self.menu_options[self.current_menu_option].trigger()
+                        self.selected_menu_option = self.current_menu_option
 
         return handler
 
