@@ -78,6 +78,9 @@ class GfxhatClient(Client):
         if self.loading_mode:
             raise RuntimeError("Cannot start client in loading mode. Call set_api() first.")
 
+        # Enable held events for long press detection
+        touch.enable_repeat(True)
+
         for index in range(6):
             touch.set_led(index, 0)
             touch.on(index, self.instrument_display.get_handler())
