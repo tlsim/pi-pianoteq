@@ -63,5 +63,9 @@ class ClientApi(ABC):
         raise NotImplemented
 
     @abstractmethod
+    def get_instrument_preset_prefix(self, instrument_name: str) -> str:
+        raise NotImplemented
+
+    @abstractmethod
     def set_preset(self, instrument_name: str, preset_name: str):
         raise NotImplemented

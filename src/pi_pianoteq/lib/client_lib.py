@@ -79,6 +79,12 @@ class ClientLib(ClientApi):
                           if i.name == instrument_name), None)
         return [p.name for p in instrument.presets] if instrument else []
 
+    def get_instrument_preset_prefix(self, instrument_name: str) -> str:
+        """Get the preset prefix for a specific instrument."""
+        instrument = next((i for i in self.instrument_library.get_instruments()
+                          if i.name == instrument_name), None)
+        return instrument.preset_prefix if instrument else ""
+
     def set_preset(self, instrument_name: str, preset_name: str):
         """
         Set specific preset for a specific instrument.
