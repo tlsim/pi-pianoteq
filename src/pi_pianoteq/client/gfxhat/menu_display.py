@@ -111,16 +111,16 @@ class MenuDisplay:
             prev_option = self.current_menu_option
 
             if ch == touch.UP:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.current_menu_option -= 1
             if ch == touch.DOWN:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.current_menu_option += 1
             if ch == touch.LEFT:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.current_menu_option -= 1
             if ch == touch.RIGHT:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.current_menu_option += 1
             if ch == touch.ENTER:
                 if self.debouncer.allow_action():

@@ -90,16 +90,16 @@ class InstrumentDisplay:
             if event != 'press':
                 return
             if ch == touch.DOWN:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.api.set_preset_next()
             if ch == touch.UP:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.api.set_preset_prev()
             if ch == touch.LEFT:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.api.set_instrument_prev()
             if ch == touch.RIGHT:
-                self.debouncer.on_navigation()
+                self.debouncer.record()
                 self.api.set_instrument_next()
             if ch == touch.ENTER:
                 if self.debouncer.allow_action():
