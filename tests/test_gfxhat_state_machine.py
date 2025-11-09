@@ -260,6 +260,103 @@ class GfxhatClientStateMachineTestCase(unittest.TestCase):
 
         self.assertTrue(client.interrupt)
 
+    def test_preset_selected_closes_both_menus(self, mock_touch, mock_lcd, mock_backlight, mock_fonts):
+        """When preset selected from instrument menu, both menus should close."""
+        mock_lcd.dimensions.return_value = (128, 64)
+        mock_fonts.BitbuntuFull = "/fake/font.ttf"
+
+        client = GfxhatClient(api=self.mock_api)
+
+        # Open instrument menu
+        client.menu_open = True
+        client.menu_display.stop_scrolling = Mock()
+
+        # Open preset menu from instrument menu
+        client.preset_menu_open = True
+        client.preset_menu_source = 'instrument_menu'
+        client.preset_menu_display = Mock()
+        client.preset_menu_display.preset_selected = True  # User selected a preset
+        client.preset_menu_display.stop_scrolling = Mock()
+
+        # Mock main display
+        client.instrument_display.update_display = Mock()
+        client.instrument_display.start_scrolling = Mock()
+
+        client.on_exit_preset_menu()
+
+        # Preset menu should close
+        self.assertFalse(client.preset_menu_open)
+        client.preset_menu_display.stop_scrolling.assert_called_once()
+
+        # Instrument menu should also close
+        self.assertFalse(client.menu_open)
+        client.menu_display.stop_scrolling.assert_called_once()
+
+        # Should return to main display
+        client.instrument_display.update_display.assert_called_once()
+        client.instrument_display.start_scrolling.assert_called_once()
+
+    def test_preset_back_button_returns_to_instrument_menu(self, mock_touch, mock_lcd, mock_backlight, mock_fonts):
+        """When BACK pressed in preset menu from instrument menu, should return to instrument menu."""
+        mock_lcd.dimensions.return_value = (128, 64)
+        mock_fonts.BitbuntuFull = "/fake/font.ttf"
+
+        client = GfxhatClient(api=self.mock_api)
+
+        # Open instrument menu
+        client.menu_open = True
+
+        # Open preset menu from instrument menu
+        client.preset_menu_open = True
+        client.preset_menu_source = 'instrument_menu'
+        client.preset_menu_display = Mock()
+        client.preset_menu_display.preset_selected = False  # User pressed BACK, not selected
+        client.preset_menu_display.stop_scrolling = Mock()
+
+        # Mock displays
+        client.menu_display.start_scrolling = Mock()
+        client.instrument_display.update_display = Mock()
+        client.menu_display.stop_scrolling = Mock()
+
+        client.on_exit_preset_menu()
+
+        # Preset menu should close
+        self.assertFalse(client.preset_menu_open)
+        client.preset_menu_display.stop_scrolling.assert_called_once()
+
+        # Instrument menu should still be open
+        self.assertTrue(client.menu_open)
+
+        # Should return to instrument menu, not main display
+        client.menu_display.start_scrolling.assert_called_once()
+        client.instrument_display.update_display.assert_not_called()
+        client.menu_display.stop_scrolling.assert_not_called()
+
+    def test_preset_back_button_returns_to_main_from_main(self, mock_touch, mock_lcd, mock_backlight, mock_fonts):
+        """When BACK pressed in preset menu from main display, should return to main display."""
+        mock_lcd.dimensions.return_value = (128, 64)
+        mock_fonts.BitbuntuFull = "/fake/font.ttf"
+
+        client = GfxhatClient(api=self.mock_api)
+
+        # Preset menu opened from main display
+        client.preset_menu_open = True
+        client.preset_menu_source = 'main'
+        client.preset_menu_display = Mock()
+        client.preset_menu_display.preset_selected = False  # User pressed BACK
+        client.preset_menu_display.stop_scrolling = Mock()
+
+        # Mock displays
+        client.instrument_display.update_display = Mock()
+        client.instrument_display.start_scrolling = Mock()
+
+        client.on_exit_preset_menu()
+
+        # Should return to main display
+        self.assertFalse(client.preset_menu_open)
+        client.instrument_display.update_display.assert_called_once()
+        client.instrument_display.start_scrolling.assert_called_once()
+
 
 if __name__ == '__main__':
     unittest.main()
