@@ -5,7 +5,7 @@ from pi_pianoteq.client.client_api import ClientApi
 from gfxhat import touch
 from pi_pianoteq.client.gfxhat.backlight import Backlight
 from pi_pianoteq.client.gfxhat.scrolling_text import ScrollingText
-from pi_pianoteq.util.button_debouncer import ButtonDebouncer
+from pi_pianoteq.util.button_suppression import ButtonSuppression
 
 
 class InstrumentDisplay:
@@ -25,7 +25,7 @@ class InstrumentDisplay:
         self.height = height
         self.font = font
         self.on_enter = on_enter
-        self.debouncer = ButtonDebouncer(300)
+        self.suppression = ButtonSuppression(300)
         self.preset = self.api.get_current_preset_display_name()
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
@@ -90,19 +90,19 @@ class InstrumentDisplay:
             if event != 'press':
                 return
             if ch == touch.DOWN:
-                self.debouncer.record()
+                self.suppression.record()
                 self.api.set_preset_next()
             if ch == touch.UP:
-                self.debouncer.record()
+                self.suppression.record()
                 self.api.set_preset_prev()
             if ch == touch.LEFT:
-                self.debouncer.record()
+                self.suppression.record()
                 self.api.set_instrument_prev()
             if ch == touch.RIGHT:
-                self.debouncer.record()
+                self.suppression.record()
                 self.api.set_instrument_next()
             if ch == touch.ENTER:
-                if self.debouncer.allow_action():
+                if self.suppression.allow_action():
                     self.on_enter()
             self.update_display()
 

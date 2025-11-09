@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw
 from pi_pianoteq.client.gfxhat.menu_option import MenuOption
 from pi_pianoteq.client.gfxhat.backlight import Backlight
 from pi_pianoteq.client.gfxhat.scrolling_text import ScrollingText
-from pi_pianoteq.util.button_debouncer import ButtonDebouncer
+from pi_pianoteq.util.button_suppression import ButtonSuppression
 
 from gfxhat import touch
 
@@ -27,7 +27,7 @@ class MenuDisplay:
         self.height = height
         self.font = font
         self.on_exit = on_exit
-        self.debouncer = ButtonDebouncer(300)
+        self.suppression = ButtonSuppression(300)
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
         self.menu_options = self.get_menu_options()
@@ -111,19 +111,19 @@ class MenuDisplay:
             prev_option = self.current_menu_option
 
             if ch == touch.UP:
-                self.debouncer.record()
+                self.suppression.record()
                 self.current_menu_option -= 1
             if ch == touch.DOWN:
-                self.debouncer.record()
+                self.suppression.record()
                 self.current_menu_option += 1
             if ch == touch.LEFT:
-                self.debouncer.record()
+                self.suppression.record()
                 self.current_menu_option -= 1
             if ch == touch.RIGHT:
-                self.debouncer.record()
+                self.suppression.record()
                 self.current_menu_option += 1
             if ch == touch.ENTER:
-                if self.debouncer.allow_action():
+                if self.suppression.allow_action():
                     self.menu_options[self.current_menu_option].trigger()
                     self.selected_menu_option = self.current_menu_option
             self.current_menu_option %= len(self.menu_options)
