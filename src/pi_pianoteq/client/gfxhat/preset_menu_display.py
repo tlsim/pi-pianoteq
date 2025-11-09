@@ -24,6 +24,7 @@ class PresetMenuDisplay(MenuDisplay):
             instrument_name: Name of instrument whose presets to display
         """
         self.instrument_name = instrument_name
+        self.ignore_next_release = True
         super().__init__(api, width, height, font, on_exit)
         self.update_preset()
 
@@ -47,3 +48,18 @@ class PresetMenuDisplay(MenuDisplay):
                 self.current_menu_option = self.menu_options.index(current_option)
                 self._update_selected_option()
                 self.draw_image()
+
+    def get_handler(self):
+        """Get button handler, ignoring first ENTER release after menu opens."""
+        from gfxhat import touch
+        base_handler = super().get_handler()
+
+        def handler(ch, event):
+            if event == 'release' and ch == touch.ENTER:
+                if self.ignore_next_release:
+                    self.ignore_next_release = False
+                    return
+
+            base_handler(ch, event)
+
+        return handler
