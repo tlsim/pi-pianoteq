@@ -26,6 +26,7 @@ class PresetMenuDisplay(MenuDisplay):
         """
         self.instrument_name = instrument_name
         self.ignore_next_release = True
+        self.preset_selected = False
         super().__init__(api, width, height, font, on_exit)
         self.update_preset()
 
@@ -44,6 +45,7 @@ class PresetMenuDisplay(MenuDisplay):
 
     def set_preset(self, preset_name):
         """Load selected preset and exit menu."""
+        self.preset_selected = True
         self.api.set_preset(self.instrument_name, preset_name)
         self.on_exit()
 
