@@ -103,17 +103,8 @@ ssh tom@192.168.0.169 "sudo systemctl status pi-pianoteq.service"
 ssh tom@192.168.0.169 "sudo journalctl -u pi-pianoteq.service -n 50"
 ```
 
-### Test JSON-RPC API
-```bash
-# Local
-curl -s http://localhost:8081/jsonrpc \
-  -H 'Content-Type: application/json' \
-  -d '{"jsonrpc":"2.0","method":"getActivationInfo","params":[],"id":1}' \
-  | python3 -m json.tool
-
-# On Pi (wrap curl command with ssh, escape quotes)
-ssh tom@192.168.0.169 "curl -s http://localhost:8081/jsonrpc ..."
-```
+### JSON-RPC API Reference
+See `docs/pianoteq-api.md` for complete API documentation with examples.
 
 ### Create a Release
 ```bash
@@ -143,4 +134,5 @@ Release notes format:
 - `src/pi_pianoteq/config/config.py` - Configuration and instrument discovery
 - `src/pi_pianoteq/__main__.py` - Main entry point with loading sequence
 - `deploy.sh` - Deployment script (reads `deploy.conf` for Pi connection details)
+- `docs/` - Documentation (API reference, development guide, systemd setup)
 
