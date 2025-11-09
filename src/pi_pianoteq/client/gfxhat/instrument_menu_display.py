@@ -9,8 +9,9 @@ from gfxhat import touch
 
 
 class InstrumentMenuDisplay(MenuDisplay):
-    def __init__(self, api: ClientApi, width, height, font, on_exit):
+    def __init__(self, api: ClientApi, width, height, font, on_exit, on_enter_preset_menu):
         super().__init__(api, width, height, font, on_exit)
+        self.on_enter_preset_menu = on_enter_preset_menu
         self.menu_open = False
         self.shutdown_display = ShutdownDisplay(api, width, height, font, self.on_exit_menu)
 
@@ -63,3 +64,18 @@ class InstrumentMenuDisplay(MenuDisplay):
     def on_exit_menu(self):
         self.menu_open = False
         self.update_handler()
+
+    def get_handler(self):
+        base_handler = super().get_handler()
+
+        def handler(ch, event):
+            if event == 'held':
+                if ch == touch.ENTER:
+                    highlighted_instrument = self.menu_options[self.current_menu_option].name
+                    if highlighted_instrument != "Shut down":
+                        self.on_enter_preset_menu(highlighted_instrument)
+                    return
+
+            base_handler(ch, event)
+
+        return handler

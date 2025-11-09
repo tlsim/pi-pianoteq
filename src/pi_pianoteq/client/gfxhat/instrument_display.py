@@ -19,12 +19,13 @@ class InstrumentDisplay:
     TEXT_MARGIN = 5
     WRAP_GAP = 20
 
-    def __init__(self, api: ClientApi, width, height, font, on_enter):
+    def __init__(self, api: ClientApi, width, height, font, on_enter, on_enter_preset_menu):
         self.api = api
         self.width = width
         self.height = height
         self.font = font
         self.on_enter = on_enter
+        self.on_enter_preset_menu = on_enter_preset_menu
         self.suppression = ButtonSuppression(300)
         self.preset = self.api.get_current_preset_display_name()
         self.instrument = self.api.get_current_instrument()
@@ -87,24 +88,27 @@ class InstrumentDisplay:
 
     def get_handler(self):
         def handler(ch, event):
-            if event != 'press':
-                return
-            if ch == touch.DOWN:
-                self.suppression.record()
-                self.api.set_preset_next()
-            if ch == touch.UP:
-                self.suppression.record()
-                self.api.set_preset_prev()
-            if ch == touch.LEFT:
-                self.suppression.record()
-                self.api.set_instrument_prev()
-            if ch == touch.RIGHT:
-                self.suppression.record()
-                self.api.set_instrument_next()
-            if ch == touch.ENTER:
-                if self.suppression.allow_action():
-                    self.on_enter()
-            self.update_display()
+            if event == 'press':
+                if ch == touch.DOWN:
+                    self.suppression.record()
+                    self.api.set_preset_next()
+                if ch == touch.UP:
+                    self.suppression.record()
+                    self.api.set_preset_prev()
+                if ch == touch.LEFT:
+                    self.suppression.record()
+                    self.api.set_instrument_prev()
+                if ch == touch.RIGHT:
+                    self.suppression.record()
+                    self.api.set_instrument_next()
+                if ch == touch.ENTER:
+                    if self.suppression.allow_action():
+                        self.on_enter()
+                self.update_display()
+
+            elif event == 'held':
+                if ch == touch.ENTER:
+                    self.on_enter_preset_menu()
 
         return handler
 
