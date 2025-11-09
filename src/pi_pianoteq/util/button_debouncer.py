@@ -1,7 +1,7 @@
 import time
 
 
-class NavigationDebouncer:
+class ButtonDebouncer:
     """
     Prevents action button presses shortly after navigation button presses.
 

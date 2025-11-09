@@ -3,7 +3,7 @@ from PIL import Image, ImageDraw
 from pi_pianoteq.client.gfxhat.menu_option import MenuOption
 from pi_pianoteq.client.gfxhat.backlight import Backlight
 from pi_pianoteq.client.gfxhat.scrolling_text import ScrollingText
-from pi_pianoteq.util.button_debouncer import NavigationDebouncer
+from pi_pianoteq.util.button_debouncer import ButtonDebouncer
 
 from gfxhat import touch
 
@@ -27,7 +27,7 @@ class MenuDisplay:
         self.height = height
         self.font = font
         self.on_exit = on_exit
-        self.debouncer = NavigationDebouncer(300)
+        self.debouncer = ButtonDebouncer(300)
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
         self.menu_options = self.get_menu_options()

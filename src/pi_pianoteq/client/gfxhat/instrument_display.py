@@ -5,7 +5,7 @@ from pi_pianoteq.client.client_api import ClientApi
 from gfxhat import touch
 from pi_pianoteq.client.gfxhat.backlight import Backlight
 from pi_pianoteq.client.gfxhat.scrolling_text import ScrollingText
-from pi_pianoteq.util.button_debouncer import NavigationDebouncer
+from pi_pianoteq.util.button_debouncer import ButtonDebouncer
 
 
 class InstrumentDisplay:
@@ -25,7 +25,7 @@ class InstrumentDisplay:
         self.height = height
         self.font = font
         self.on_enter = on_enter
-        self.debouncer = NavigationDebouncer(300)
+        self.debouncer = ButtonDebouncer(300)
         self.preset = self.api.get_current_preset_display_name()
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
