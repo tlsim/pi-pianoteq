@@ -28,11 +28,33 @@ gfxhat.touch.LEFT = 4
 gfxhat.touch.RIGHT = 5
 gfxhat.fonts.BitbuntuFull = "/fake/font.ttf"
 
-# Mock PIL.ImageFont.truetype to avoid loading real fonts
-from PIL import ImageFont
+# Mock PIL to avoid real image operations
+from PIL import ImageFont, Image, ImageDraw
+
+# Mock font
 mock_font = mock.Mock()
 mock_font.getbbox = mock.Mock(return_value=(0, 0, 50, 10))
+mock_font.getmask2 = mock.Mock(return_value=(mock.Mock(), (0, 0)))
 ImageFont.truetype = mock.Mock(return_value=mock_font)
+
+# Mock Image.new to return a mock image
+original_image_new = Image.new
+def mock_image_new(mode, size, color=0):
+    mock_img = mock.Mock()
+    mock_img.mode = mode
+    mock_img.size = size
+    return mock_img
+Image.new = mock_image_new
+
+# Mock ImageDraw.Draw to return a mock draw object
+original_draw = ImageDraw.Draw
+def mock_draw(image, mode=None):
+    mock_drawer = mock.Mock()
+    mock_drawer.text = mock.Mock()
+    mock_drawer.rectangle = mock.Mock()
+    mock_drawer.line = mock.Mock()
+    return mock_drawer
+ImageDraw.Draw = mock_draw
 
 # Now we can run tests
 import unittest

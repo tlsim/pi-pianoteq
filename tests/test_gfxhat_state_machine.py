@@ -148,7 +148,8 @@ class GfxhatClientStateMachineTestCase(unittest.TestCase):
         # Should create preset menu for current instrument
         self.mock_api.get_current_instrument.assert_called()
         mock_preset_menu_class.assert_called_once()
-        created_instrument = mock_preset_menu_class.call_args[1]['instrument_name']
+        # instrument_name is the 6th positional argument (index 5)
+        created_instrument = mock_preset_menu_class.call_args[0][5]
         self.assertEqual("Piano", created_instrument)
 
         # Should set state correctly
@@ -177,7 +178,8 @@ class GfxhatClientStateMachineTestCase(unittest.TestCase):
         client.menu_display.stop_scrolling.assert_called_once()
 
         # Should create preset menu for specified instrument
-        created_instrument = mock_preset_menu_class.call_args[1]['instrument_name']
+        # instrument_name is the 6th positional argument (index 5)
+        created_instrument = mock_preset_menu_class.call_args[0][5]
         self.assertEqual("Strings", created_instrument)
 
         # Should track source as instrument_menu
@@ -212,6 +214,7 @@ class GfxhatClientStateMachineTestCase(unittest.TestCase):
         client.preset_menu_open = True
         client.preset_menu_source = 'instrument_menu'
         client.preset_menu_display = Mock()
+        client.preset_menu_display.preset_selected = False  # User pressed BACK, not selected
 
         client.menu_display.start_scrolling = Mock()
         client.instrument_display.update_display = Mock()
