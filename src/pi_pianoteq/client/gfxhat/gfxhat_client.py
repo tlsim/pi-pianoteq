@@ -201,6 +201,10 @@ class GfxhatClient(Client):
         # If a preset was selected, always return to main display
         # Otherwise (BACK pressed), return to source
         if self.preset_menu_display.preset_selected:
+            # Close instrument menu too if it was open
+            if self.menu_open:
+                self.menu_display.stop_scrolling()
+                self.menu_open = False
             self.instrument_display.update_display()
             self.instrument_display.start_scrolling()
         elif self.preset_menu_source == 'main':
