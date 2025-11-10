@@ -8,7 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Preset selection menu for GFX HAT (long press ENTER to open)
+  - Access from main display to browse current instrument's presets
+  - Access from instrument menu to browse any instrument's presets before switching
+  - Current preset automatically highlighted when viewing current instrument
+  - Menu headings distinguish instrument menu ("Select Instrument:") from preset menu ("Select Preset:")
 - Button suppression window to prevent accidental menu activation when navigating with arrow buttons
+- Comprehensive test suite with 179 tests covering all client functionality
 
 ## [2.0.0] - 2025-11-06
 

@@ -13,5 +13,8 @@ class ShutdownDisplay(MenuDisplay):
         cancel_option = MenuOption("Cancel", self.on_exit, self.font)
         return [shutdown_option, cancel_option]
 
+    def get_heading(self):
+        return "Shut down?"
+
     def shutdown_device(self):
         self.api.shutdown_device();

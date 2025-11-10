@@ -57,3 +57,15 @@ class ClientApi(ABC):
     @abstractmethod
     def set_on_exit(self, on_exit) -> None:
         raise NotImplemented
+
+    @abstractmethod
+    def get_preset_names(self, instrument_name: str) -> list:
+        raise NotImplemented
+
+    @abstractmethod
+    def get_instrument_preset_prefix(self, instrument_name: str) -> str:
+        raise NotImplemented
+
+    @abstractmethod
+    def set_preset(self, instrument_name: str, preset_name: str):
+        raise NotImplemented

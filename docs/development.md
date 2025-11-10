@@ -90,9 +90,33 @@ The `deploy.sh` script will:
 
 ### Running Tests
 
+Run all tests:
 ```bash
-pipenv run test
+pipenv run pytest
 ```
+
+Run specific test file or directory:
+```bash
+pipenv run pytest tests/client/gfxhat/test_scrolling_text.py
+pipenv run pytest tests/client/gfxhat/  # All GFX HAT tests
+```
+
+Run with coverage:
+```bash
+# Terminal report with missing lines
+pipenv run pytest --cov --cov-report=term-missing
+
+# Generate browsable HTML report
+pipenv run pytest --cov --cov-report=html
+# Open htmlcov/index.html in browser
+```
+
+### Test Organization
+
+Tests mirror the `src/pi_pianoteq/` structure. Hardware dependencies (GFX HAT, PIL) are automatically mocked via `conftest.py`.
+
+**Current Coverage: ~50%** - Use coverage reports to identify gaps and guide new tests.
+
 
 ### Code Checks
 
@@ -129,8 +153,8 @@ When releasing a new version:
 
 1. Update version in `pyproject.toml`
 2. Update `CHANGELOG.md`
-4. Build and test
-5. Commit and tag
+3. Build and test
+4. Commit and tag
 
 ## Direct Commands (without pipenv)
 

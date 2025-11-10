@@ -72,3 +72,23 @@ class ClientLib(ClientApi):
         if self.on_exit is not None:
             self.on_exit()
         system(Config.SHUTDOWN_COMMAND)
+
+    def get_preset_names(self, instrument_name: str) -> List[str]:
+        """Get list of preset names for a specific instrument."""
+        instrument = self.selector.get_instrument_by_name(instrument_name)
+        return [p.name for p in instrument.presets] if instrument else []
+
+    def get_instrument_preset_prefix(self, instrument_name: str) -> str:
+        """Get the preset prefix for a specific instrument."""
+        instrument = self.selector.get_instrument_by_name(instrument_name)
+        return instrument.preset_prefix if instrument else ""
+
+    def set_preset(self, instrument_name: str, preset_name: str):
+        """
+        Set specific preset for a specific instrument.
+
+        Switches to the instrument if not current, then loads the preset.
+        Uses MIDI Program Change to trigger Pianoteq preset load.
+        """
+        if self.selector.set_preset_by_name(instrument_name, preset_name):
+            self.program_change.set_preset(self.selector.get_current_preset())
