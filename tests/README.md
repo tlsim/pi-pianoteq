@@ -10,43 +10,60 @@ Install the package in development mode with dependencies:
 pipenv install -e .
 ```
 
-Or install test dependencies manually:
-```bash
-pip install pillow python-rtmidi
-```
-
 ### Run All Tests
 
 ```bash
 # From project root
-python -m unittest discover tests -v
+pipenv run pytest
 ```
 
 ### Run Specific Test File
 
 ```bash
-python -m unittest tests.test_preset_menu_display -v
-python -m unittest tests.test_gfxhat_state_machine -v
-python -m unittest tests.test_button_suppression -v
+pipenv run pytest tests/client/gfxhat/test_preset_menu_display.py
+pipenv run pytest tests/client/gfxhat/test_gfxhat_state_machine.py
+pipenv run pytest tests/util/test_button_suppression.py
+```
+
+### Run Tests in Specific Directory
+
+```bash
+pipenv run pytest tests/client/gfxhat/  # All GFX HAT client tests
+pipenv run pytest tests/config/         # Configuration tests
 ```
 
 ### Run Single Test
 
 ```bash
-python -m unittest tests.test_preset_menu_display.PresetMenuDisplayTestCase.test_current_preset_highlighted_for_current_instrument
+pipenv run pytest tests/client/gfxhat/test_preset_menu_display.py::test_current_preset_highlighted_for_current_instrument
+```
+
+## Test Directory Structure
+
+Tests are organized to mirror the source code structure:
+
+```
+tests/
+├── conftest.py              # Shared fixtures and hardware mocking
+├── client/
+│   └── gfxhat/
+│       ├── test_gfxhat_state_machine.py
+│       └── test_preset_menu_display.py
+├── config/
+│   └── test_config.py
+├── instrument/
+│   └── test_presets.py
+├── logging/
+│   └── test_logging_config.py
+├── rpc/
+│   └── test_jsonrpc_client.py
+└── util/
+    └── test_button_suppression.py
 ```
 
 ## Test Coverage
 
-### Existing Tests
-
-- **test_button_suppression.py** - ButtonSuppression timing logic
-- **test_presets.py** - Preset display name stripping, instrument grouping
-- **test_config.py** - Configuration loading
-- **test_logging_config.py** - Logging setup
-- **test_jsonrpc_client.py** - JSON-RPC client
-
-### New Tests (GFX HAT Client)
+### Client Tests (client/gfxhat/)
 
 - **test_preset_menu_display.py** - Preset menu functionality
   - Menu option generation
@@ -61,23 +78,24 @@ python -m unittest tests.test_preset_menu_display.PresetMenuDisplayTestCase.test
   - Preset menu transitions (from main/instrument menu)
   - Cleanup (stop all scrolling)
 
+### Core Component Tests
+
+- **util/test_button_suppression.py** - ButtonSuppression timing logic
+- **instrument/test_presets.py** - Preset display name stripping, instrument grouping
+- **config/test_config.py** - Configuration loading
+- **logging/test_logging_config.py** - Logging setup
+- **rpc/test_jsonrpc_client.py** - JSON-RPC client
+
 ## Hardware Mocking
 
-The GFX HAT tests use `unittest.mock` to mock hardware dependencies:
+Hardware dependencies are automatically mocked by `conftest.py`:
 
 - `gfxhat.lcd` - LCD display
 - `gfxhat.touch` - Touch buttons
 - `gfxhat.backlight` - RGB backlight
 - `PIL.Image` / `PIL.ImageDraw` - Image rendering
 
-Example:
-```python
-@patch('pi_pianoteq.client.gfxhat.gfxhat_client.lcd')
-@patch('pi_pianoteq.client.gfxhat.gfxhat_client.touch')
-@patch('pi_pianoteq.client.gfxhat.gfxhat_client.backlight')
-def test_something(self, mock_backlight, mock_touch, mock_lcd):
-    # Hardware is mocked - test logic without physical hardware
-```
+The mocking is configured once in `conftest.py` and applies to all tests automatically. This allows tests to run on any system without requiring physical hardware.
 
 ## Adding New Tests
 
@@ -90,26 +108,21 @@ See `docs/testing-strategy.md` for comprehensive guidance on:
 ### Example Test Structure
 
 ```python
-import unittest
-from unittest.mock import Mock, patch
+from unittest.mock import Mock
+import pytest
 
-class MyComponentTestCase(unittest.TestCase):
-    def setUp(self):
-        """Set up common fixtures used across tests."""
-        self.mock_api = Mock()
-        # Set up return values...
+def test_specific_behavior():
+    """Test description explaining what and why."""
+    # Arrange
+    mock_api = Mock()
+    component = MyComponent(mock_api)
 
-    def test_specific_behavior(self):
-        """Test description explaining what and why."""
-        # Arrange
-        component = MyComponent(self.mock_api)
+    # Act
+    result = component.do_something()
 
-        # Act
-        result = component.do_something()
-
-        # Assert
-        self.assertEqual(expected, result)
-        self.mock_api.some_method.assert_called_once()
+    # Assert
+    assert result == expected_value
+    mock_api.some_method.assert_called_once()
 ```
 
 ## Test Philosophy
@@ -134,10 +147,10 @@ Tests can be run in CI/CD pipelines without hardware:
 - name: Run tests
   run: |
     pip install -e .
-    python -m unittest discover tests -v
+    pytest
 ```
 
-The hardware mocking allows tests to run on any system, including:
+The hardware mocking (configured in `conftest.py`) allows tests to run on any system, including:
 - Development machines (without GFX HAT)
 - CI servers
 - Docker containers

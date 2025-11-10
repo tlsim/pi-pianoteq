@@ -42,3 +42,13 @@ packages = ["pi_pianoteq", "pi_pianoteq.client", "pi_pianoteq.client.cli", "pi_p
 
 [tool.setuptools.package-data]
 "pi_pianoteq.config" = ["pi_pianoteq.conf"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--import-mode=importlib",
+]
