@@ -38,6 +38,26 @@ pipenv run pytest tests/config/         # Configuration tests
 pipenv run pytest tests/client/gfxhat/test_preset_menu_display.py::test_current_preset_highlighted_for_current_instrument
 ```
 
+### Run Tests with Coverage
+
+```bash
+# Run with terminal coverage report
+pipenv run pytest --cov --cov-report=term-missing
+
+# Generate HTML coverage report (opens in browser)
+pipenv run pytest --cov --cov-report=html
+# Then open htmlcov/index.html in browser
+
+# Run with both terminal and HTML reports
+pipenv run pytest --cov --cov-report=term-missing --cov-report=html
+```
+
+Coverage reports show:
+- Overall coverage percentage
+- Line-by-line coverage for each file
+- Missing lines (not covered by tests)
+- HTML report provides visual highlighting
+
 ## Test Directory Structure
 
 Tests are organized to mirror the source code structure:

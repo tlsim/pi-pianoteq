@@ -18,3 +18,5 @@ pi-pianoteq.service
 
 pi-pianoteq/*
 backup-*/
+htmlcov/
+.coverage

@@ -6,6 +6,7 @@ verify_ssl = true
 [dev-packages]
 build = "*"
 pytest = "*"
+pytest-cov = "*"
 
 [packages]
 python-rtmidi = "~=1.5"
