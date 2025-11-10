@@ -75,14 +75,12 @@ class ClientLib(ClientApi):
 
     def get_preset_names(self, instrument_name: str) -> List[str]:
         """Get list of preset names for a specific instrument."""
-        instrument = next((i for i in self.instrument_library.get_instruments()
-                          if i.name == instrument_name), None)
+        instrument = self.selector.get_instrument_by_name(instrument_name)
         return [p.name for p in instrument.presets] if instrument else []
 
     def get_instrument_preset_prefix(self, instrument_name: str) -> str:
         """Get the preset prefix for a specific instrument."""
-        instrument = next((i for i in self.instrument_library.get_instruments()
-                          if i.name == instrument_name), None)
+        instrument = self.selector.get_instrument_by_name(instrument_name)
         return instrument.preset_prefix if instrument else ""
 
     def set_preset(self, instrument_name: str, preset_name: str):
@@ -92,17 +90,5 @@ class ClientLib(ClientApi):
         Switches to the instrument if not current, then loads the preset.
         Uses MIDI Program Change to trigger Pianoteq preset load.
         """
-        instrument = next((i for i in self.instrument_library.get_instruments()
-                          if i.name == instrument_name), None)
-        if not instrument:
-            return
-
-        preset = next((p for p in instrument.presets if p.name == preset_name), None)
-        if not preset:
-            return
-
-        self.selector.set_instrument(instrument_name)
-        preset_idx = instrument.presets.index(preset)
-        self.selector.current_instrument_preset_idx = preset_idx
-
-        self.program_change.set_preset(preset)
+        if self.selector.set_preset_by_name(instrument_name, preset_name):
+            self.program_change.set_preset(self.selector.get_current_preset())

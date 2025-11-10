@@ -8,6 +8,10 @@ class Selector:
         self.current_instrument_idx: int = 0
         self.current_instrument_preset_idx: int = 0
 
+    def get_instrument_by_name(self, name: str) -> Instrument | None:
+        """Find instrument by name."""
+        return next((i for i in self.instruments if i.name == name), None)
+
     def get_current_instrument(self) -> Instrument:
         return self.instruments[self.current_instrument_idx]
 
@@ -20,7 +24,7 @@ class Selector:
         self.current_instrument_preset_idx = 0
 
     def set_instrument(self, name) -> None:
-        instrument = next((i for i in self.instruments if name == i.name), None)
+        instrument = self.get_instrument_by_name(name)
         if instrument is not None:
             self.current_instrument_idx = self.instruments.index(instrument)
             self.current_instrument_preset_idx = 0
@@ -40,3 +44,21 @@ class Selector:
             self.current_instrument_preset_idx = len(self.get_current_instrument().presets) - 1
         else:
             self.current_instrument_preset_idx -= 1
+
+    def set_preset_by_name(self, instrument_name: str, preset_name: str) -> bool:
+        """
+        Set preset by instrument and preset name.
+
+        Returns True if successful, False if instrument or preset not found.
+        """
+        instrument = self.get_instrument_by_name(instrument_name)
+        if not instrument:
+            return False
+
+        preset = next((p for p in instrument.presets if p.name == preset_name), None)
+        if not preset:
+            return False
+
+        self.current_instrument_idx = self.instruments.index(instrument)
+        self.current_instrument_preset_idx = instrument.presets.index(preset)
+        return True
