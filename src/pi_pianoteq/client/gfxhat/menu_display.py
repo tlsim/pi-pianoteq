@@ -47,7 +47,11 @@ class MenuDisplay:
         self.draw_image()
 
     def get_menu_options(self):
-        raise NotImplemented
+        raise NotImplementedError
+
+    def get_heading(self):
+        """Return heading text to display at top of menu (scrolls with menu items)."""
+        raise NotImplementedError
 
     def get_backlight(self):
         return self.backlight
@@ -70,6 +74,13 @@ class MenuDisplay:
 
         # Get current scroll offset from background thread
         scroll_offset = self.option_scroller.get_offset() if self.option_scroller else 0
+
+        # Draw heading at top of display (scrolls with menu items)
+        heading = self.get_heading()
+        if heading:
+            heading_x = self.MENU_ARROW_WIDTH
+            heading_y = 2 - offset_top
+            self.draw.text((heading_x, heading_y), heading, 1, self.font)
 
         for index in range(len(self.menu_options)):
             x = self.MENU_ARROW_WIDTH

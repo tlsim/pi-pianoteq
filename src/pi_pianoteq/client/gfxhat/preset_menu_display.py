@@ -43,6 +43,9 @@ class PresetMenuDisplay(MenuDisplay):
 
         return options
 
+    def get_heading(self):
+        return "Select Preset:"
+
     def set_preset(self, preset_name):
         """Load selected preset and exit menu."""
         self.preset_selected = True

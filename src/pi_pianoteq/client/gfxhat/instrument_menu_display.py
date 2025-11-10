@@ -22,6 +22,9 @@ class InstrumentMenuDisplay(MenuDisplay):
         menu_options.append(shutdown_option)
         return menu_options
 
+    def get_heading(self):
+        return "Select Instrument:"
+
     def set_instrument(self, name):
         self.api.set_instrument(name)
         self.on_exit()

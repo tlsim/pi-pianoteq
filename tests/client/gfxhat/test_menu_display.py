@@ -16,6 +16,9 @@ class ConcreteMenuDisplay(MenuDisplay):
     def get_menu_options(self):
         return self._menu_options
 
+    def get_heading(self):
+        return "Test Menu"
+
 
 class MenuDisplayTestCase(unittest.TestCase):
     """Test MenuDisplay navigation and wrapping behavior."""
