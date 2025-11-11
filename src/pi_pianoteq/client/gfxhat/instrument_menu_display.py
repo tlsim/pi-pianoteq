@@ -16,8 +16,8 @@ class InstrumentMenuDisplay(MenuDisplay):
         self.shutdown_display = ShutdownDisplay(api, width, height, font, self.on_exit_menu)
 
     def get_menu_options(self):
-        instrument_names = self.api.get_instrument_names()
-        menu_options = [MenuOption(i, self.set_instrument, self.font, (i,)) for i in instrument_names]
+        instruments = self.api.get_instruments()
+        menu_options = [MenuOption(i.name, self.set_instrument, self.font, (i.name,)) for i in instruments]
         shutdown_option = MenuOption("Shut down", self.on_enter_menu, self.font)
         menu_options.append(shutdown_option)
         return menu_options
@@ -31,7 +31,7 @@ class InstrumentMenuDisplay(MenuDisplay):
 
     def update_instrument(self):
         current_instrument = self.api.get_current_instrument()
-        current_option = next((o for o in self.menu_options if o.name == current_instrument), None)
+        current_option = next((o for o in self.menu_options if o.name == current_instrument.name), None)
         if current_option is not None:
             self.current_menu_option = self.menu_options.index(current_option)
             self._update_selected_option()

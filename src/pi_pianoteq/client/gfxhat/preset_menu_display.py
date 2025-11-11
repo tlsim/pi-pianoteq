@@ -50,7 +50,7 @@ class PresetMenuDisplay(MenuDisplay):
 
     def update_preset(self):
         """Highlight currently loaded preset if viewing current instrument's presets."""
-        if self.instrument_name == self.api.get_current_instrument():
+        if self.instrument_name == self.api.get_current_instrument().name:
             current_preset = self.api.get_current_preset()
             # Compare raw names (stored in options[0]), not display names
             current_option = next((o for o in self.menu_options

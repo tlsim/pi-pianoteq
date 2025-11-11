@@ -27,10 +27,11 @@ class InstrumentDisplay:
         self.on_enter = on_enter
         self.on_enter_preset_menu = on_enter_preset_menu
         self.suppression = ButtonSuppression(300)
+        current_instrument = self.api.get_current_instrument()
         self.preset = self.api.get_current_preset().display_name
-        self.instrument = self.api.get_current_instrument()
-        self.background_primary = self.api.get_current_background_primary()
-        self.background_secondary = self.api.get_current_background_secondary()
+        self.instrument = current_instrument.name
+        self.background_primary = current_instrument.background_primary
+        self.background_secondary = current_instrument.background_secondary
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
         self.preset_scroller = ScrollingText(self.preset, self.font, self.width - self.TEXT_MARGIN)
@@ -120,10 +121,11 @@ class InstrumentDisplay:
 
     def update_display(self):
         """Update display when instrument/preset changes (e.g., button press)."""
+        current_instrument = self.api.get_current_instrument()
         self.preset = self.api.get_current_preset().display_name
-        self.instrument = self.api.get_current_instrument()
-        self.background_primary = self.api.get_current_background_primary()
-        self.background_secondary = self.api.get_current_background_secondary()
+        self.instrument = current_instrument.name
+        self.background_primary = current_instrument.background_primary
+        self.background_secondary = current_instrument.background_secondary
         # Update text and restart scrolling threads
         self.preset_scroller.update_text(self.preset)
         self.instrument_scroller.update_text(self.instrument)

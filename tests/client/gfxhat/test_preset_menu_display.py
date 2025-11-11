@@ -3,6 +3,7 @@ from unittest.mock import Mock, patch, MagicMock
 
 from pi_pianoteq.client.gfxhat.preset_menu_display import PresetMenuDisplay
 from pi_pianoteq.instrument.preset import Preset
+from pi_pianoteq.instrument.instrument import Instrument
 
 
 class PresetMenuDisplayTestCase(unittest.TestCase):
@@ -87,7 +88,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         the menu should automatically position on the current preset.
         """
         self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_current_instrument.return_value = "Piano"
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#000000", "#FFFFFF")
         self.mock_api.get_current_preset.return_value = Preset("Medium", "Medium")
         self.mock_api.get_presets.return_value = [
             Preset("Bright", "Bright"),
@@ -116,7 +117,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         of the currently loaded instrument.
         """
         self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_current_instrument.return_value = "Piano"
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#000000", "#FFFFFF")
         self.mock_api.get_current_preset.return_value = Preset("Medium", "Medium")
         self.mock_api.get_presets.return_value = [
             Preset("Plucked", "Plucked"),
@@ -142,7 +143,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         This is an edge case that shouldn't happen in normal operation,
         but the code should not crash if API returns inconsistent data.
         """
-        self.mock_api.get_current_instrument.return_value = "Piano"
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#000000", "#FFFFFF")
         self._configure_scroller_mock(mock_scroller)
         self.mock_api.get_current_preset.return_value = Preset("NonExistent", "NonExistent")
         self.mock_api.get_presets.return_value = [

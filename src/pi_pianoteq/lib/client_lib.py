@@ -44,21 +44,17 @@ class ClientLib(ClientApi):
         self.selector.set_instrument_prev()
         self.program_change.set_preset(self.selector.get_current_preset())
 
-    def get_instrument_names(self) -> List[str]:
-        return [i.name for i in self.instrument_library.get_instruments()]
+    def get_instruments(self) -> list:
+        """Get list of all Instrument objects."""
+        return self.instrument_library.get_instruments()
 
     def get_current_preset(self):
         """Get the current Preset object."""
         return self.selector.get_current_preset()
 
-    def get_current_instrument(self) -> str:
-        return self.selector.get_current_instrument().name
-
-    def get_current_background_primary(self) -> str:
-        return self.selector.get_current_instrument().background_primary
-
-    def get_current_background_secondary(self) -> str:
-        return self.selector.get_current_instrument().background_secondary
+    def get_current_instrument(self):
+        """Get the current Instrument object."""
+        return self.selector.get_current_instrument()
 
     def set_on_exit(self, on_exit) -> None:
         self.on_exit = on_exit

@@ -32,19 +32,13 @@ class ClientApi(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def get_instrument_names(self):
+    def get_instruments(self) -> list:
+        """Get list of all Instrument objects."""
         raise NotImplemented
 
     @abstractmethod
-    def get_current_instrument(self) -> str:
-        raise NotImplemented
-
-    @abstractmethod
-    def get_current_background_primary(self) -> str:
-        raise NotImplemented
-
-    @abstractmethod
-    def get_current_background_secondary(self) -> str:
+    def get_current_instrument(self):
+        """Get the current Instrument object."""
         raise NotImplemented
 
     @abstractmethod
