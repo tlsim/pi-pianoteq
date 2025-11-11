@@ -221,7 +221,7 @@ class ConfigLoader:
         Calculates display names based on longest common word prefix.
         """
         from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpcError
-        from pi_pianoteq.instrument.preset import find_longest_common_word_prefix, calculate_display_name
+        from pi_pianoteq.util.preset_names import find_longest_common_word_prefix, calculate_display_name
 
         try:
             presets = jsonrpc_client.get_presets()
