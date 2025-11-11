@@ -15,11 +15,8 @@ class ClientApi(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def get_current_preset(self) -> str:
-        raise NotImplemented
-
-    @abstractmethod
-    def get_current_preset_display_name(self) -> str:
+    def get_current_preset(self):
+        """Get the current Preset object."""
         raise NotImplemented
 
     @abstractmethod
@@ -59,16 +56,8 @@ class ClientApi(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def get_preset_names(self, instrument_name: str) -> list:
-        raise NotImplemented
-
-    @abstractmethod
     def get_presets(self, instrument_name: str) -> list:
         """Get list of Preset objects for a specific instrument."""
-        raise NotImplemented
-
-    @abstractmethod
-    def get_instrument_preset_prefix(self, instrument_name: str) -> str:
         raise NotImplemented
 
     @abstractmethod

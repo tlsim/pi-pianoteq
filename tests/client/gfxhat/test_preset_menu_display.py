@@ -88,7 +88,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         """
         self._configure_scroller_mock(mock_scroller)
         self.mock_api.get_current_instrument.return_value = "Piano"
-        self.mock_api.get_current_preset.return_value = "Medium"
+        self.mock_api.get_current_preset.return_value = Preset("Medium", "Medium")
         self.mock_api.get_presets.return_value = [
             Preset("Bright", "Bright"),
             Preset("Dark", "Dark"),
@@ -117,7 +117,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         """
         self._configure_scroller_mock(mock_scroller)
         self.mock_api.get_current_instrument.return_value = "Piano"
-        self.mock_api.get_current_preset.return_value = "Medium"  # Piano preset
+        self.mock_api.get_current_preset.return_value = Preset("Medium", "Medium")
         self.mock_api.get_presets.return_value = [
             Preset("Plucked", "Plucked"),
             Preset("Muted", "Muted"),
@@ -144,7 +144,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         """
         self.mock_api.get_current_instrument.return_value = "Piano"
         self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_current_preset.return_value = "NonExistent"
+        self.mock_api.get_current_preset.return_value = Preset("NonExistent", "NonExistent")
         self.mock_api.get_presets.return_value = [
             Preset("Bright", "Bright"),
             Preset("Dark", "Dark"),

@@ -54,7 +54,7 @@ class PresetMenuDisplay(MenuDisplay):
             current_preset = self.api.get_current_preset()
             # Compare raw names (stored in options[0]), not display names
             current_option = next((o for o in self.menu_options
-                                  if o.options and o.options[0] == current_preset), None)
+                                  if o.options and o.options[0] == current_preset.name), None)
             if current_option is not None:
                 self.current_menu_option = self.menu_options.index(current_option)
                 self._update_selected_option()

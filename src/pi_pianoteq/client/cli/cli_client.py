@@ -302,7 +302,7 @@ class CliClient(Client):
     def _get_normal_text(self):
         """Generate normal mode display using formatted text tuples"""
         instrument = self.api.get_current_instrument()
-        preset = self.api.get_current_preset_display_name()
+        preset = self.api.get_current_preset().display_name
 
         # Use list of (style, text) tuples for proper formatting
         lines = [

@@ -27,7 +27,7 @@ class InstrumentDisplay:
         self.on_enter = on_enter
         self.on_enter_preset_menu = on_enter_preset_menu
         self.suppression = ButtonSuppression(300)
-        self.preset = self.api.get_current_preset_display_name()
+        self.preset = self.api.get_current_preset().display_name
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
         self.background_secondary = self.api.get_current_background_secondary()
@@ -120,7 +120,7 @@ class InstrumentDisplay:
 
     def update_display(self):
         """Update display when instrument/preset changes (e.g., button press)."""
-        self.preset = self.api.get_current_preset_display_name()
+        self.preset = self.api.get_current_preset().display_name
         self.instrument = self.api.get_current_instrument()
         self.background_primary = self.api.get_current_background_primary()
         self.background_secondary = self.api.get_current_background_secondary()
