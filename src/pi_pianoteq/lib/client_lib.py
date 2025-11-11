@@ -52,8 +52,7 @@ class ClientLib(ClientApi):
 
     def get_current_preset_display_name(self) -> str:
         preset = self.selector.get_current_preset()
-        instrument = self.selector.get_current_instrument()
-        return preset.get_display_name(instrument.preset_prefix)
+        return preset.display_name
 
     def get_current_instrument(self) -> str:
         return self.selector.get_current_instrument().name
@@ -77,6 +76,11 @@ class ClientLib(ClientApi):
         """Get list of preset names for a specific instrument."""
         instrument = self.selector.get_instrument_by_name(instrument_name)
         return [p.name for p in instrument.presets] if instrument else []
+
+    def get_presets(self, instrument_name: str) -> list:
+        """Get list of Preset objects for a specific instrument."""
+        instrument = self.selector.get_instrument_by_name(instrument_name)
+        return instrument.presets if instrument else []
 
     def get_instrument_preset_prefix(self, instrument_name: str) -> str:
         """Get the preset prefix for a specific instrument."""

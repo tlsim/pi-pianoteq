@@ -1,7 +1,6 @@
 from pi_pianoteq.client.client_api import ClientApi
 from pi_pianoteq.client.gfxhat.menu_option import MenuOption
 from pi_pianoteq.client.gfxhat.menu_display import MenuDisplay
-from pi_pianoteq.instrument.preset import Preset
 
 
 class PresetMenuDisplay(MenuDisplay):
@@ -32,14 +31,11 @@ class PresetMenuDisplay(MenuDisplay):
 
     def get_menu_options(self):
         """Build menu options from preset names for this instrument."""
-        preset_names = self.api.get_preset_names(self.instrument_name)
-        preset_prefix = self.api.get_instrument_preset_prefix(self.instrument_name)
+        presets = self.api.get_presets(self.instrument_name)
 
         options = []
-        for raw_name in preset_names:
-            preset = Preset(raw_name)
-            display_name = preset.get_display_name(preset_prefix)
-            options.append(MenuOption(display_name, self.set_preset, self.font, (raw_name,)))
+        for preset in presets:
+            options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
 
         return options
 

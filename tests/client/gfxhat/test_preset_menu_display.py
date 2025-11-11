@@ -2,6 +2,7 @@ import unittest
 from unittest.mock import Mock, patch, MagicMock
 
 from pi_pianoteq.client.gfxhat.preset_menu_display import PresetMenuDisplay
+from pi_pianoteq.instrument.preset import Preset
 
 
 class PresetMenuDisplayTestCase(unittest.TestCase):
@@ -17,7 +18,6 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     def setUp(self):
         """Set up common test fixtures."""
         self.mock_api = Mock()
-        self.mock_api.get_instrument_preset_prefix.return_value = ""  # Default to no prefix
         self.mock_font = Mock()
         self.mock_font.getbbox.return_value = (0, 0, 50, 10)
         self.mock_on_exit = Mock()
@@ -36,7 +36,11 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     def test_get_menu_options_creates_options_from_api(self, mock_image, mock_draw, mock_scroller_class):
         """Menu options should be created from API preset list."""
         self._configure_scroller_mock(mock_scroller_class)
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark", "Medium"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Bright", "Bright"),
+            Preset("Dark", "Dark"),
+            Preset("Medium", "Medium")
+        ]
 
         menu = PresetMenuDisplay(
             self.mock_api, 128, 64, self.mock_font,
@@ -55,7 +59,10 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     def test_set_preset_calls_api_and_exits(self, mock_image, mock_draw, mock_scroller):
         """Selecting a preset should call API and trigger exit callback."""
         self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Bright", "Bright"),
+            Preset("Dark", "Dark")
+        ]
 
         menu = PresetMenuDisplay(
             self.mock_api, 128, 64, self.mock_font,
@@ -82,7 +89,12 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         self._configure_scroller_mock(mock_scroller)
         self.mock_api.get_current_instrument.return_value = "Piano"
         self.mock_api.get_current_preset.return_value = "Medium"
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark", "Medium", "Soft"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Bright", "Bright"),
+            Preset("Dark", "Dark"),
+            Preset("Medium", "Medium"),
+            Preset("Soft", "Soft")
+        ]
 
         menu = PresetMenuDisplay(
             self.mock_api, 128, 64, self.mock_font,
@@ -106,7 +118,11 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         self._configure_scroller_mock(mock_scroller)
         self.mock_api.get_current_instrument.return_value = "Piano"
         self.mock_api.get_current_preset.return_value = "Medium"  # Piano preset
-        self.mock_api.get_preset_names.return_value = ["Plucked", "Muted", "Sustained"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Plucked", "Plucked"),
+            Preset("Muted", "Muted"),
+            Preset("Sustained", "Sustained")
+        ]
 
         menu = PresetMenuDisplay(
             self.mock_api, 128, 64, self.mock_font,
@@ -129,7 +145,11 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         self.mock_api.get_current_instrument.return_value = "Piano"
         self._configure_scroller_mock(mock_scroller)
         self.mock_api.get_current_preset.return_value = "NonExistent"
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark", "Medium"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Bright", "Bright"),
+            Preset("Dark", "Dark"),
+            Preset("Medium", "Medium")
+        ]
 
         menu = PresetMenuDisplay(
             self.mock_api, 128, 64, self.mock_font,
@@ -144,7 +164,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.Image.new')
     def test_empty_preset_list(self, mock_image, mock_draw, mock_scroller):
         """Should handle empty preset list without crashing."""
-        self.mock_api.get_preset_names.return_value = []
+        self.mock_api.get_presets.return_value = []
         self._configure_scroller_mock(mock_scroller)
 
         menu = PresetMenuDisplay(
@@ -159,7 +179,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.Image.new')
     def test_stores_instrument_name(self, mock_image, mock_draw, mock_scroller):
         """Should store the instrument name for later use."""
-        self.mock_api.get_preset_names.return_value = ["Bright"]
+        self.mock_api.get_presets.return_value = [Preset("Bright", "Bright")]
         self._configure_scroller_mock(mock_scroller)
 
         menu = PresetMenuDisplay(
@@ -175,7 +195,10 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('gfxhat.touch')
     def test_ignore_first_enter_release(self, mock_touch, mock_image, mock_draw, mock_scroller):
         """First ENTER release should be ignored to prevent spurious selection."""
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Bright", "Bright"),
+            Preset("Dark", "Dark")
+        ]
         self._configure_scroller_mock(mock_scroller)
         mock_touch.ENTER = 0
 
@@ -199,7 +222,10 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('gfxhat.touch')
     def test_second_enter_release_triggers_selection(self, mock_touch, mock_image, mock_draw, mock_scroller):
         """Second ENTER release should trigger preset selection."""
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Bright", "Bright"),
+            Preset("Dark", "Dark")
+        ]
         self._configure_scroller_mock(mock_scroller)
         mock_touch.ENTER = 0
 
@@ -225,7 +251,10 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.Image.new')
     def test_preset_selected_flag_set_on_selection(self, mock_image, mock_draw, mock_scroller):
         """preset_selected flag should be set when user selects a preset."""
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark"]
+        self.mock_api.get_presets.return_value = [
+            Preset("Bright", "Bright"),
+            Preset("Dark", "Dark")
+        ]
         self._configure_scroller_mock(mock_scroller)
 
         menu = PresetMenuDisplay(
@@ -247,10 +276,12 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.Image.new')
     def test_uses_display_names_but_stores_raw_names(self, mock_image, mock_draw, mock_scroller):
         """Menu should show display names but use raw names for API calls."""
-        # Piano presets have "Piano " prefix
+        # Piano presets have "Piano " prefix stripped in display_name
         self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_preset_names.return_value = ["Piano Bright", "Piano Dark"]
-        self.mock_api.get_instrument_preset_prefix.return_value = "Piano "
+        self.mock_api.get_presets.return_value = [
+            Preset("Piano Bright", "Bright"),
+            Preset("Piano Dark", "Dark")
+        ]
 
         menu = PresetMenuDisplay(
             self.mock_api, 128, 64, self.mock_font,
