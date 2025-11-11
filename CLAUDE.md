@@ -62,7 +62,7 @@ PYTHONPATH=src python3 -m pytest tests/ -v
 - `tests/conftest.py` - Mocks hardware dependencies (gfxhat, PIL) before test imports
 - Hardware modules (gfxhat.lcd, gfxhat.touch, etc.) are mocked automatically
 - No need for actual hardware or display drivers to run tests
-- All 191 tests should pass
+- All tests should pass
 
 **When to run tests:**
 - After making API changes to verify all clients still work
