@@ -52,14 +52,16 @@ pipenv run pytest tests/ -v
 **Without pipenv (e.g., CI environments, sandboxed sessions):**
 
 ```bash
-# Install only required test dependencies
-pip3 install pytest pillow
+# Install system dependencies for python-rtmidi
+apt-get install -y libasound2-dev
 
-# Run tests with PYTHONPATH set
-PYTHONPATH=src python3 -m pytest tests/ -v
+# Install pipenv and dependencies
+pip3 install pipenv
+pipenv install --dev
+
+# Run tests
+pipenv run pytest tests/ -v
 ```
-
-**Note:** You cannot use `pipenv install --dev` in constrained environments because `python-rtmidi` requires ALSA system libraries. However, tests don't require rtmidi since all hardware dependencies are mocked in `tests/conftest.py`.
 
 **Test structure:**
 - `tests/conftest.py` - Mocks hardware dependencies (gfxhat, PIL) before test imports
