@@ -24,52 +24,39 @@ class ClientLib(ClientApi):
         sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
         self.program_change.set_preset(self.selector.get_current_preset())
 
-    def set_preset_next(self) -> None:
-        self.selector.set_preset_next()
-        self.program_change.set_preset(self.selector.get_current_preset())
+    # Instrument getters
+    def get_instruments(self) -> list:
+        """Get list of all Instrument objects."""
+        return self.instrument_library.get_instruments()
 
-    def set_preset_prev(self) -> None:
-        self.selector.set_preset_prev()
+    def get_current_instrument(self):
+        """Get the current Instrument object."""
+        return self.selector.get_current_instrument()
+
+    # Instrument setters
+    def set_instrument(self, name) -> None:
+        self.selector.set_instrument(name)
         self.program_change.set_preset(self.selector.get_current_preset())
 
     def set_instrument_next(self) -> None:
         self.selector.set_instrument_next()
         self.program_change.set_preset(self.selector.get_current_preset())
 
-    def set_instrument(self, name) -> None:
-        self.selector.set_instrument(name)
-        self.program_change.set_preset(self.selector.get_current_preset())
-
     def set_instrument_prev(self) -> None:
         self.selector.set_instrument_prev()
         self.program_change.set_preset(self.selector.get_current_preset())
 
-    def get_instruments(self) -> list:
-        """Get list of all Instrument objects."""
-        return self.instrument_library.get_instruments()
-
-    def get_current_preset(self):
-        """Get the current Preset object."""
-        return self.selector.get_current_preset()
-
-    def get_current_instrument(self):
-        """Get the current Instrument object."""
-        return self.selector.get_current_instrument()
-
-    def set_on_exit(self, on_exit) -> None:
-        self.on_exit = on_exit
-
-    def shutdown_device(self) -> None:
-        logger.info("Client requested shutdown")
-        if self.on_exit is not None:
-            self.on_exit()
-        system(Config.SHUTDOWN_COMMAND)
-
+    # Preset getters
     def get_presets(self, instrument_name: str) -> list:
         """Get list of Preset objects for a specific instrument."""
         instrument = self.selector.get_instrument_by_name(instrument_name)
         return instrument.presets if instrument else []
 
+    def get_current_preset(self):
+        """Get the current Preset object."""
+        return self.selector.get_current_preset()
+
+    # Preset setters
     def set_preset(self, instrument_name: str, preset_name: str):
         """
         Set specific preset for a specific instrument.
@@ -79,3 +66,21 @@ class ClientLib(ClientApi):
         """
         if self.selector.set_preset_by_name(instrument_name, preset_name):
             self.program_change.set_preset(self.selector.get_current_preset())
+
+    def set_preset_next(self) -> None:
+        self.selector.set_preset_next()
+        self.program_change.set_preset(self.selector.get_current_preset())
+
+    def set_preset_prev(self) -> None:
+        self.selector.set_preset_prev()
+        self.program_change.set_preset(self.selector.get_current_preset())
+
+    # Utility methods
+    def set_on_exit(self, on_exit) -> None:
+        self.on_exit = on_exit
+
+    def shutdown_device(self) -> None:
+        logger.info("Client requested shutdown")
+        if self.on_exit is not None:
+            self.on_exit()
+        system(Config.SHUTDOWN_COMMAND)
