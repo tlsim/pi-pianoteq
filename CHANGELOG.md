@@ -16,6 +16,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Button suppression window to prevent accidental menu activation when navigating with arrow buttons
 - Comprehensive test suite with 179 tests covering all client functionality
 
+### Changed
+- Preset display names now use longest common word prefix of preset names instead of instrument "instr" field
+- Client API simplified to return Instrument and Preset objects instead of primitive types
+
 ## [2.0.0] - 2025-11-06
 
 ### Breaking Changes

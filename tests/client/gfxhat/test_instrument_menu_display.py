@@ -3,6 +3,7 @@ from unittest.mock import Mock, MagicMock, patch
 
 from gfxhat import touch
 from pi_pianoteq.client.gfxhat.instrument_menu_display import InstrumentMenuDisplay
+from pi_pianoteq.instrument.instrument import Instrument
 
 
 class InstrumentMenuDisplayTestCase(unittest.TestCase):
@@ -11,8 +12,12 @@ class InstrumentMenuDisplayTestCase(unittest.TestCase):
     def setUp(self):
         """Set up common mocks for tests."""
         self.mock_api = Mock()
-        self.mock_api.get_instrument_names.return_value = ["Piano", "Strings", "Guitar"]
-        self.mock_api.get_current_instrument.return_value = "Piano"
+        self.mock_api.get_instruments.return_value = [
+            Instrument("Piano", "Piano", "#000000", "#FFFFFF"),
+            Instrument("Strings", "Strings", "#111111", "#EEEEEE"),
+            Instrument("Guitar", "Guitar", "#222222", "#DDDDDD")
+        ]
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#000000", "#FFFFFF")
 
         self.mock_font = Mock()
         self.mock_font.getbbox.return_value = (0, 0, 50, 10)
@@ -52,7 +57,7 @@ class InstrumentMenuDisplayTestCase(unittest.TestCase):
 
     def test_update_instrument_positions_on_current(self):
         """update_instrument should position menu on current instrument."""
-        self.mock_api.get_current_instrument.return_value = "Guitar"
+        self.mock_api.get_current_instrument.return_value = Instrument("Guitar", "Guitar", "#222222", "#DDDDDD")
         display = self.create_display()
 
         display.update_instrument()
@@ -62,7 +67,7 @@ class InstrumentMenuDisplayTestCase(unittest.TestCase):
 
     def test_update_instrument_with_unknown_instrument(self):
         """update_instrument with unknown instrument should not crash."""
-        self.mock_api.get_current_instrument.return_value = "Unknown"
+        self.mock_api.get_current_instrument.return_value = Instrument("Unknown", "Unknown", "#000000", "#FFFFFF")
         display = self.create_display()
 
         # Should not raise error
@@ -293,7 +298,7 @@ class InstrumentMenuDisplayTestCase(unittest.TestCase):
 
     def test_update_instrument_updates_scroller(self):
         """update_instrument should update scrolling text."""
-        self.mock_api.get_current_instrument.return_value = "Strings"
+        self.mock_api.get_current_instrument.return_value = Instrument("Strings", "Strings", "#111111", "#EEEEEE")
         display = self.create_display()
 
         # Mock the scroller

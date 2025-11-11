@@ -146,7 +146,7 @@ class CliClient(Client):
         """Build the normal interactive layout (requires API)"""
         # State management
         self.menu_mode = False
-        self.instrument_names = self.api.get_instrument_names()
+        self.instrument_names = [i.name for i in self.api.get_instruments()]
         self.current_menu_index = 0
         self.menu_scroll_offset = 0
         self.menu_visible_items = 10
@@ -154,7 +154,7 @@ class CliClient(Client):
         # Set initial menu index to current instrument
         current_instrument = self.api.get_current_instrument()
         try:
-            self.current_menu_index = self.instrument_names.index(current_instrument)
+            self.current_menu_index = self.instrument_names.index(current_instrument.name)
         except ValueError:
             self.current_menu_index = 0
 
@@ -236,7 +236,7 @@ class CliClient(Client):
                 # Set menu index to current instrument
                 current_instrument = self.api.get_current_instrument()
                 try:
-                    self.current_menu_index = self.instrument_names.index(current_instrument)
+                    self.current_menu_index = self.instrument_names.index(current_instrument.name)
                     self._update_scroll_offset()
                 except ValueError:
                     pass
@@ -302,13 +302,13 @@ class CliClient(Client):
     def _get_normal_text(self):
         """Generate normal mode display using formatted text tuples"""
         instrument = self.api.get_current_instrument()
-        preset = self.api.get_current_preset_display_name()
+        preset = self.api.get_current_preset().display_name
 
         # Use list of (style, text) tuples for proper formatting
         lines = [
             ('', '\n'),
             ('bold cyan', 'Instrument:'), ('', '\n'),
-            ('ansigreen', f'  {instrument}'), ('', '\n'),
+            ('ansigreen', f'  {instrument.name}'), ('', '\n'),
             ('', '\n'),
             ('bold cyan', 'Preset:'), ('', '\n'),
             ('ansiyellow', f'  {preset}'), ('', '\n'),

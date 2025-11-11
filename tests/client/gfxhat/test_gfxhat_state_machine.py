@@ -2,6 +2,8 @@ import unittest
 from unittest.mock import Mock, patch, MagicMock
 
 from pi_pianoteq.client.gfxhat.gfxhat_client import GfxhatClient
+from pi_pianoteq.instrument.instrument import Instrument
+from pi_pianoteq.instrument.preset import Preset
 
 
 @patch('pi_pianoteq.client.gfxhat.gfxhat_client.fonts')
@@ -24,13 +26,16 @@ class GfxhatClientStateMachineTestCase(unittest.TestCase):
     def setUp(self):
         """Set up common test fixtures."""
         self.mock_api = Mock()
-        self.mock_api.get_current_instrument.return_value = "Piano"
-        self.mock_api.get_current_preset.return_value = "Bright"
-        self.mock_api.get_current_preset_display_name.return_value = "Bright"
-        self.mock_api.get_current_background_primary.return_value = "#FF0000"
-        self.mock_api.get_current_background_secondary.return_value = "#0000FF"
-        self.mock_api.get_instrument_names.return_value = ["Piano", "Strings"]
-        self.mock_api.get_preset_names.return_value = ["Bright", "Dark"]
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#FF0000", "#0000FF")
+        self.mock_api.get_current_preset.return_value = Preset("Piano - Bright", "Bright")
+        self.mock_api.get_instruments.return_value = [
+            Instrument("Piano", "Piano", "#FF0000", "#0000FF"),
+            Instrument("Strings", "Strings", "#00FF00", "#0000FF")
+        ]
+        self.mock_api.get_presets.return_value = [
+            Preset("Piano - Bright", "Bright"),
+            Preset("Piano - Dark", "Dark")
+        ]
 
     def test_loading_mode_initialization(self, mock_touch, mock_lcd, mock_backlight, mock_fonts):
         """Client should start in loading mode when api=None."""

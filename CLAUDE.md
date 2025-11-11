@@ -40,6 +40,17 @@ python3 -m build
 
 **Important**: Don't use `timeout` with CLI client on Pi via SSH - causes terminal issues.
 
+### Running Tests
+
+See `docs/development.md` for standard test workflow. For constrained environments (CI, sandboxed sessions):
+
+```bash
+apt-get install -y libasound2-dev
+pip3 install pipenv
+pipenv install --dev
+pipenv run pytest tests/ -v
+```
+
 ## Code Style & Conventions
 
 ### Comments

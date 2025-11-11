@@ -218,8 +218,10 @@ class ConfigLoader:
         Discover instruments from Pianoteq JSON-RPC API.
 
         Groups presets by instrument and assigns colors based on type.
+        Calculates display names based on longest common word prefix.
         """
         from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpcError
+        from pi_pianoteq.util.preset_names import find_longest_common_word_prefix, calculate_display_name
 
         try:
             presets = jsonrpc_client.get_presets()
@@ -228,9 +230,9 @@ class ConfigLoader:
             logger.error("Make sure Pianoteq is running with --serve flag")
             return []
 
-        # Group presets by 'instr' field (authoritative instrument name from API)
-        # Maintain order as returned by API
+        # First pass: group preset names by instrument and create Instrument objects
         instruments_dict = {}  # {instr_name: Instrument}
+        preset_names_by_instrument = {}  # {instr_name: [preset_names]}
         preset_order = []  # Track order for maintaining API sorting
 
         for preset_data in presets:
@@ -253,10 +255,20 @@ class ConfigLoader:
                     bg_secondary=secondary
                 )
                 instruments_dict[instr_name] = instrument
+                preset_names_by_instrument[instr_name] = []
                 preset_order.append(instr_name)
 
-            preset = Preset(preset_data['name'])
-            instruments_dict[instr_name].add_preset(preset)
+            preset_names_by_instrument[instr_name].append(preset_data['name'])
+
+        # Second pass: calculate common prefix for each instrument and create Preset objects
+        for instr_name in preset_order:
+            preset_names = preset_names_by_instrument[instr_name]
+            common_prefix = find_longest_common_word_prefix(preset_names)
+
+            for preset_name in preset_names:
+                display_name = calculate_display_name(preset_name, common_prefix)
+                preset = Preset(preset_name, display_name=display_name)
+                instruments_dict[instr_name].add_preset(preset)
 
         result = [instruments_dict[name] for name in preset_order]
         logger.info(f"Discovered {len(result)} instruments from Pianoteq API")

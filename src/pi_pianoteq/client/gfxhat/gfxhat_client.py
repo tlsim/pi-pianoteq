@@ -169,7 +169,7 @@ class GfxhatClient(Client):
 
     def on_enter_preset_menu_from_main(self):
         """Long press ENTER on main display - show presets for current instrument."""
-        instrument_name = self.api.get_current_instrument()
+        instrument_name = self.api.get_current_instrument().name
         self._open_preset_menu(instrument_name, source='main')
 
     def on_enter_preset_menu_from_instrument_menu(self, instrument_name):

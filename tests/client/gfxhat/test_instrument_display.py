@@ -3,6 +3,8 @@ from unittest.mock import Mock, MagicMock, patch
 
 from gfxhat import touch
 from pi_pianoteq.client.gfxhat.instrument_display import InstrumentDisplay
+from pi_pianoteq.instrument.instrument import Instrument
+from pi_pianoteq.instrument.preset import Preset
 
 
 class InstrumentDisplayTestCase(unittest.TestCase):
@@ -11,10 +13,8 @@ class InstrumentDisplayTestCase(unittest.TestCase):
     def setUp(self):
         """Set up common mocks for tests."""
         self.mock_api = Mock()
-        self.mock_api.get_current_preset_display_name.return_value = "Bright Piano"
-        self.mock_api.get_current_instrument.return_value = "Piano"
-        self.mock_api.get_current_background_primary.return_value = "#1e3a5f"
-        self.mock_api.get_current_background_secondary.return_value = "#2a4a7f"
+        self.mock_api.get_current_preset.return_value = Preset("Piano - Bright", "Bright Piano")
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#1e3a5f", "#2a4a7f")
 
         self.mock_font = Mock()
         self.mock_font.getbbox.return_value = (0, 0, 80, 10)
@@ -38,7 +38,7 @@ class InstrumentDisplayTestCase(unittest.TestCase):
         display = self.create_display()
 
         self.mock_api.get_current_instrument.assert_called_once()
-        self.mock_api.get_current_preset_display_name.assert_called_once()
+        self.mock_api.get_current_preset.assert_called_once()
         self.assertEqual(display.instrument, "Piano")
         self.assertEqual(display.preset, "Bright Piano")
 
@@ -96,8 +96,8 @@ class InstrumentDisplayTestCase(unittest.TestCase):
         handler = display.get_handler()
 
         # Update API to return new values
-        self.mock_api.get_current_preset_display_name.return_value = "Dark Piano"
-        self.mock_api.get_current_instrument.return_value = "Piano"
+        self.mock_api.get_current_preset.return_value = Preset("Piano - Dark", "Dark Piano")
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#1e3a5f", "#2a4a7f")
 
         handler(touch.DOWN, 'press')
 
@@ -141,10 +141,8 @@ class InstrumentDisplayTestCase(unittest.TestCase):
         display = self.create_display()
 
         # Change API return values
-        self.mock_api.get_current_preset_display_name.return_value = "Soft Piano"
-        self.mock_api.get_current_instrument.return_value = "Piano"
-        self.mock_api.get_current_background_primary.return_value = "#3a5a9f"
-        self.mock_api.get_current_background_secondary.return_value = "#4a6abf"
+        self.mock_api.get_current_preset.return_value = Preset("Piano - Soft", "Soft Piano")
+        self.mock_api.get_current_instrument.return_value = Instrument("Piano", "Piano", "#3a5a9f", "#4a6abf")
 
         display.update_display()
 
@@ -164,8 +162,8 @@ class InstrumentDisplayTestCase(unittest.TestCase):
         display.instrument_scroller.get_offset.return_value = 0
 
         # Change text
-        self.mock_api.get_current_preset_display_name.return_value = "New Preset"
-        self.mock_api.get_current_instrument.return_value = "New Instrument"
+        self.mock_api.get_current_preset.return_value = Preset("New Preset", "New Preset")
+        self.mock_api.get_current_instrument.return_value = Instrument("New Instrument", "New Instrument", "#000000", "#FFFFFF")
 
         display.update_display()
 
@@ -291,14 +289,14 @@ class InstrumentDisplayTestCase(unittest.TestCase):
         handler = display.get_handler()
 
         # Track call counts
-        initial_calls = self.mock_api.get_current_preset_display_name.call_count
+        initial_calls = self.mock_api.get_current_preset.call_count
 
         handler(touch.DOWN, 'press')
         handler(touch.UP, 'press')
         handler(touch.RIGHT, 'press')
 
         # Should have updated 3 times (plus initial)
-        final_calls = self.mock_api.get_current_preset_display_name.call_count
+        final_calls = self.mock_api.get_current_preset.call_count
         self.assertEqual(final_calls - initial_calls, 3)
 
     def test_draw_text_uses_scroll_offsets(self):

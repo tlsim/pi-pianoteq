@@ -17,9 +17,9 @@ class InstrumentTestCase(unittest.TestCase):
     def test_preset_instrument_grouping(self):
         # Create instruments with presets already added
         inst1 = Instrument(i1, i1, '#000000', '#FFFFFF')
-        inst1.presets = [Preset(s1), Preset(s2)]
+        inst1.presets = [Preset(s1, 'Prelude'), Preset(s2, 'Jazz')]
         inst2 = Instrument(i2, i2, '#000000', '#FFFFFF')
-        inst2.presets = [Preset(a1), Preset(a2)]
+        inst2.presets = [Preset(a1, 'Recording 1'), Preset(a2, 'Recording 2')]
 
         library = Library([inst1, inst2])
         grouped = library.get_instruments()
@@ -28,42 +28,16 @@ class InstrumentTestCase(unittest.TestCase):
         self.assertEqual(2, len(grouped[1].presets))
 
 
-class PresetDisplayNameTestCase(unittest.TestCase):
-    def test_strip_prefix_with_space_separator(self):
+class PresetDisplayNameFieldTestCase(unittest.TestCase):
+    def test_preset_has_display_name_field(self):
+        preset = Preset('Steel Drum natural', display_name='Natural')
+        self.assertEqual('Steel Drum natural', preset.name)
+        self.assertEqual('Natural', preset.display_name)
+
+    def test_preset_defaults_display_name_to_name(self):
         preset = Preset('Steel Drum natural')
-        self.assertEqual('Natural', preset.get_display_name('Steel Drum'))
-
-    def test_strip_prefix_with_hyphen_separator(self):
-        preset = Preset('Hand Pan - natural, foo')
-        self.assertEqual('Natural, foo', preset.get_display_name('Hand Pan'))
-
-    def test_strip_prefix_case_insensitive(self):
-        preset = Preset('steel drum natural')
-        self.assertEqual('Natural', preset.get_display_name('Steel Drum'))
-
-    def test_strip_prefix_with_em_dash(self):
-        preset = Preset('Hand Pan — natural')
-        self.assertEqual('Natural', preset.get_display_name('Hand Pan'))
-
-    def test_strip_prefix_with_colon(self):
-        preset = Preset('Grotrian: Concert')
-        self.assertEqual('Concert', preset.get_display_name('Grotrian'))
-
-    def test_exact_match_returns_original(self):
-        preset = Preset('Steel Drum')
-        self.assertEqual('Steel Drum', preset.get_display_name('Steel Drum'))
-
-    def test_no_match_returns_original(self):
-        preset = Preset('Different Name')
-        self.assertEqual('Different Name', preset.get_display_name('Steel Drum'))
-
-    def test_multiple_word_result(self):
-        preset = Preset('Ant. Petrof Recording 1')
-        self.assertEqual('Recording 1', preset.get_display_name('Ant. Petrof'))
-
-    def test_single_letter_capitalization(self):
-        preset = Preset('Grotrian a')
-        self.assertEqual('A', preset.get_display_name('Grotrian'))
+        self.assertEqual('Steel Drum natural', preset.name)
+        self.assertEqual('Steel Drum natural', preset.display_name)
 
 
 if __name__ == '__main__':
