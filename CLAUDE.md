@@ -50,8 +50,22 @@ pipenv run pytest tests/ -v
 ```
 
 **Without pipenv (e.g., CI environments, sandboxed sessions):**
+
+Option 1 - Install pipenv and use it:
 ```bash
-# Install dependencies
+# Install pipenv
+pip3 install pipenv
+
+# Install dependencies from Pipfile.lock
+pipenv install --dev
+
+# Run tests
+pipenv run pytest tests/ -v
+```
+
+Option 2 - Minimal dependency install:
+```bash
+# Install only required test dependencies
 pip3 install pytest pillow
 
 # Run tests with PYTHONPATH set
