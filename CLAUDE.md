@@ -42,37 +42,14 @@ python3 -m build
 
 ### Running Tests
 
-The project uses pytest with mocked hardware dependencies (configured in `tests/conftest.py`).
-
-**With pipenv (preferred on development machine):**
-```bash
-pipenv run pytest tests/ -v
-```
-
-**Without pipenv (e.g., CI environments, sandboxed sessions):**
+See `docs/development.md` for standard test workflow. For constrained environments (CI, sandboxed sessions):
 
 ```bash
-# Install system dependencies for python-rtmidi
 apt-get install -y libasound2-dev
-
-# Install pipenv and dependencies
 pip3 install pipenv
 pipenv install --dev
-
-# Run tests
 pipenv run pytest tests/ -v
 ```
-
-**Test structure:**
-- `tests/conftest.py` - Mocks hardware dependencies (gfxhat, PIL) before test imports
-- Hardware modules (gfxhat.lcd, gfxhat.touch, etc.) are mocked automatically
-- No need for actual hardware or display drivers to run tests
-- All tests should pass
-
-**When to run tests:**
-- After making API changes to verify all clients still work
-- Before committing significant refactoring
-- When updating test mocks after changing method signatures
 
 ## Code Style & Conventions
 
