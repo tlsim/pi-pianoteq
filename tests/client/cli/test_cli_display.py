@@ -130,9 +130,8 @@ class CliClientDisplayTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = "Pia"
-            client._update_search_results()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("Pia")
 
             text = client._get_search_text()
             text_string = ''.join([item[1] for item in text])
@@ -146,9 +145,8 @@ class CliClientDisplayTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = "Pia"
-            client._update_search_results()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("Pia")
 
             text = client._get_search_text()
             text_string = ''.join([item[1] for item in text])
@@ -161,9 +159,8 @@ class CliClientDisplayTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = "xyz"
-            client._update_search_results()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("xyz")
 
             text = client._get_search_text()
             text_string = ''.join([item[1] for item in text])
@@ -176,7 +173,7 @@ class CliClientDisplayTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('combined')
+            client.search_manager.enter_search('combined')
             text = client._get_search_text()
             text_string = ''.join([item[1] for item in text])
 
@@ -190,7 +187,7 @@ class CliClientDisplayTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
+            client.search_manager.enter_search('instrument')
             text = client._get_search_text()
             text_string = ''.join([item[1] for item in text])
 
@@ -241,7 +238,7 @@ class CliClientDisplayTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
+            client.search_manager.enter_search('instrument')
             with patch.object(client, '_get_search_text', return_value=[]) as mock_search:
                 client._get_display_text()
                 mock_search.assert_called_once()

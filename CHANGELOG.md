@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Button suppression window to prevent accidental menu activation when navigating with arrow buttons
 - Comprehensive test suite covering all client and process functionality
 - Startup preset sync: matches Pianoteq's current preset instead of always resetting to first
+  - 23 tests for SearchManager (filtering, selection, contexts)
 
 ### Changed
 - Preset display names now use longest common word prefix of preset names instead of instrument "instr" field

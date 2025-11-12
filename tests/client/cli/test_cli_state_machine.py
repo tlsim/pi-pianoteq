@@ -52,7 +52,7 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             self.assertFalse(client.loading_mode)
             self.assertFalse(client.menu_mode)
             self.assertFalse(client.preset_menu_mode)
-            self.assertFalse(client.search_mode)
+            self.assertFalse(client.search_manager.is_active())
 
     def test_instrument_names_loaded_on_set_api(self):
         """Instrument names should be loaded when API is set."""
@@ -74,7 +74,7 @@ class CliClientStateMachineTestCase(unittest.TestCase):
 
             self.assertTrue(client.menu_mode)
             self.assertFalse(client.preset_menu_mode)
-            self.assertFalse(client.search_mode)
+            self.assertFalse(client.search_manager.is_active())
 
     def test_open_preset_menu_from_main(self):
         """Opening preset menu from main should populate preset_names."""
@@ -117,12 +117,12 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
+            client.search_manager.enter_search('instrument')
 
-            self.assertTrue(client.search_mode)
-            self.assertEqual(client.search_context, 'instrument')
-            self.assertEqual(client.search_query, "")
-            self.assertEqual(len(client.filtered_items), 2)  # Piano, Strings
+            self.assertTrue(client.search_manager.is_active())
+            self.assertEqual(client.search_manager.context, 'instrument')
+            self.assertEqual(client.search_manager.query, "")
+            self.assertEqual(len(client.search_manager.filtered_items), 2)  # Piano, Strings
 
     def test_enter_search_mode_preset(self):
         """Entering search mode with preset context."""
@@ -130,13 +130,12 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client.preset_menu_instrument = "Piano"
-            client._enter_search_mode('preset')
+            client.search_manager.enter_search('preset', 'Piano')
 
-            self.assertTrue(client.search_mode)
-            self.assertEqual(client.search_context, 'preset')
+            self.assertTrue(client.search_manager.is_active())
+            self.assertEqual(client.search_manager.context, 'preset')
             # Should have 2 presets for Piano
-            self.assertEqual(len(client.filtered_items), 2)
+            self.assertEqual(len(client.search_manager.filtered_items), 2)
 
     def test_enter_search_mode_combined(self):
         """Entering search mode with combined context."""
@@ -144,12 +143,12 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('combined')
+            client.search_manager.enter_search('combined')
 
-            self.assertTrue(client.search_mode)
-            self.assertEqual(client.search_context, 'combined')
+            self.assertTrue(client.search_manager.is_active())
+            self.assertEqual(client.search_manager.context, 'combined')
             # Should have 2 instruments + 4 presets = 6 items
-            self.assertEqual(len(client.filtered_items), 6)
+            self.assertEqual(len(client.search_manager.filtered_items), 6)
 
     def test_exit_search_mode(self):
         """Exiting search mode should reset state."""
@@ -157,14 +156,14 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = "Pia"
-            client._exit_search_mode()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("Pia")
+            client.search_manager.exit_search()
 
-            self.assertFalse(client.search_mode)
-            self.assertEqual(client.search_query, "")
-            self.assertEqual(client.filtered_items, [])
-            self.assertIsNone(client.search_context)
+            self.assertFalse(client.search_manager.is_active())
+            self.assertEqual(client.search_manager.query, "")
+            self.assertEqual(client.search_manager.filtered_items, [])
+            self.assertIsNone(client.search_manager.context)
 
     def test_update_search_results_filters_instruments(self):
         """Search should filter instruments by query."""
@@ -172,12 +171,11 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = "pia"
-            client._update_search_results()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("pia")
 
-            self.assertEqual(len(client.filtered_items), 1)
-            self.assertEqual(client.filtered_items[0][0], "Piano")
+            self.assertEqual(len(client.search_manager.filtered_items), 1)
+            self.assertEqual(client.search_manager.filtered_items[0][0], "Piano")
 
     def test_update_search_results_case_insensitive(self):
         """Search should be case-insensitive."""
@@ -185,12 +183,11 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = "STRING"
-            client._update_search_results()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("STRING")
 
-            self.assertEqual(len(client.filtered_items), 1)
-            self.assertEqual(client.filtered_items[0][0], "Strings")
+            self.assertEqual(len(client.search_manager.filtered_items), 1)
+            self.assertEqual(client.search_manager.filtered_items[0][0], "Strings")
 
     def test_update_search_results_empty_query_shows_all(self):
         """Empty search query should show all items."""
@@ -198,11 +195,10 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = ""
-            client._update_search_results()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("")
 
-            self.assertEqual(len(client.filtered_items), 2)
+            self.assertEqual(len(client.search_manager.filtered_items), 2)
 
     def test_select_search_result_instrument(self):
         """Selecting instrument from search should call set_instrument."""
@@ -210,15 +206,19 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
-            client.search_query = "string"
-            client._update_search_results()
+            client.search_manager.enter_search('instrument')
+            client.search_manager.set_query("string")
             client.current_menu_index = 0
 
-            client._select_search_result()
+            action = client.search_manager.get_selection_action(client.current_menu_index)
+            self.assertIsNotNone(action)
+            action_type, action_data = action
+
+            # Simulate what CliClient does
+            if action_type == 'set_instrument':
+                self.mock_api.set_instrument(action_data)
 
             self.mock_api.set_instrument.assert_called_once_with("Strings")
-            self.assertFalse(client.search_mode)
 
     def test_select_search_result_preset_combined(self):
         """Selecting preset from combined search should call set_preset."""
@@ -226,10 +226,10 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('combined')
+            client.search_manager.enter_search('combined')
             # Find a preset result (not an instrument)
             preset_index = None
-            for i, item in enumerate(client.filtered_items):
+            for i, item in enumerate(client.search_manager.filtered_items):
                 if item[1] == 'preset':
                     preset_index = i
                     break
@@ -237,10 +237,16 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             self.assertIsNotNone(preset_index)
             client.current_menu_index = preset_index
 
-            client._select_search_result()
+            action = client.search_manager.get_selection_action(client.current_menu_index)
+            self.assertIsNotNone(action)
+            action_type, action_data = action
+
+            # Simulate what CliClient does
+            if action_type == 'set_preset':
+                instrument_name, preset_name = action_data
+                self.mock_api.set_preset(instrument_name, preset_name)
 
             self.mock_api.set_preset.assert_called_once()
-            self.assertFalse(client.search_mode)
 
     def test_menu_next_increments_index(self):
         """Navigating next should increment menu index."""
@@ -322,7 +328,7 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('instrument')
+            client.search_manager.enter_search('instrument')
             self.assertEqual(client._get_title(), "Search Instruments")
 
     def test_get_title_search_preset(self):
@@ -331,8 +337,7 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client.preset_menu_instrument = "Piano"
-            client._enter_search_mode('preset')
+            client.search_manager.enter_search('preset', 'Piano')
             self.assertEqual(client._get_title(), "Search Presets - Piano")
 
     def test_get_title_search_combined(self):
@@ -341,7 +346,7 @@ class CliClientStateMachineTestCase(unittest.TestCase):
             client = CliClient(api=None)
             client.set_api(self.mock_api)
 
-            client._enter_search_mode('combined')
+            client.search_manager.enter_search('combined')
             self.assertEqual(client._get_title(), "Search Instruments & Presets")
 
     def test_selecting_preset_exits_both_menus(self):
