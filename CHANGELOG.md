@@ -8,6 +8,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- CLI client preset menu (press 'p' to open)
+  - Access from main display to browse current instrument's presets
+  - Access from instrument menu to browse any instrument's presets before switching
+  - Current preset automatically highlighted when viewing current instrument
+- CLI client search functionality (press '/' to search)
+  - Search instruments from instrument menu
+  - Search presets from preset menu
+  - Combined search from main display (searches both instruments and presets)
+  - Real-time filtering as you type
+  - Case-insensitive substring matching
 - Preset selection menu for GFX HAT (long press ENTER to open)
   - Access from main display to browse current instrument's presets
   - Access from instrument menu to browse any instrument's presets before switching
