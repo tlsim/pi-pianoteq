@@ -7,10 +7,6 @@ verify_ssl = true
 build = "*"
 pytest = "*"
 pytest-cov = "*"
-sphinx = "*"
-sphinx-rtd-theme = "*"
-myst-parser = "*"
-toml = "*"
 
 [packages]
 python-rtmidi = "~=1.5"
@@ -27,5 +23,3 @@ check = "python3 -m compileall src/pi_pianoteq"
 package = "python3 -m build"
 deploy = "sh deploy.sh"
 build-and-deploy = "bash -c 'python3 -m build && sh deploy.sh'"
-docs = "sphinx-build -b html docs/source docs/build/html"
-docs-clean = "bash -c 'rm -rf docs/build && pipenv run docs'"

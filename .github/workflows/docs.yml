@@ -8,7 +8,6 @@ on:
       - 'docs/**'
       - 'src/pi_pianoteq/**/*.py'
       - '.github/workflows/docs.yml'
-      - 'Pipfile'
   workflow_dispatch:
 
 permissions:
@@ -32,12 +31,9 @@ jobs:
         with:
           python-version: '3.13'
 
-      - name: Install pipenv
-        run: pip install pipenv
-
-      - name: Install dependencies
+      - name: Install documentation dependencies
         run: |
-          pipenv install --dev --system
+          pip install -r docs/requirements.txt
 
       - name: Build documentation
         run: |
