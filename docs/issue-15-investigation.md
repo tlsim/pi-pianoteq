@@ -12,7 +12,11 @@ This investigation confirms that **migrating from MIDI Program Change to JSON-RP
 
 **Key Finding:** The MIDI mapping file format `{LoadPreset|28||PresetName|0}` proves that MIDI is just a layer on top of LoadPreset. We're currently creating virtual ports, generating binary files, requiring manual user configuration, and dealing with race conditions - all to ultimately trigger the same action we can call directly.
 
+**Scope:** This migration concerns **MIDI output (program changes) only**. MIDI input capabilities (rtmidi dependency) will be preserved for future features like issue #7 (displaying MIDI keyboard input on GFX HAT).
+
 **Recommendation:** Proceed with migration. The benefits (simplified code, no manual configuration, better reliability) outweigh the minimal risks (need to test performance).
+
+**Historical Note:** The original MIDI-based approach (2019) was an elegant solution before Pianoteq had a JSON-RPC API. It demonstrated creative problem-solving using the tools available at the time. The API's introduction in Pianoteq 7.0+ now provides a more direct path to the same functionality.
 
 ---
 
@@ -61,13 +65,23 @@ Users must enable the MIDI port in Pianoteq (`README.md:86-96`):
 
 Failure to do this results in preset selection not working. The system warns but continues running.
 
-### Known Issues with Current MIDI Implementation
+### Known Issues with Current MIDI Output Implementation
 
 1. **Race Condition:** Fixed in v1.4.1 by adding 2-second delay (`CHANGELOG.md:111`)
 2. **Manual Configuration:** User friction, potential support burden
 3. **Complexity:** Binary file format, MIDI channel/program assignment logic
-4. **Dependencies:** Requires rtmidi for virtual port creation
-5. **Limited Capacity:** 2048 presets max (not a real-world issue)
+4. **Limited Capacity:** 2048 presets max (not a real-world issue, but architectural limitation)
+
+### MIDI Capabilities to Preserve
+
+**rtmidi dependency will be retained** for MIDI input monitoring:
+
+- **Issue #7:** Display MIDI keyboard input on GFX HAT (piano graphic showing key presses)
+- **Future features:** MIDI event visualization, velocity display, pedal state, etc.
+- **MidiIn (input):** Keep for monitoring keyboard events from Pianoteq
+- **MidiOut (output):** Can be removed for preset selection (migrate to JSON-RPC)
+
+The migration only removes MIDI *output* for program changes. All MIDI *input* capabilities remain available.
 
 ---
 
@@ -141,16 +155,23 @@ jsonrpc.load_preset("My Custom Preset", "My Presets")  # User preset
 - ❌ `util/pianoteq_prefs.py` (37 lines) - Config validation
 - ✂️ `instrument/library.py` - Remove MIDI number assignment (12 lines)
 - ✂️ `instrument/preset.py` - Remove MIDI params (3 fields)
+- ✂️ `__main__.py` - Remove MidiOut, mapping generation, prefs check
 
-**Total Reduction:** ~276 lines of code, 5 entire modules
+**Files/dependencies that remain:**
+- ✅ `rtmidi` dependency - Kept for MIDI input monitoring (issue #7)
+- ✅ `midi/` module - Available for MIDI input features
+
+**Total Reduction:** ~276 lines of code, 5 entire modules related to MIDI *output*
 
 ### 3. More Reliable
 
 **Current Issues Eliminated:**
-- Race condition with MIDI port detection
-- Virtual MIDI port failures
-- Manual configuration errors
-- Binary file generation errors
+- Race condition with MIDI port detection (for program changes)
+- Manual configuration errors (no longer need to enable PI-PTQ device)
+- Binary file generation errors (no more `.ptm` files)
+- Silent MIDI delivery failures
+
+**Note:** Virtual MIDI port capabilities remain available for MIDI input monitoring (issue #7).
 
 ### 4. Better Error Handling
 
@@ -252,8 +273,9 @@ MIDI errors are silent or cryptic:
 
 2. **`__main__.py`** - Startup initialization
    ```python
-   # REMOVE: midiout, program_change, mapping, writer, prefs check
+   # REMOVE: MidiOut(), program_change, mapping, writer, prefs check
    # KEEP: jsonrpc (already initialized)
+   # KEEP: rtmidi import (for future MIDI input features)
    # CHANGE: ClientLib(library, selector, jsonrpc)
    ```
 
@@ -270,16 +292,22 @@ MIDI errors are silent or cryptic:
    ```
 
 **Files to Remove:**
-- `mapping/mapping.py`
-- `mapping/mapping_builder.py`
-- `mapping/writer.py`
-- `midi/program_change.py`
-- `midi/util.py`
-- `util/pianoteq_prefs.py`
+- `mapping/mapping.py` - MIDI mapping file format
+- `mapping/mapping_builder.py` - MIDI mapping generation
+- `mapping/writer.py` - MIDI mapping file writing
+- `midi/program_change.py` - MIDI program change output
+- `midi/util.py` - MIDI channel/program number assignment
+- `util/pianoteq_prefs.py` - MIDI port configuration validation
+
+**Files/Modules to Keep:**
+- `rtmidi` dependency - Required for MIDI input monitoring (issue #7)
+- `midi/` directory - Can be used for future MIDI input features
+- `midi/midi_exception.py` - May be useful for MIDI input error handling
 
 **Configuration Changes:**
-- Mark MIDI config options as deprecated (keep for backwards compat)
+- Mark MIDI output config options as deprecated (keep for backwards compat)
 - No need to remove - they'll just be ignored
+- Update documentation to reflect that MIDI configuration is no longer required
 
 ### Phase 2: Documentation Updates
 
@@ -455,9 +483,11 @@ Based on architecture analysis:
 
 ### Recommendation
 
-**Proceed with migration from MIDI to JSON-RPC for instrument selection.**
+**Proceed with migration from MIDI output (program changes) to JSON-RPC for instrument selection.**
 
-The benefits (simplified code, no manual configuration, better reliability) far outweigh the minimal risks (need to test performance). The current MIDI system is essentially a complex indirection layer that can be eliminated.
+The benefits (simplified code, no manual configuration, better reliability) far outweigh the minimal risks (need to test performance). The current MIDI output system is essentially a complex indirection layer that can be eliminated.
+
+**Important:** This migration preserves all MIDI input capabilities. The rtmidi dependency remains for future features like issue #7 (displaying MIDI keyboard input on GFX HAT). We're only removing MIDI *output* for preset selection, not removing MIDI support entirely.
 
 ### Next Steps
 
