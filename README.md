@@ -2,6 +2,8 @@
 
 Pi-Pianoteq is a Python/MIDI remote control for Pianoteq on Raspberry Pi.
 
+**📚 [Developer Documentation](https://tlsim.github.io/pi-pianoteq/)** - Complete API docs for creating custom clients
+
 ## About
 
 Pi-Pianoteq provides a simplified hardware interface for controlling Pianoteq on a Raspberry Pi 4B using the [Pimoroni GFX HAT](https://github.com/pimoroni/gfx-hat) - a HAT with 128x64 LCD display, 6 touch buttons and RGB backlight. After configuration, you can run Pianoteq without needing a monitor, using the GFX HAT as your interface.
@@ -140,6 +142,21 @@ See [docs/systemd.md](docs/systemd.md) for instructions on setting up a systemd 
 For developers who want to build and deploy to a remote Pi, see [docs/development.md](docs/development.md).
 
 ## Documentation
+
+### For Developers
+
+Want to create a custom client for pi-pianoteq? (e.g., web interface, OLED display, rotary encoders, touchscreen, mobile app)
+
+**📚 [Complete Developer Documentation](https://tlsim.github.io/pi-pianoteq/)**
+
+The online documentation includes:
+- **Client Development Guide** - Step-by-step guide to creating custom clients
+- **Architecture Overview** - System design and patterns
+- **API Reference** - Complete ClientApi documentation with examples
+- **Minimal Example Client** - Working reference implementation
+- **Testing Guide** - How to test your custom client
+
+### For Users
 
 - [docs/systemd.md](docs/systemd.md) - Running as a systemd service
 - [docs/development.md](docs/development.md) - Development and deployment workflow
