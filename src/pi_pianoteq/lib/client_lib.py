@@ -32,8 +32,7 @@ class ClientLib(ClientApi):
 
         try:
             info = jsonrpc.get_info()
-            current_preset_info = info.get('current_preset', {})
-            preset_name = current_preset_info.get('name', '')
+            preset_name = info.current_preset.name
 
             if not preset_name:
                 logger.warning("Could not get current preset name from Pianoteq, resetting to first preset")

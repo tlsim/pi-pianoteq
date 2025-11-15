@@ -66,3 +66,6 @@ try:
     ImageDraw.Draw = mock_draw
 except ImportError:
     pass
+
+# Mock rtmidi for test environments without ALSA/MIDI support
+sys.modules['rtmidi'] = mock.MagicMock()

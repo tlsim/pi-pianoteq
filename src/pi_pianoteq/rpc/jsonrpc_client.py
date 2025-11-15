@@ -4,6 +4,8 @@ from typing import List, Dict, Optional
 from urllib.request import Request, urlopen
 from urllib.error import URLError, HTTPError
 
+from .types import PresetInfo, PianoteqInfo, ActivationInfo
+
 logger = logging.getLogger(__name__)
 
 
@@ -82,35 +84,25 @@ class PianoteqJsonRpc:
         except json.JSONDecodeError as e:
             raise PianoteqJsonRpcError(f"Invalid JSON response from Pianoteq: {e}")
 
-    def get_presets(self) -> List[Dict]:
+    def get_presets(self) -> List[PresetInfo]:
         """
         Get list of all available presets from Pianoteq.
 
         Returns:
-            List of preset dictionaries with fields:
-            - name: Preset name
-            - instr: Instrument name (authoritative grouping)
-            - class: Instrument class (e.g. "Acoustic Piano", "Electric Piano")
-            - license: License name
-            - license_status: "ok" (licensed) or "demo" (limited functionality)
-            - bank: Bank name
-            - collection: Collection name
+            List of PresetInfo objects with typed fields for preset metadata.
         """
         logger.debug("Fetching preset list from Pianoteq JSON-RPC API")
         result = self._call('getListOfPresets')
         logger.info(f"Retrieved {len(result)} presets from Pianoteq")
-        return result
+        return [PresetInfo.from_dict(preset) for preset in result]
 
-    def get_info(self) -> Dict:
+    def get_info(self) -> PianoteqInfo:
         """
         Get current state information from Pianoteq.
 
         Returns:
-            Dictionary with Pianoteq state info including:
-            - version: Pianoteq version
-            - product_name: Product name
-            - current_preset: Currently loaded preset info
-            - etc.
+            PianoteqInfo object with typed fields for version, product info,
+            current preset, and other state information.
 
         Raises:
             PianoteqJsonRpcError: If the call fails
@@ -118,18 +110,16 @@ class PianoteqJsonRpc:
         logger.debug("Fetching Pianoteq state info")
         result = self._call('getInfo')
         # getInfo returns a list with one element
-        return result[0] if result else {}
+        data = result[0] if result else {}
+        return PianoteqInfo.from_dict(data)
 
-    def get_activation_info(self) -> Dict:
+    def get_activation_info(self) -> ActivationInfo:
         """
         Get activation/license information from Pianoteq.
 
         Returns:
-            Dictionary with activation info including:
-            - addons: List of licensed addon names
-            - error_msg: "Demo" if unlicensed, "" if licensed
-            - status: License status code (present if licensed)
-            - name, email, hwname: License holder info (if licensed)
+            ActivationInfo object with typed fields for license status,
+            addons, and license holder information (if licensed).
 
         Raises:
             PianoteqJsonRpcError: If the call fails
@@ -137,7 +127,8 @@ class PianoteqJsonRpc:
         logger.debug("Fetching Pianoteq activation info")
         result = self._call('getActivationInfo')
         # getActivationInfo returns a list with one element
-        return result[0] if result else {}
+        data = result[0] if result else {}
+        return ActivationInfo(**data)
 
     def is_licensed(self) -> bool:
         """
@@ -151,7 +142,7 @@ class PianoteqJsonRpc:
         """
         activation_info = self.get_activation_info()
         # Demo/trial version has error_msg="Demo", licensed has error_msg=""
-        return activation_info.get('error_msg', 'Demo') != 'Demo'
+        return activation_info.error_msg != 'Demo'
 
     def load_preset(self, name: str, bank: str = "") -> None:
         """

@@ -7,6 +7,7 @@ from pi_pianoteq.instrument.selector import Selector
 from pi_pianoteq.instrument.instrument import Instrument
 from pi_pianoteq.instrument.preset import Preset
 from pi_pianoteq.midi.program_change import ProgramChange
+from pi_pianoteq.rpc.types import PianoteqInfo, CurrentPreset
 
 
 class ClientLibPresetSyncTestCase(unittest.TestCase):
@@ -28,11 +29,9 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
     @patch('pi_pianoteq.lib.client_lib.sleep')
     def test_sync_with_matching_preset_syncs_position(self, mock_sleep):
-        self.jsonrpc.get_info.return_value = {
-            'current_preset': {
-                'name': 'Ant. Petrof Recording 2'
-            }
-        }
+        preset_info = CurrentPreset(name='Ant. Petrof Recording 2')
+        info = PianoteqInfo(current_preset=preset_info)
+        self.jsonrpc.get_info.return_value = info
 
         client_lib = ClientLib(self.library, self.selector, self.program_change, self.jsonrpc)
 
@@ -42,11 +41,9 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
     @patch('pi_pianoteq.lib.client_lib.sleep')
     def test_sync_with_non_matching_preset_resets_to_first(self, mock_sleep):
-        self.jsonrpc.get_info.return_value = {
-            'current_preset': {
-                'name': 'Unknown Preset Not In Library'
-            }
-        }
+        preset_info = CurrentPreset(name='Unknown Preset Not In Library')
+        info = PianoteqInfo(current_preset=preset_info)
+        self.jsonrpc.get_info.return_value = info
 
         client_lib = ClientLib(self.library, self.selector, self.program_change, self.jsonrpc)
 
@@ -56,11 +53,9 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
     @patch('pi_pianoteq.lib.client_lib.sleep')
     def test_sync_with_empty_preset_name_resets_to_first(self, mock_sleep):
-        self.jsonrpc.get_info.return_value = {
-            'current_preset': {
-                'name': ''
-            }
-        }
+        preset_info = CurrentPreset(name='')
+        info = PianoteqInfo(current_preset=preset_info)
+        self.jsonrpc.get_info.return_value = info
 
         client_lib = ClientLib(self.library, self.selector, self.program_change, self.jsonrpc)
 
@@ -68,7 +63,9 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
     @patch('pi_pianoteq.lib.client_lib.sleep')
     def test_sync_with_missing_current_preset_resets_to_first(self, mock_sleep):
-        self.jsonrpc.get_info.return_value = {}
+        preset_info = CurrentPreset(name='')
+        info = PianoteqInfo(current_preset=preset_info)
+        self.jsonrpc.get_info.return_value = info
 
         client_lib = ClientLib(self.library, self.selector, self.program_change, self.jsonrpc)
 
@@ -84,11 +81,9 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
     @patch('pi_pianoteq.lib.client_lib.sleep')
     def test_sync_with_first_preset_syncs_correctly(self, mock_sleep):
-        self.jsonrpc.get_info.return_value = {
-            'current_preset': {
-                'name': 'Steinway D Prelude'
-            }
-        }
+        preset_info = CurrentPreset(name='Steinway D Prelude')
+        info = PianoteqInfo(current_preset=preset_info)
+        self.jsonrpc.get_info.return_value = info
 
         client_lib = ClientLib(self.library, self.selector, self.program_change, self.jsonrpc)
 
@@ -98,11 +93,9 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
     @patch('pi_pianoteq.lib.client_lib.sleep')
     def test_sync_respects_startup_delay(self, mock_sleep):
-        self.jsonrpc.get_info.return_value = {
-            'current_preset': {
-                'name': 'Steinway D Jazz'
-            }
-        }
+        preset_info = CurrentPreset(name='Steinway D Jazz')
+        info = PianoteqInfo(current_preset=preset_info)
+        self.jsonrpc.get_info.return_value = info
 
         client_lib = ClientLib(self.library, self.selector, self.program_change, self.jsonrpc)
 
