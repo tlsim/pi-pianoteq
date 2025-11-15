@@ -115,19 +115,29 @@ class CliClient(Client):
         if not messages:
             return [('ansigray', '  Initializing...\n')]
 
-        # Calculate how many lines can fit on screen
-        # Terminal height minus loading message area (6 lines) minus frame (3 lines) minus padding
+        # Calculate terminal dimensions
         try:
-            terminal_height = os.get_terminal_size().lines
+            terminal_size = os.get_terminal_size()
+            terminal_height = terminal_size.lines
+            terminal_width = terminal_size.columns
             max_log_lines = max(10, terminal_height - 12)  # At least 10, otherwise height - 12
         except (OSError, AttributeError):
             max_log_lines = 20  # Default if can't detect terminal size
+            terminal_width = 80  # Default width
 
-        # Return last N messages that fit
+        # Account for frame borders (2 chars), padding (2 chars for "  "), and safety margin
+        max_line_width = terminal_width - 6
+
+        # Return last N messages that fit, truncating if needed
         lines = []
         visible_messages = messages[-max_log_lines:]
         for msg in visible_messages:
-            lines.append(('ansibrightblack', f'  {msg}\n'))
+            # Truncate message if too long
+            if len(msg) > max_line_width:
+                truncated_msg = msg[:max_line_width - 3] + '...'
+            else:
+                truncated_msg = msg
+            lines.append(('ansibrightblack', f'  {truncated_msg}\n'))
         return lines
 
     def set_api(self, api: ClientApi):
