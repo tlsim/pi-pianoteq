@@ -28,6 +28,8 @@ class MenuDisplay:
         self.font = font
         self.on_exit = on_exit
         self.suppression = ButtonSuppression(300)
+        self.held_count = {}
+        self.held_threshold = 2
         self.image = Image.new('P', (self.width, self.height))
         self.draw = ImageDraw.Draw(self.image)
         self.menu_options = self.get_menu_options()
@@ -118,18 +120,19 @@ class MenuDisplay:
                     self.on_exit()
                     return
 
+                self.held_count[ch] = 0
                 prev_option = self.current_menu_option
 
                 if ch == touch.UP:
                     self.suppression.record()
                     self.current_menu_option -= 1
-                if ch == touch.DOWN:
+                elif ch == touch.DOWN:
                     self.suppression.record()
                     self.current_menu_option += 1
-                if ch == touch.LEFT:
+                elif ch == touch.LEFT:
                     self.suppression.record()
                     self.current_menu_option -= 1
-                if ch == touch.RIGHT:
+                elif ch == touch.RIGHT:
                     self.suppression.record()
                     self.current_menu_option += 1
 
@@ -140,11 +143,40 @@ class MenuDisplay:
 
                 self.draw_image()
 
+            elif event == 'held':
+                if ch in (touch.UP, touch.DOWN, touch.LEFT, touch.RIGHT):
+                    self.held_count[ch] = self.held_count.get(ch, 0) + 1
+                    if self.held_count[ch] >= self.held_threshold:
+                        prev_option = self.current_menu_option
+
+                        if ch == touch.UP:
+                            self.suppression.record()
+                            self.current_menu_option -= 1
+                        elif ch == touch.DOWN:
+                            self.suppression.record()
+                            self.current_menu_option += 1
+                        elif ch == touch.LEFT:
+                            self.suppression.record()
+                            self.current_menu_option -= 1
+                        elif ch == touch.RIGHT:
+                            self.suppression.record()
+                            self.current_menu_option += 1
+
+                        self.current_menu_option %= len(self.menu_options)
+
+                        if prev_option != self.current_menu_option:
+                            self._update_selected_option()
+
+                        self.draw_image()
+
             elif event == 'release':
                 if ch == touch.ENTER:
                     if self.suppression.allow_action():
                         self.menu_options[self.current_menu_option].trigger()
                         self.selected_menu_option = self.current_menu_option
+
+                if ch in self.held_count:
+                    del self.held_count[ch]
 
         return handler
 

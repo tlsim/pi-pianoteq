@@ -74,9 +74,11 @@ class InstrumentMenuDisplay(MenuDisplay):
         def handler(ch, event):
             if event == 'held':
                 if ch == touch.ENTER:
-                    option_name = self.menu_options[self.current_menu_option].name
-                    if option_name != "Shut down":
-                        self.on_enter_preset_menu(option_name)
+                    self.held_count[ch] = self.held_count.get(ch, 0) + 1
+                    if self.held_count[ch] >= self.held_threshold:
+                        option_name = self.menu_options[self.current_menu_option].name
+                        if option_name != "Shut down":
+                            self.on_enter_preset_menu(option_name)
                     return
 
             base_handler(ch, event)
