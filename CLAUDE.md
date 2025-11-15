@@ -78,8 +78,9 @@ pipenv run pytest tests/ -v
 
 ### Pianoteq Integration
 - **JSON-RPC API**: `http://localhost:8081/jsonrpc` (since Pianoteq 7+)
+- **Preset Selection**: Uses JSON-RPC `loadPreset()` (migrated from MIDI Program Change as of v2.2.0)
 - **License Detection**: `getActivationInfo()` returns `error_msg: "Demo"` (trial, 51+ instruments) or `""` (licensed, 11 instruments on Pi)
-- **Startup Timing**: API available ~6 seconds, instruments loaded ~6-8 seconds (after license check)
+- **Startup Timing**: API available ~6 seconds, instruments loaded ~6-8 seconds (no MIDI delay needed)
 
 ### Loading Screen
 - Two messages: "Starting..." and "Loading..."
