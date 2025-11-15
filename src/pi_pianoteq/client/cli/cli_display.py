@@ -5,6 +5,7 @@ from typing import List, Tuple
 
 from pi_pianoteq.client.client_api import ClientApi
 from pi_pianoteq.client.cli.search_manager import SearchManager
+from pi_pianoteq.logging.logging_config import BufferedLoggingHandler
 
 
 def calculate_menu_visible_items() -> int:
@@ -29,9 +30,11 @@ def calculate_menu_visible_items() -> int:
 
 
 def get_title(search_manager: SearchManager, preset_menu_mode: bool,
-              preset_menu_instrument: str, menu_mode: bool) -> str:
+              preset_menu_instrument: str, menu_mode: bool, logs_view_mode: bool = False) -> str:
     """Get frame title based on current mode"""
-    if search_manager.is_active():
+    if logs_view_mode:
+        return "View Logs"
+    elif search_manager.is_active():
         if search_manager.context == 'instrument':
             return "Search Instruments"
         elif search_manager.context == 'preset':
@@ -65,6 +68,7 @@ def get_normal_text(api: ClientApi) -> List[Tuple[str, str]]:
         ('bold', '  i'), ('', '           : Open instrument menu\n'),
         ('bold', '  p'), ('', '           : Open preset menu\n'),
         ('bold', '  /'), ('', '           : Search instruments & presets\n'),
+        ('bold', '  l'), ('', '           : View logs\n'),
         ('bold', '  q'), ('', '           : Quit\n'),
         ('', '\n'),
     ]
@@ -261,6 +265,52 @@ def get_search_text(search_manager: SearchManager, current_menu_index: int,
         ('bold', '  Enter'), ('', '       : Select item\n'),
         ('bold', '  Backspace'), ('', '   : Delete character (or exit if empty)\n'),
         ('bold', '  Esc'), ('', ' or '), ('bold', 'q'), ('', '    : Exit search\n'),
+        ('', '\n'),
+    ])
+
+    return lines
+
+
+def get_logs_view_text(log_buffer: BufferedLoggingHandler) -> List[Tuple[str, str]]:
+    """Generate logs view display using formatted text tuples"""
+    messages = log_buffer.get_messages()
+
+    if not messages:
+        return [
+            ('', '\n'),
+            ('ansigray', '  No logs available\n'),
+            ('', '\n'),
+        ]
+
+    # Calculate terminal dimensions
+    try:
+        terminal_size = os.get_terminal_size()
+        terminal_height = terminal_size.lines
+        terminal_width = terminal_size.columns
+        # Reserve space for frame, title, and controls
+        max_log_lines = max(10, terminal_height - 10)
+    except (OSError, AttributeError):
+        max_log_lines = 20
+        terminal_width = 80
+
+    # Account for frame borders and padding
+    max_line_width = terminal_width - 6
+
+    # Build log lines
+    lines = [('', '\n')]
+    visible_messages = messages[-max_log_lines:]
+    for msg in visible_messages:
+        # Truncate message if too long
+        if len(msg) > max_line_width:
+            truncated_msg = msg[:max_line_width - 3] + '...'
+        else:
+            truncated_msg = msg
+        lines.append(('ansibrightblack', f'  {truncated_msg}\n'))
+
+    lines.extend([
+        ('', '\n'),
+        ('bold underline', 'Logs Controls:'), ('', '\n'),
+        ('bold', '  Esc'), ('', ' or '), ('bold', 'q'), ('', ' : Return to main view\n'),
         ('', '\n'),
     ])
 
