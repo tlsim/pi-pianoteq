@@ -346,3 +346,66 @@ def test_init_user_config_creates_file(tmp_path):
         # If not successful, it already existed
         assert USER_CONFIG_PATH.exists()
         assert "already exists" in message
+
+
+def test_discover_instruments_adds_randomised_preset():
+    """Test that discover_instruments adds a Randomised preset to each instrument"""
+    from unittest.mock import Mock
+    from pi_pianoteq.rpc.types import PresetInfo
+
+    # Create mock JSON-RPC client
+    mock_rpc = Mock()
+
+    # Mock preset data with two instruments
+    mock_presets = [
+        PresetInfo(
+            name="Grand K2 Bright",
+            instr="Grand K2",
+            instrument_class="Acoustic Piano",
+            license_status="ok",
+            tags=[]
+        ),
+        PresetInfo(
+            name="Grand K2 Warm",
+            instr="Grand K2",
+            instrument_class="Acoustic Piano",
+            license_status="ok",
+            tags=[]
+        ),
+        PresetInfo(
+            name="Clavinet D6 Funky",
+            instr="Clavinet D6",
+            instrument_class="Electric Piano",
+            license_status="ok",
+            tags=[]
+        ),
+    ]
+    mock_rpc.get_presets.return_value = mock_presets
+
+    # Discover instruments
+    instruments = ConfigLoader.discover_instruments_from_api(mock_rpc)
+
+    # Should have 2 instruments
+    assert len(instruments) == 2
+
+    # Check first instrument (Grand K2)
+    grand_k2 = instruments[0]
+    assert grand_k2.name == "Grand K2"
+    # Should have 2 regular presets + 1 Randomised preset
+    assert len(grand_k2.presets) == 3
+
+    # Check that last preset is Randomised
+    random_preset = grand_k2.presets[-1]
+    assert random_preset.name == "__RANDOMISE__"
+    assert random_preset.display_name == "Randomised"
+
+    # Check second instrument (Clavinet D6)
+    clavinet = instruments[1]
+    assert clavinet.name == "Clavinet D6"
+    # Should have 1 regular preset + 1 Randomised preset
+    assert len(clavinet.presets) == 2
+
+    # Check that last preset is Randomised
+    random_preset = clavinet.presets[-1]
+    assert random_preset.name == "__RANDOMISE__"
+    assert random_preset.display_name == "Randomised"

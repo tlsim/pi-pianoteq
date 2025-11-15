@@ -158,6 +158,20 @@ class PianoteqJsonRpc:
         logger.debug(f"Loading preset: {name} (bank: {bank or 'factory'})")
         self._call('loadPreset', [name, bank])
 
+    def randomize_parameters(self, amount: float = 1.0) -> None:
+        """
+        Randomize parameter values.
+
+        Args:
+            amount: Randomization amount (0.0-1.0, default 1.0)
+                   0.0 = no change, 1.0 = maximum randomization
+
+        Raises:
+            PianoteqJsonRpcError: If the call fails
+        """
+        logger.debug(f"Randomizing parameters with amount={amount}")
+        self._call('randomizeParameters', [amount])
+
     def quit(self) -> None:
         """
         Send quit command to Pianoteq to exit gracefully.

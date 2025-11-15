@@ -34,7 +34,7 @@ class ClientLib(ClientApi):
             if not preset_name:
                 logger.warning("Could not get current preset name from Pianoteq, resetting to first preset")
                 preset = self.selector.get_current_preset()
-                self.jsonrpc.load_preset(preset.name)
+                self._apply_preset(preset)
                 return
 
             logger.info(f"Pianoteq current preset: {preset_name}")
@@ -47,16 +47,16 @@ class ClientLib(ClientApi):
                 else:
                     logger.warning(f"Found preset '{preset_name}' but failed to set position, resetting to first preset")
                     preset = self.selector.get_current_preset()
-                    self.jsonrpc.load_preset(preset.name)
+                    self._apply_preset(preset)
             else:
                 logger.info(f"Current preset '{preset_name}' not in library, resetting to first preset")
                 preset = self.selector.get_current_preset()
-                self.jsonrpc.load_preset(preset.name)
+                self._apply_preset(preset)
 
         except Exception as e:
             logger.warning(f"Error syncing with Pianoteq: {e}, resetting to first preset")
             preset = self.selector.get_current_preset()
-            self.jsonrpc.load_preset(preset.name)
+            self._apply_preset(preset)
 
     # Instrument getters
     def get_instruments(self) -> list:
@@ -71,17 +71,17 @@ class ClientLib(ClientApi):
     def set_instrument(self, name) -> None:
         self.selector.set_instrument(name)
         preset = self.selector.get_current_preset()
-        self.jsonrpc.load_preset(preset.name)
+        self._apply_preset(preset)
 
     def set_instrument_next(self) -> None:
         self.selector.set_instrument_next()
         preset = self.selector.get_current_preset()
-        self.jsonrpc.load_preset(preset.name)
+        self._apply_preset(preset)
 
     def set_instrument_prev(self) -> None:
         self.selector.set_instrument_prev()
         preset = self.selector.get_current_preset()
-        self.jsonrpc.load_preset(preset.name)
+        self._apply_preset(preset)
 
     # Preset getters
     def get_presets(self, instrument_name: str) -> list:
@@ -103,17 +103,30 @@ class ClientLib(ClientApi):
         """
         if self.selector.set_preset_by_name(instrument_name, preset_name):
             preset = self.selector.get_current_preset()
-            self.jsonrpc.load_preset(preset.name)
+            self._apply_preset(preset)
 
     def set_preset_next(self) -> None:
         self.selector.set_preset_next()
         preset = self.selector.get_current_preset()
-        self.jsonrpc.load_preset(preset.name)
+        self._apply_preset(preset)
 
     def set_preset_prev(self) -> None:
         self.selector.set_preset_prev()
         preset = self.selector.get_current_preset()
-        self.jsonrpc.load_preset(preset.name)
+        self._apply_preset(preset)
+
+    def _apply_preset(self, preset: 'Preset') -> None:
+        """
+        Apply a preset, handling both regular presets and special randomize preset.
+
+        Args:
+            preset: The preset to apply
+        """
+        if preset.name == "__RANDOMISE__":
+            logger.info("Randomizing parameters")
+            self.jsonrpc.randomize_parameters()
+        else:
+            self.jsonrpc.load_preset(preset.name)
 
     # Utility methods
     def set_on_exit(self, on_exit) -> None:

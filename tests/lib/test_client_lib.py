@@ -82,5 +82,73 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
         self.jsonrpc.load_preset.assert_not_called()
 
 
+class ClientLibRandomisePresetTestCase(unittest.TestCase):
+    """Test that the special Randomised preset triggers parameter randomization."""
+
+    def setUp(self):
+        self.inst1 = Instrument('Steinway D', 'Steinway D', '#000000', '#FFFFFF')
+        self.preset1a = Preset('Steinway D Prelude', 'Prelude')
+        self.preset1b = Preset('Steinway D Jazz', 'Jazz')
+        self.random_preset = Preset('__RANDOMISE__', 'Randomised')
+        self.inst1.presets = [self.preset1a, self.preset1b, self.random_preset]
+
+        self.library = Library([self.inst1])
+        self.selector = Selector([self.inst1])
+        self.jsonrpc = Mock()
+
+        # Mock get_info for sync
+        preset_info = CurrentPreset(name='Steinway D Prelude')
+        info = PianoteqInfo(current_preset=preset_info)
+        self.jsonrpc.get_info.return_value = info
+
+        self.client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
+        self.jsonrpc.reset_mock()
+
+    def test_set_preset_next_to_randomise_calls_randomize_parameters(self):
+        """Test that navigating to Randomised preset calls randomize_parameters."""
+        # Navigate from Prelude -> Jazz -> Randomised
+        self.client_lib.set_preset_next()
+        self.assertEqual(self.selector.current_instrument_preset_idx, 1)
+        self.jsonrpc.load_preset.assert_called_once_with('Steinway D Jazz')
+        self.jsonrpc.reset_mock()
+
+        # Navigate to Randomised preset
+        self.client_lib.set_preset_next()
+        self.assertEqual(self.selector.current_instrument_preset_idx, 2)
+        self.jsonrpc.randomize_parameters.assert_called_once()
+        self.jsonrpc.load_preset.assert_not_called()
+
+    def test_set_preset_directly_to_randomise_calls_randomize_parameters(self):
+        """Test that directly selecting Randomised preset calls randomize_parameters."""
+        self.client_lib.set_preset('Steinway D', '__RANDOMISE__')
+
+        self.jsonrpc.randomize_parameters.assert_called_once()
+        self.jsonrpc.load_preset.assert_not_called()
+
+    def test_regular_preset_still_calls_load_preset(self):
+        """Test that regular presets still call load_preset."""
+        self.client_lib.set_preset_next()
+
+        self.jsonrpc.load_preset.assert_called_once_with('Steinway D Jazz')
+        self.jsonrpc.randomize_parameters.assert_not_called()
+
+    def test_set_instrument_to_randomise_calls_randomize_parameters(self):
+        """Test that switching instruments with Randomised as first preset works."""
+        # Add another instrument with Randomised as first preset
+        inst2 = Instrument('Ant. Petrof', 'Ant. Petrof', '#000000', '#FFFFFF')
+        random_preset2 = Preset('__RANDOMISE__', 'Randomised')
+        inst2.presets = [random_preset2]
+
+        # Update library and selector
+        self.library.instruments.append(inst2)
+        self.selector.instruments.append(inst2)
+
+        # Switch to the instrument (which defaults to first preset)
+        self.client_lib.set_instrument('Ant. Petrof')
+
+        self.jsonrpc.randomize_parameters.assert_called_once()
+        self.jsonrpc.load_preset.assert_not_called()
+
+
 if __name__ == '__main__':
     unittest.main()

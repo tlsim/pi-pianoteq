@@ -5,6 +5,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+- Randomised preset for each instrument
+  - Appears as the last preset in each instrument's preset list
+  - Randomizes all Pianoteq parameters when selected
+  - Available via preset navigation in both CLI and GFX HAT clients
+
 ## [2.2.0] - 2025-11-15
 
 ### Changed
