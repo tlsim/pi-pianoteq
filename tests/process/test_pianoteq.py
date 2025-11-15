@@ -25,7 +25,7 @@ class TestPianoteqQuit(unittest.TestCase):
         self.pianoteq.quit()
 
         # Should not attempt to call JSON-RPC
-        self.mock_jsonrpc._call.assert_not_called()
+        self.mock_jsonrpc.quit.assert_not_called()
 
     def test_quit_with_already_exited_process(self):
         """Test quit() handles case when process already exited."""
@@ -36,7 +36,7 @@ class TestPianoteqQuit(unittest.TestCase):
         self.pianoteq.quit()
 
         # Should not attempt to quit or terminate
-        self.mock_jsonrpc._call.assert_not_called()
+        self.mock_jsonrpc.quit.assert_not_called()
         mock_process.terminate.assert_not_called()
 
     @patch('pi_pianoteq.process.pianoteq.time.sleep')
@@ -50,7 +50,7 @@ class TestPianoteqQuit(unittest.TestCase):
         self.pianoteq.quit(timeout=5.0)
 
         # Should send quit command
-        self.mock_jsonrpc._call.assert_called_once_with('quit')
+        self.mock_jsonrpc.quit.assert_called_once()
         # Should poll process
         self.assertEqual(mock_process.poll.call_count, 3)
         # Should not terminate since graceful quit succeeded
@@ -72,7 +72,7 @@ class TestPianoteqQuit(unittest.TestCase):
         self.pianoteq.quit(timeout=5.0)
 
         # Should send quit command
-        self.mock_jsonrpc._call.assert_called_once_with('quit')
+        self.mock_jsonrpc.quit.assert_called_once()
         # Should fall back to terminate
         mock_process.terminate.assert_called_once()
 
@@ -85,12 +85,12 @@ class TestPianoteqQuit(unittest.TestCase):
         self.pianoteq.process = mock_process
 
         # Simulate JSON-RPC error (expected when Pianoteq closes connection)
-        self.mock_jsonrpc._call.side_effect = PianoteqJsonRpcError("Connection closed")
+        self.mock_jsonrpc.quit.side_effect = PianoteqJsonRpcError("Connection closed")
 
         self.pianoteq.quit(timeout=5.0)
 
         # Should attempt quit command
-        self.mock_jsonrpc._call.assert_called_once_with('quit')
+        self.mock_jsonrpc.quit.assert_called_once()
         # Should poll process and see it exited, no need to terminate
         self.assertEqual(mock_process.poll.call_count, 3)
         mock_process.terminate.assert_not_called()
@@ -104,12 +104,12 @@ class TestPianoteqQuit(unittest.TestCase):
         self.pianoteq.process = mock_process
 
         # Simulate connection close (expected behavior)
-        self.mock_jsonrpc._call.side_effect = PianoteqJsonRpcError("Connection refused")
+        self.mock_jsonrpc.quit.side_effect = PianoteqJsonRpcError("Connection refused")
 
         self.pianoteq.quit(timeout=5.0)
 
         # Should attempt quit command (even if it errors)
-        self.mock_jsonrpc._call.assert_called_once_with('quit')
+        self.mock_jsonrpc.quit.assert_called_once()
         # Process exits immediately, so should not need terminate
         mock_process.poll.assert_called_once()
         mock_process.terminate.assert_not_called()
@@ -138,7 +138,7 @@ class TestPianoteqQuit(unittest.TestCase):
         self.pianoteq.process = mock_process
 
         # Simulate unexpected error
-        self.mock_jsonrpc._call.side_effect = Exception("Unexpected error")
+        self.mock_jsonrpc.quit.side_effect = Exception("Unexpected error")
 
         self.pianoteq.quit(timeout=5.0)
 

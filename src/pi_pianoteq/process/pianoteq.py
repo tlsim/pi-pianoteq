@@ -62,10 +62,9 @@ class Pianoteq:
                 logger.info("Sending quit command to Pianoteq via JSON-RPC")
                 from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpcError
                 try:
-                    self.jsonrpc_client._call('quit')
+                    self.jsonrpc_client.quit()
                 except PianoteqJsonRpcError:
                     # Pianoteq may close the connection immediately, causing an error
-                    # This is expected behavior
                     pass
 
                 # Wait for process to exit gracefully

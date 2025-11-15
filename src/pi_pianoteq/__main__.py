@@ -140,7 +140,6 @@ def main():
     pianoteq.start()
 
     jsonrpc = PianoteqJsonRpc()
-    # Provide JSON-RPC client to Pianoteq for graceful shutdown
     pianoteq.jsonrpc_client = jsonrpc
 
     # Register cleanup handlers
