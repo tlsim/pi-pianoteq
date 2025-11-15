@@ -229,62 +229,57 @@ def setup_logging(handler: Optional[logging.Handler] = None):
 
 ## 5. Documentation Updates
 
-**File:** `docs/source/guide.rst`
+**File:** `docs/development.md`
 
-Add section after "Creating Your Client":
-```rst
-Using Your Custom Client
-========================
+Add new section "Custom Clients" explaining:
+- How to use `--client` flag to override default
+- How to set default client in config file (`[Client]` section)
+- How to use `--list-clients` to discover available clients
+- How to load external clients via `package.module:ClassName` syntax
+- How to configure systemd service with custom client
 
-Once you've created your client, there are several ways to use it:
+Example content:
+```markdown
+## Using Custom Clients
 
-CLI Override
-------------
+### Command Line Override
 
-Run once with your custom client:
+Run with a specific client:
+```bash
+pi-pianoteq --client cli
+pi-pianoteq --client mypackage.myclient:MyClient
+```
 
-.. code-block:: bash
+### Set Default Client
 
-   pi-pianoteq --client mypackage.myclient:MyClient
-
-Set as Default
---------------
-
-Edit your config file to make it the default:
-
-.. code-block:: bash
-
-   pi-pianoteq --init-config  # If you haven't already
-   nano ~/.config/pi_pianoteq/pi_pianoteq.conf
+Edit your config file:
+```bash
+pi-pianoteq --init-config  # If you haven't already
+nano ~/.config/pi_pianoteq/pi_pianoteq.conf
+```
 
 Add:
-
-.. code-block:: ini
-
-   [Client]
-   CLIENT = mypackage.myclient:MyClient
-
-Now ``pi-pianoteq`` will use your client by default.
-
-Systemd Service
----------------
-
-To use your client in a systemd service, edit the service file:
-
-.. code-block:: ini
-
-   [Service]
-   ExecStart=/path/to/venv/bin/pi-pianoteq --client mypackage:MyClient
-
-Discovery
----------
-
-List available built-in clients:
-
-.. code-block:: bash
-
-   pi-pianoteq --list-clients
+```ini
+[Client]
+CLIENT = mypackage.myclient:MyClient
 ```
+
+### List Available Clients
+
+```bash
+pi-pianoteq --list-clients
+```
+
+### Systemd Service
+
+Edit the service file to use a specific client:
+```ini
+[Service]
+ExecStart=/path/to/venv/bin/pi-pianoteq --client mypackage:MyClient
+```
+```
+
+**Note:** Detailed custom client development guide (with .rst files) is in progress on another branch. This markdown documentation provides essential usage information for now.
 
 ## 6. Testing
 
