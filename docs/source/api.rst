@@ -31,11 +31,13 @@ set_api(api)
    def set_api(self, api: ClientApi):
        """Receive the API once Pianoteq is ready."""
 
-**When called**: After Pianoteq starts and instruments are discovered (~6-8 seconds)
+**When called**: After the JSON-RPC API initializes and instruments are loaded
 
 **Parameters**: ``api`` - The ClientApi instance to use
 
 **What to do**: Store the API reference, optionally cache instrument data
+
+**Note**: Initialization typically takes 6-8 seconds on a Raspberry Pi, but may be faster on other hardware
 
 show_loading_message(message)
 ------------------------------

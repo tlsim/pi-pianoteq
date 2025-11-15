@@ -23,12 +23,21 @@ Quick Start
 .. toctree::
    :maxdepth: 2
    :hidden:
-   :caption: Documentation
+   :caption: Client Development
 
    guide
    example
    api
    data-models
+
+.. toctree::
+   :maxdepth: 1
+   :hidden:
+   :caption: Reference
+
+   reference/development
+   reference/pianoteq-api
+   reference/systemd
 
 How It Works
 ------------

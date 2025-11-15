@@ -42,11 +42,11 @@ Two-Phase Initialization
 Why Two Phases?
 ---------------
 
-Pianoteq takes 6-8 seconds to start. During this time:
+Pianoteq's JSON-RPC API takes time to initialize and load instruments (typically 6-8 seconds on a Raspberry Pi, faster on other hardware). During this startup:
 
 1. Client created with ``api=None``
 2. Loading messages shown via ``show_loading_message()``
-3. Once Pianoteq is ready, ``set_api()`` called with the real API
+3. Once the API is ready and instruments are loaded, ``set_api()`` called with the real API
 4. Finally, ``start()`` called to begin normal operation
 
 **Phase 1 - Loading Mode** (api=None):
