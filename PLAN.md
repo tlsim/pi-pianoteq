@@ -154,29 +154,78 @@ def list_clients():
     print(f"  {USER_CONFIG_PATH}")
 ```
 
-## 4. CLI Mode Detection
+## 4. Logging Handler Integration
 
-**Challenge:** Lines like `setup_logging(cli_mode=args.cli, ...)` need to detect CLI client
+**Challenge:** `__main__.py` needs to configure logging appropriately for each client type without knowing internal implementation details.
 
-**Solution:** Add method to Client base class:
+**Solution:** Add abstract method to Client base class that returns the logging handler to use:
+
 ```python
 # In src/pi_pianoteq/client/client.py
 class Client(ABC):
-    def is_cli_mode(self) -> bool:
-        """Override in CLI client to return True for buffered logging"""
-        return False
+    @abstractmethod
+    def get_logging_handler(self) -> Optional[logging.Handler]:
+        """
+        Return logging handler to use for this client.
 
+        Returns None to use default stdout/stderr handlers.
+        CLI client returns BufferedLoggingHandler for UI display.
+        """
+        pass
+```
+
+**Client implementations:**
+```python
 # In src/pi_pianoteq/client/cli/cli_client.py
 class CliClient(Client):
-    def is_cli_mode(self) -> bool:
-        return True
+    def get_logging_handler(self) -> Optional[logging.Handler]:
+        return self.log_buffer  # BufferedLoggingHandler for UI
+
+# In src/pi_pianoteq/client/gfxhat/gfxhat_client.py
+class GfxhatClient(Client):
+    def get_logging_handler(self) -> Optional[logging.Handler]:
+        return None  # Use default stdout/stderr handlers
 ```
 
-Then in `__main__.py`:
+**Update `__main__.py`** (replace lines ~130-132):
 ```python
-log_buffer = client.log_buffer if client.is_cli_mode() else None
-setup_logging(cli_mode=client.is_cli_mode(), log_buffer=log_buffer)
+# Old:
+# log_buffer = client.log_buffer if args.cli else None
+# setup_logging(cli_mode=args.cli, log_buffer=log_buffer)
+
+# New:
+setup_logging(handler=client.get_logging_handler())
 ```
+
+**Update `logging_config.py`** `setup_logging()` signature:
+```python
+def setup_logging(handler: Optional[logging.Handler] = None):
+    """
+    Configure logging for the application.
+
+    Args:
+        handler: Optional handler from client, or None for default stdout/stderr
+
+    If handler is provided, uses it for all logging.
+    Otherwise uses default stdout (INFO/DEBUG) and stderr (WARNING/ERROR).
+    """
+    # ... setup code ...
+
+    if handler:
+        # Use client-provided handler
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
+    else:
+        # Default handlers (existing lines 78-90)
+        # stdout for INFO/DEBUG, stderr for WARNING/ERROR
+```
+
+**Benefits:**
+- Clean abstraction - client controls its logging needs
+- No boolean flags or mode detection needed
+- Default behavior for any client returning None
+- Custom clients can provide their own handlers
 
 ## 5. Documentation Updates
 
