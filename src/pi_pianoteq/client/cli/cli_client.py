@@ -160,6 +160,7 @@ class CliClient(Client):
         self.menu_mode = False
         self.preset_menu_mode = False
         self.preset_menu_instrument = None
+        self.logs_view_mode = False
         self.instrument_names = [i.name for i in self.api.get_instruments()]
         self.preset_names = []
         self.current_menu_index = 0
@@ -211,6 +212,10 @@ class CliClient(Client):
                 # Exit menu mode
                 self.menu_mode = False
                 self._update_display()
+            elif self.logs_view_mode:
+                # Exit logs view mode
+                self.logs_view_mode = False
+                self._update_display()
             else:
                 # Exit application
                 event.app.exit()
@@ -227,6 +232,9 @@ class CliClient(Client):
                 self._update_display()
             elif self.menu_mode:
                 self.menu_mode = False
+                self._update_display()
+            elif self.logs_view_mode:
+                self.logs_view_mode = False
                 self._update_display()
 
         # Normal mode: Arrow keys for navigation
@@ -299,6 +307,13 @@ class CliClient(Client):
                 else:
                     self.search_manager.enter_search('combined')
                 self.current_menu_index = 0
+                self._update_display()
+
+        # Enter logs view mode
+        @kb.add('l')
+        def kb_logs(event):
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active() and not self.logs_view_mode:
+                self.logs_view_mode = True
                 self._update_display()
 
         # Handle text input in search mode
@@ -444,12 +459,15 @@ class CliClient(Client):
             self.search_manager,
             self.preset_menu_mode,
             self.preset_menu_instrument,
-            self.menu_mode
+            self.menu_mode,
+            self.logs_view_mode
         )
 
     def _get_display_text(self):
         """Generate display text based on current mode"""
-        if self.search_manager.is_active():
+        if self.logs_view_mode:
+            return cli_display.get_logs_view_text(self.log_buffer)
+        elif self.search_manager.is_active():
             return cli_display.get_search_text(
                 self.search_manager,
                 self.current_menu_index,
