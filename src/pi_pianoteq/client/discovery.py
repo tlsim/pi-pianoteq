@@ -8,7 +8,7 @@ both built-in and external.
 import pkgutil
 import importlib
 import inspect
-from typing import Dict, Type, Optional
+from typing import Dict, Type, Optional, Tuple
 from pi_pianoteq.client.client import Client
 
 
@@ -19,7 +19,21 @@ def discover_builtin_clients() -> Dict[str, Type[Client]]:
     Returns:
         Dictionary mapping client names to client classes (e.g., {'gfxhat': GfxhatClient, 'cli': CliClient})
     """
-    clients = {}
+    clients, _ = discover_builtin_clients_with_errors()
+    return clients
+
+
+def discover_builtin_clients_with_errors() -> Tuple[Dict[str, Type[Client]], Dict[str, str]]:
+    """
+    Scan pi_pianoteq.client.* for Client subclasses, tracking import failures.
+
+    Returns:
+        Tuple of (available_clients, unavailable_clients)
+        - available_clients: Dict mapping client names to client classes
+        - unavailable_clients: Dict mapping client names to error messages
+    """
+    available = {}
+    unavailable = {}
 
     # Import the client package to get its path
     import pi_pianoteq.client as client_package
@@ -29,6 +43,9 @@ def discover_builtin_clients() -> Dict[str, Type[Client]]:
         if modname in ['client', 'client_api', 'discovery']:
             # Skip base classes and this module
             continue
+
+        client_found = False
+        import_error = None
 
         try:
             # Import the module
@@ -42,9 +59,9 @@ def discover_builtin_clients() -> Dict[str, Type[Client]]:
                     submodule_name = f'{full_module_name}.{modname}_client'
                     submodule = importlib.import_module(submodule_name)
                     module = submodule
-                except ImportError:
-                    # If there's no *_client.py, scan all modules in the subpackage
-                    pass
+                except ImportError as e:
+                    # Track this error for potential unavailable listing
+                    import_error = e
 
             # Find Client subclasses in the module
             for name, obj in inspect.getmembers(module, inspect.isclass):
@@ -52,14 +69,35 @@ def discover_builtin_clients() -> Dict[str, Type[Client]]:
                     obj is not Client and
                     obj.__module__.startswith('pi_pianoteq.client')):
                     # Use the module/package name as the client name
-                    clients[modname] = obj
+                    available[modname] = obj
+                    client_found = True
                     break  # Only take the first Client subclass from each module
 
-        except ImportError:
-            # Skip modules that can't be imported (e.g., missing dependencies)
-            continue
+            # If we didn't find a client but had an import error, mark as unavailable
+            if not client_found and import_error:
+                error_msg = str(import_error)
+                if 'No module named' in error_msg:
+                    missing = error_msg.split("'")[1] if "'" in error_msg else error_msg
+                    unavailable[modname] = f"missing dependency: {missing}"
+                elif 'python3-smbus' in error_msg:
+                    unavailable[modname] = "missing dependency: python3-smbus"
+                else:
+                    # Keep first line of error only
+                    first_line = error_msg.split('\n')[0]
+                    unavailable[modname] = first_line[:60]  # Truncate if too long
 
-    return clients
+        except ImportError as e:
+            # Track modules that can't be imported (e.g., missing dependencies)
+            # Extract a user-friendly error message
+            error_msg = str(e)
+            if 'No module named' in error_msg:
+                # Extract just the missing module name
+                missing = error_msg.split("'")[1] if "'" in error_msg else error_msg
+                unavailable[modname] = f"missing dependency: {missing}"
+            else:
+                unavailable[modname] = f"import error: {error_msg}"
+
+    return available, unavailable
 
 
 def get_client_info(client_class: Type[Client]) -> Dict[str, str]:
