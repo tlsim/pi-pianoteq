@@ -16,6 +16,9 @@ build/
 pi_pianoteq.service
 pi-pianoteq.service
 
+# Sphinx documentation build output
+docs/build/
+
 pi-pianoteq/*
 backup-*/
 htmlcov/
