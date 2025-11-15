@@ -52,7 +52,7 @@ class ClientLib(ClientApi):
             result = self.instrument_library.find_preset_by_name(preset_name)
             if result is not None:
                 instrument, preset = result
-                if self.selector.set_position_from_objects(instrument, preset):
+                if self.selector.set_preset_by_name(instrument.name, preset.name):
                     logger.info(f"Synced to current preset: {instrument.name} - {preset.name}")
                 else:
                     logger.warning(f"Found preset '{preset_name}' but failed to set position, resetting to first preset")

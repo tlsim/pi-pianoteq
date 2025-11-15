@@ -62,16 +62,3 @@ class Selector:
         self.current_instrument_idx = self.instruments.index(instrument)
         self.current_instrument_preset_idx = instrument.presets.index(preset)
         return True
-
-    def set_position_from_objects(self, instrument: Instrument, preset: Preset) -> bool:
-        """
-        Set position from Instrument and Preset objects.
-
-        Returns True if successful, False if instrument or preset not found in library.
-        """
-        try:
-            self.current_instrument_idx = self.instruments.index(instrument)
-            self.current_instrument_preset_idx = instrument.presets.index(preset)
-            return True
-        except ValueError:
-            return False

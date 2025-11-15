@@ -5,7 +5,7 @@ from pi_pianoteq.instrument.instrument import Instrument
 from pi_pianoteq.instrument.preset import Preset
 
 
-class SelectorSetPositionFromObjectsTestCase(unittest.TestCase):
+class SelectorSetPresetByNameTestCase(unittest.TestCase):
     def setUp(self):
         self.inst1 = Instrument('Steinway D', 'Steinway D', '#000000', '#FFFFFF')
         self.preset1a = Preset('Steinway D Prelude', 'Prelude')
@@ -19,52 +19,47 @@ class SelectorSetPositionFromObjectsTestCase(unittest.TestCase):
 
         self.selector = Selector([self.inst1, self.inst2])
 
-    def test_set_position_from_objects_first_instrument_first_preset(self):
-        result = self.selector.set_position_from_objects(self.inst1, self.preset1a)
+    def test_set_preset_by_name_first_instrument_first_preset(self):
+        result = self.selector.set_preset_by_name('Steinway D', 'Steinway D Prelude')
         self.assertTrue(result)
         self.assertEqual(0, self.selector.current_instrument_idx)
         self.assertEqual(0, self.selector.current_instrument_preset_idx)
 
-    def test_set_position_from_objects_first_instrument_second_preset(self):
-        result = self.selector.set_position_from_objects(self.inst1, self.preset1b)
+    def test_set_preset_by_name_first_instrument_second_preset(self):
+        result = self.selector.set_preset_by_name('Steinway D', 'Steinway D Jazz')
         self.assertTrue(result)
         self.assertEqual(0, self.selector.current_instrument_idx)
         self.assertEqual(1, self.selector.current_instrument_preset_idx)
 
-    def test_set_position_from_objects_second_instrument_first_preset(self):
-        result = self.selector.set_position_from_objects(self.inst2, self.preset2a)
+    def test_set_preset_by_name_second_instrument_first_preset(self):
+        result = self.selector.set_preset_by_name('Ant. Petrof', 'Ant. Petrof Recording 1')
         self.assertTrue(result)
         self.assertEqual(1, self.selector.current_instrument_idx)
         self.assertEqual(0, self.selector.current_instrument_preset_idx)
 
-    def test_set_position_from_objects_second_instrument_second_preset(self):
-        result = self.selector.set_position_from_objects(self.inst2, self.preset2b)
+    def test_set_preset_by_name_second_instrument_second_preset(self):
+        result = self.selector.set_preset_by_name('Ant. Petrof', 'Ant. Petrof Recording 2')
         self.assertTrue(result)
         self.assertEqual(1, self.selector.current_instrument_idx)
         self.assertEqual(1, self.selector.current_instrument_preset_idx)
 
-    def test_set_position_from_objects_instrument_not_in_library(self):
-        inst3 = Instrument('Unknown', 'Unknown', '#000000', '#FFFFFF')
-        inst3.presets = [Preset('Unknown Preset', 'Preset')]
-        result = self.selector.set_position_from_objects(inst3, inst3.presets[0])
+    def test_set_preset_by_name_instrument_not_found(self):
+        result = self.selector.set_preset_by_name('Unknown', 'Unknown Preset')
         self.assertFalse(result)
         self.assertEqual(0, self.selector.current_instrument_idx)
         self.assertEqual(0, self.selector.current_instrument_preset_idx)
 
-    def test_set_position_from_objects_preset_not_in_instrument(self):
-        wrong_preset = Preset('Wrong Preset', 'Wrong')
-        result = self.selector.set_position_from_objects(self.inst1, wrong_preset)
+    def test_set_preset_by_name_preset_not_found(self):
+        result = self.selector.set_preset_by_name('Steinway D', 'Nonexistent Preset')
         self.assertFalse(result)
         self.assertEqual(0, self.selector.current_instrument_idx)
         self.assertEqual(0, self.selector.current_instrument_preset_idx)
 
-    def test_set_position_from_objects_preserves_current_on_failure(self):
+    def test_set_preset_by_name_preserves_current_on_failure(self):
         self.selector.current_instrument_idx = 1
         self.selector.current_instrument_preset_idx = 1
 
-        inst3 = Instrument('Unknown', 'Unknown', '#000000', '#FFFFFF')
-        inst3.presets = [Preset('Unknown Preset', 'Preset')]
-        result = self.selector.set_position_from_objects(inst3, inst3.presets[0])
+        result = self.selector.set_preset_by_name('Unknown', 'Unknown Preset')
 
         self.assertFalse(result)
         self.assertEqual(1, self.selector.current_instrument_idx)
