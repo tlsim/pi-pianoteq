@@ -29,6 +29,13 @@ def list_clients():
         info = get_client_info(client_class)
         print(f"  {name:12} - {info.get('description', 'No description')}")
 
+    if not clients:
+        print("  No clients found (all clients have missing dependencies)")
+
+    print()
+    print("Note: Only clients with satisfied dependencies are shown.")
+    print("      Install hardware dependencies to see additional clients.")
+    print("      (e.g., gfxhat requires python3-smbus)")
     print()
     print("Usage:")
     print(f"  pi-pianoteq --client <name>")
