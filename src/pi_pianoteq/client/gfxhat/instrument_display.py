@@ -27,6 +27,8 @@ class InstrumentDisplay:
         self.on_enter = on_enter
         self.on_enter_preset_menu = on_enter_preset_menu
         self.suppression = ButtonSuppression(300)
+        self.held_count = {}
+        self.held_threshold = 2
         current_instrument = self.api.get_current_instrument()
         self.preset = self.api.get_current_preset().display_name
         self.instrument = current_instrument.name
@@ -89,7 +91,8 @@ class InstrumentDisplay:
 
     def get_handler(self):
         def handler(ch, event):
-            if event == 'press' or event == 'held':
+            if event == 'press':
+                self.held_count[ch] = 0
                 if ch == touch.DOWN:
                     self.suppression.record()
                     self.api.set_preset_next()
@@ -106,13 +109,36 @@ class InstrumentDisplay:
                     self.suppression.record()
                     self.api.set_instrument_next()
                     self.update_display()
-                elif event == 'held' and ch == touch.ENTER:
+
+            elif event == 'held':
+                if ch == touch.ENTER:
                     self.on_enter_preset_menu()
+                elif ch in (touch.UP, touch.DOWN, touch.LEFT, touch.RIGHT):
+                    self.held_count[ch] = self.held_count.get(ch, 0) + 1
+                    if self.held_count[ch] >= self.held_threshold:
+                        if ch == touch.DOWN:
+                            self.suppression.record()
+                            self.api.set_preset_next()
+                            self.update_display()
+                        elif ch == touch.UP:
+                            self.suppression.record()
+                            self.api.set_preset_prev()
+                            self.update_display()
+                        elif ch == touch.LEFT:
+                            self.suppression.record()
+                            self.api.set_instrument_prev()
+                            self.update_display()
+                        elif ch == touch.RIGHT:
+                            self.suppression.record()
+                            self.api.set_instrument_next()
+                            self.update_display()
 
             elif event == 'release':
                 if ch == touch.ENTER:
                     if self.suppression.allow_action():
                         self.on_enter()
+                elif ch in self.held_count:
+                    del self.held_count[ch]
 
         return handler
 

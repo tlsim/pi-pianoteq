@@ -8,7 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Key repeat for navigation buttons on GFX HAT: hold down arrow buttons for continuous scrolling through instruments, presets, and menus
+- Key repeat for navigation buttons on GFX HAT with intelligent threshold
+  - Hold down arrow buttons for continuous scrolling through instruments, presets, and menus
+  - Short press: single navigation step with immediate response
+  - Hold: continuous scrolling starts after brief delay (2 held events) to prevent accidental over-navigation
 
 ## [2.2.0] - 2025-11-15
 
