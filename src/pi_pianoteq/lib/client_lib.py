@@ -119,11 +119,36 @@ class ClientLib(ClientApi):
         """
         Apply a preset, handling both regular presets and special randomize preset.
 
+        When applying the Randomise preset, ensures we switch to the correct
+        instrument first (if needed) before randomizing parameters.
+
         Args:
             preset: The preset to apply
         """
         if preset.name == "__RANDOMISE__":
             logger.info("Randomizing parameters")
+
+            # Get current instrument from selector
+            current_instrument = self.selector.get_current_instrument()
+
+            # Check if we need to switch instruments first
+            try:
+                info = self.jsonrpc.get_info()
+                pianoteq_instrument = info.current_preset.instrument
+
+                # If we're switching instruments, load a real preset first
+                if pianoteq_instrument != current_instrument.name:
+                    # Load the first non-randomise preset
+                    first_preset = current_instrument.presets[0]
+                    logger.info(f"Switching to {current_instrument.name} before randomizing")
+                    self.jsonrpc.load_preset(first_preset.name)
+            except Exception as e:
+                logger.warning(f"Could not check current instrument, loading first preset: {e}")
+                # Fallback: always load first preset to ensure we're on right instrument
+                first_preset = current_instrument.presets[0]
+                self.jsonrpc.load_preset(first_preset.name)
+
+            # Now randomize the parameters
             self.jsonrpc.randomize_parameters()
         else:
             self.jsonrpc.load_preset(preset.name)
