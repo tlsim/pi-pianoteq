@@ -112,7 +112,9 @@ class InstrumentDisplay:
 
             elif event == 'held':
                 if ch == touch.ENTER:
-                    self.on_enter_preset_menu()
+                    self.held_count[ch] = self.held_count.get(ch, 0) + 1
+                    if self.held_count[ch] >= self.held_threshold:
+                        self.on_enter_preset_menu()
                 elif ch in (touch.UP, touch.DOWN, touch.LEFT, touch.RIGHT):
                     self.held_count[ch] = self.held_count.get(ch, 0) + 1
                     if self.held_count[ch] >= self.held_threshold:

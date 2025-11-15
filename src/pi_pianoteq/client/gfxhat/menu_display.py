@@ -174,7 +174,8 @@ class MenuDisplay:
                     if self.suppression.allow_action():
                         self.menu_options[self.current_menu_option].trigger()
                         self.selected_menu_option = self.current_menu_option
-                elif ch in self.held_count:
+
+                if ch in self.held_count:
                     del self.held_count[ch]
 
         return handler

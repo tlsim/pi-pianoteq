@@ -74,23 +74,28 @@ class InstrumentMenuDisplayTestCase(unittest.TestCase):
         display.update_instrument()
 
     def test_enter_held_opens_preset_menu_for_instrument(self):
-        """ENTER held on instrument should call on_enter_preset_menu."""
+        """ENTER held on instrument should call on_enter_preset_menu after threshold."""
         display = self.create_display()
         handler = display.get_handler()
 
         display.current_menu_option = 1  # Strings
 
+        # Send held events to meet threshold (default: 2)
         handler(touch.ENTER, 'held')
+        self.on_enter_preset_menu.assert_not_called()
 
+        handler(touch.ENTER, 'held')
         self.on_enter_preset_menu.assert_called_once_with("Strings")
 
     def test_enter_held_on_shutdown_does_nothing(self):
-        """ENTER held on 'Shut down' should not open preset menu."""
+        """ENTER held on 'Shut down' should not open preset menu even after threshold."""
         display = self.create_display()
         handler = display.get_handler()
 
         display.current_menu_option = 3  # Shut down
 
+        # Send held events beyond threshold to verify shutdown doesn't trigger preset menu
+        handler(touch.ENTER, 'held')
         handler(touch.ENTER, 'held')
 
         self.on_enter_preset_menu.assert_not_called()
@@ -283,7 +288,7 @@ class InstrumentMenuDisplayTestCase(unittest.TestCase):
             self.on_exit.assert_called_once()
 
     def test_enter_held_with_different_instruments(self):
-        """ENTER held should work for all instrument options."""
+        """ENTER held should work for all instrument options after threshold."""
         display = self.create_display()
         handler = display.get_handler()
 
@@ -292,9 +297,15 @@ class InstrumentMenuDisplayTestCase(unittest.TestCase):
             self.on_enter_preset_menu.reset_mock()
 
             display.current_menu_option = i
+            # Send held events to meet threshold (default: 2)
             handler(touch.ENTER, 'held')
+            self.on_enter_preset_menu.assert_not_called()
 
+            handler(touch.ENTER, 'held')
             self.on_enter_preset_menu.assert_called_once_with(instrument)
+
+            # Release to clean up held_count for next iteration
+            handler(touch.ENTER, 'release')
 
     def test_update_instrument_updates_scroller(self):
         """update_instrument should update scrolling text."""

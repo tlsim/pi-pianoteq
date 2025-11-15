@@ -128,12 +128,15 @@ class InstrumentDisplayTestCase(unittest.TestCase):
         self.on_enter.assert_not_called()
 
     def test_enter_held_calls_on_enter_preset_menu(self):
-        """ENTER held should call on_enter_preset_menu callback."""
+        """ENTER held should call on_enter_preset_menu callback after threshold."""
         display = self.create_display()
         handler = display.get_handler()
 
+        # Send held events to meet threshold (default: 2)
         handler(touch.ENTER, 'held')
+        self.on_enter_preset_menu.assert_not_called()
 
+        handler(touch.ENTER, 'held')
         self.on_enter_preset_menu.assert_called_once()
 
     def test_update_display_fetches_new_state(self):

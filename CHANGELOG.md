@@ -8,10 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- Key repeat for navigation buttons on GFX HAT with intelligent threshold
+- Key repeat for all navigation and action buttons on GFX HAT with intelligent held event threshold
   - Hold down arrow buttons for continuous scrolling through instruments, presets, and menus
-  - Short press: single navigation step with immediate response
-  - Hold: continuous scrolling starts after brief delay (2 held events) to prevent accidental over-navigation
+  - Long press ENTER button to open preset menu (with threshold to prevent accidental triggers)
+  - Intelligent threshold distinguishes between short press and hold
+    - Short press: immediate single-step navigation or menu action
+    - Hold: continuous scrolling/long-press action starts after brief delay (2 held events)
+    - Prevents accidental over-navigation or unintended long-press activation
 
 ## [2.2.0] - 2025-11-15
 
