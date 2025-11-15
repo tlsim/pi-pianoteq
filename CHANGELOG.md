@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.2.0] - 2025-11-15
+
+### Changed
+- Preset selection now uses JSON-RPC `loadPreset()` instead of MIDI Program Change messages
+- Faster startup time: ~5 seconds from launch to ready (eliminated MIDI initialization delay)
+
+### Removed
+- Obsolete MIDI output configuration options (MIDI input capabilities preserved for future features)
+
 ## [2.1.0] - 2025-11-15
 
 ### Added
