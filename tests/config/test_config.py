@@ -21,15 +21,7 @@ def temp_config_file():
         f.write("""[Pianoteq]
 PIANOTEQ_DIR = /custom/pianoteq/dir/
 PIANOTEQ_BIN = Custom Pianoteq
-PIANOTEQ_DATA_DIR = /custom/data/
-PIANOTEQ_MIDI_MAPPINGS_DIR = /custom/mappings/
-PIANOTEQ_PREFS_FILE = /custom/prefs.file
 PIANOTEQ_HEADLESS = true
-
-[Midi]
-MIDI_PORT_NAME = CUSTOM-PORT
-MIDI_MAPPING_NAME = CustomMapping
-MIDI_PIANOTEQ_STARTUP_DELAY = 5
 
 [System]
 SHUTDOWN_COMMAND = custom shutdown command
@@ -49,9 +41,6 @@ def partial_config_file():
         f.write("""[Pianoteq]
 PIANOTEQ_DIR = /partial/pianoteq/dir/
 PIANOTEQ_BIN = Partial Pianoteq
-
-[Midi]
-MIDI_PORT_NAME = PARTIAL-PORT
 """)
         temp_path = Path(f.name)
 
@@ -73,7 +62,7 @@ def test_loads_bundled_default_when_no_user_config():
 
     # Should fall back to bundled defaults
     assert config.PIANOTEQ_DIR is not None
-    assert config.MIDI_PORT_NAME is not None
+    assert config.SHUTDOWN_COMMAND is not None
 
     # All values should come from bundled default
     sources = config.get_config_sources()
@@ -86,13 +75,13 @@ def test_user_config_overrides_default(temp_config_file):
 
     assert config.PIANOTEQ_DIR == '/custom/pianoteq/dir/'
     assert config.PIANOTEQ_BIN == 'Custom Pianoteq'
-    assert config.MIDI_PORT_NAME == 'CUSTOM-PORT'
+    assert config.SHUTDOWN_COMMAND == 'custom shutdown command'
     assert config.PIANOTEQ_HEADLESS is True
 
     # Check sources
     sources = config.get_config_sources()
     assert sources['PIANOTEQ_DIR'] == 'user_config'
-    assert sources['MIDI_PORT_NAME'] == 'user_config'
+    assert sources['SHUTDOWN_COMMAND'] == 'user_config'
 
 
 def test_partial_user_config_merges_with_default(partial_config_file):
@@ -102,33 +91,29 @@ def test_partial_user_config_merges_with_default(partial_config_file):
     # Values from user config
     assert config.PIANOTEQ_DIR == '/partial/pianoteq/dir/'
     assert config.PIANOTEQ_BIN == 'Partial Pianoteq'
-    assert config.MIDI_PORT_NAME == 'PARTIAL-PORT'
 
     # Values should fall back to default
-    assert config.PIANOTEQ_DATA_DIR is not None  # From default
-    assert config.MIDI_MAPPING_NAME is not None  # From default
+    assert config.SHUTDOWN_COMMAND is not None  # From default
 
     # Check sources
     sources = config.get_config_sources()
     assert sources['PIANOTEQ_DIR'] == 'user_config'
     assert sources['PIANOTEQ_BIN'] == 'user_config'
-    assert sources['MIDI_PORT_NAME'] == 'user_config'
-    assert sources['PIANOTEQ_DATA_DIR'] == 'bundled_default'
-    assert sources['MIDI_MAPPING_NAME'] == 'bundled_default'
+    assert sources['SHUTDOWN_COMMAND'] == 'bundled_default'
 
 
 def test_env_var_overrides_user_config(temp_config_file):
     """Test that environment variables override user config"""
     # Set environment variable
     os.environ['PIANOTEQ_DIR'] = '/env/override/dir/'
-    os.environ['MIDI_PORT_NAME'] = 'ENV-PORT'
+    os.environ['SHUTDOWN_COMMAND'] = 'env shutdown'
 
     try:
         config = ConfigLoader(config_path=temp_config_file)
 
         # Env vars should override user config
         assert config.PIANOTEQ_DIR == '/env/override/dir/'
-        assert config.MIDI_PORT_NAME == 'ENV-PORT'
+        assert config.SHUTDOWN_COMMAND == 'env shutdown'
 
         # Non-overridden values still from user config
         assert config.PIANOTEQ_BIN == 'Custom Pianoteq'
@@ -136,12 +121,12 @@ def test_env_var_overrides_user_config(temp_config_file):
         # Check sources
         sources = config.get_config_sources()
         assert sources['PIANOTEQ_DIR'] == 'environment'
-        assert sources['MIDI_PORT_NAME'] == 'environment'
+        assert sources['SHUTDOWN_COMMAND'] == 'environment'
         assert sources['PIANOTEQ_BIN'] == 'user_config'
     finally:
         # Clean up environment
         del os.environ['PIANOTEQ_DIR']
-        del os.environ['MIDI_PORT_NAME']
+        del os.environ['SHUTDOWN_COMMAND']
 
 
 def test_env_var_overrides_default():
@@ -192,15 +177,6 @@ def test_boolean_config_parsing(temp_config_file):
     assert isinstance(config.PIANOTEQ_HEADLESS, bool)
 
 
-def test_integer_config_parsing(temp_config_file):
-    """Test that integer config values are parsed correctly"""
-    config = ConfigLoader(config_path=temp_config_file)
-
-    # temp_config_file sets MIDI_PIANOTEQ_STARTUP_DELAY = 5
-    assert config.MIDI_PIANOTEQ_STARTUP_DELAY == 5
-    assert isinstance(config.MIDI_PIANOTEQ_STARTUP_DELAY, int)
-
-
 def test_get_config_sources():
     """Test that config sources tracking works"""
     config = ConfigLoader(config_path=Path('/nonexistent/config.conf'))
@@ -212,7 +188,7 @@ def test_get_config_sources():
 
     # Should have entries for all config keys
     assert 'PIANOTEQ_DIR' in sources
-    assert 'MIDI_PORT_NAME' in sources
+    assert 'PIANOTEQ_BIN' in sources
     assert 'SHUTDOWN_COMMAND' in sources
 
     # All should be from bundled_default

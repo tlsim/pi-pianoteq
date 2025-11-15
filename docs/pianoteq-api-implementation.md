@@ -4,20 +4,20 @@ Implementation status for the pi-pianoteq project. For complete API documentatio
 
 ---
 
-## Current API Usage
+## Current API Usage (v2.2.0+)
 
-The project uses **4 out of 37+ available methods**, only for **discovery** during startup:
+The project uses **4 out of 37+ available methods**:
 
 | Method | Usage | Location |
 |--------|-------|----------|
-| `getActivationInfo()` | Detect licensed vs trial | `jsonrpc_client.py:121`, `__main__.py:150` |
-| `getListOfPresets()` | Discover available instruments | `jsonrpc_client.py:85`, `config.py:225` |
-| `getInfo()` | Defined but unused | `jsonrpc_client.py:104` |
-| `loadPreset()` | Defined but unused | `jsonrpc_client.py:154` |
+| `getActivationInfo()` | Detect licensed vs trial | `jsonrpc_client.py:116`, `__main__.py` |
+| `getListOfPresets()` | Discover available instruments | `jsonrpc_client.py:87`, `config.py` |
+| `getInfo()` | Sync with current preset at startup | `jsonrpc_client.py:99`, `client_lib.py:31` |
+| `loadPreset()` | Load presets during navigation | `jsonrpc_client.py:147`, `client_lib.py` |
 
-**Runtime control uses MIDI:**
-- Preset switching: MIDI Program Change → Pianoteq LoadPreset mapping (`.ptqmap` file)
-- Parameters: MIDI CC messages (not currently used)
+**Runtime control uses JSON-RPC:**
+- Preset switching: Direct `loadPreset(name, bank)` calls
+- No MIDI output required for preset selection (MIDI input preserved for future features)
 
 ---
 
@@ -25,10 +25,9 @@ The project uses **4 out of 37+ available methods**, only for **discovery** duri
 
 Prev/next buttons work via:
 1. GFX HAT buttons trigger menu navigation
-2. Menu sends MIDI Program Change
-3. Pianoteq's mapping file translates to LoadPreset
-
-No need for `nextPreset()` API calls - current implementation is simpler.
+2. Menu calls `client_lib.set_preset_next()` / `set_preset_prev()`
+3. ClientLib calls `jsonrpc.load_preset(preset.name)`
+4. Pianoteq loads the preset directly
 
 ---
 
@@ -62,6 +61,6 @@ If adding parameter manipulation, note version/edition differences:
 ## See Also
 
 - [pianoteq-api.md](pianoteq-api.md) - Complete API reference
-- [../src/pi_pianoteq/rpc/jsonrpc_client.py](../src/pi_pianoteq/rpc/jsonrpc_client.py) - Current implementation
-- [../src/pi_pianoteq/mapping/mapping.py](../src/pi_pianoteq/mapping/mapping.py) - MIDI mapping for preset loading
+- [../src/pi_pianoteq/rpc/jsonrpc_client.py](../src/pi_pianoteq/rpc/jsonrpc_client.py) - JSON-RPC client implementation
+- [../src/pi_pianoteq/lib/client_lib.py](../src/pi_pianoteq/lib/client_lib.py) - Client library using JSON-RPC
 - [../CLAUDE.md](../CLAUDE.md) - Project development context

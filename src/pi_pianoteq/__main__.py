@@ -38,13 +38,7 @@ def show_config():
     configs = [
         ("PIANOTEQ_DIR", Config.PIANOTEQ_DIR),
         ("PIANOTEQ_BIN", Config.PIANOTEQ_BIN),
-        ("PIANOTEQ_DATA_DIR", Config.PIANOTEQ_DATA_DIR),
-        ("PIANOTEQ_MIDI_MAPPINGS_DIR", Config.PIANOTEQ_MIDI_MAPPINGS_DIR),
-        ("PIANOTEQ_PREFS_FILE", Config.PIANOTEQ_PREFS_FILE),
         ("PIANOTEQ_HEADLESS", Config.PIANOTEQ_HEADLESS),
-        ("MIDI_PORT_NAME", Config.MIDI_PORT_NAME),
-        ("MIDI_MAPPING_NAME", Config.MIDI_MAPPING_NAME),
-        ("MIDI_PIANOTEQ_STARTUP_DELAY", Config.MIDI_PIANOTEQ_STARTUP_DELAY),
         ("SHUTDOWN_COMMAND", Config.SHUTDOWN_COMMAND),
     ]
 
@@ -104,16 +98,11 @@ def main():
         return init_config()
 
     # Normal startup - import hardware dependencies only when needed
-    from rtmidi import MidiOut
     from pi_pianoteq.instrument.library import Library
     from pi_pianoteq.instrument.selector import Selector
     from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc, PianoteqJsonRpcError
     from pi_pianoteq.lib.client_lib import ClientLib
-    from pi_pianoteq.mapping.mapping_builder import MappingBuilder
-    from pi_pianoteq.mapping.writer import Writer
-    from pi_pianoteq.midi.program_change import ProgramChange
     from pi_pianoteq.process.pianoteq import Pianoteq
-    from pi_pianoteq.util.pianoteq_prefs import is_midi_device_enabled
 
     # Import appropriate client based on mode
     if args.cli:
@@ -204,31 +193,8 @@ def main():
     # Build library with discovered instruments (already grouped with presets)
     library = Library(instruments)
     selector = Selector(library.get_instruments())
-    mapping = MappingBuilder(library).build()
-    Writer(mapping).write()
 
-    midiout = MidiOut()
-    midiout.open_virtual_port(Config.MIDI_PORT_NAME)
-    program_change = ProgramChange(midiout)
-
-    client_lib = ClientLib(library, selector, program_change, jsonrpc)
-
-    # Give Pianoteq a bit more time to detect the virtual MIDI port and update its prefs
-    time.sleep(2)
-
-    # Check if PI-PTQ MIDI device is enabled in Pianoteq preferences
-    midi_port_enabled = is_midi_device_enabled(Config.PIANOTEQ_PREFS_FILE)
-    if not midi_port_enabled:
-        logger.warning(
-            "PI-PTQ MIDI port not enabled in Pianoteq. "
-            "Please enable it in Pianoteq preferences: "
-            "Edit → Preferences → Devices, then enable 'PI-PTQ' under Active MIDI Inputs. "
-            "You may need to restart the service after enabling the port."
-        )
-        # Show warning in loading screen for CLI mode
-        if args.cli:
-            client.show_loading_message("⚠️  MIDI port not configured - see logs")
-            time.sleep(3)  # Give user time to see the warning
+    client_lib = ClientLib(library, selector, jsonrpc)
 
     # Provide API and start normal operation
     client.set_api(client_lib)

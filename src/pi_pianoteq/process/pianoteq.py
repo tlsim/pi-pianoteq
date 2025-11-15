@@ -12,7 +12,6 @@ logger = logging.getLogger(__name__)
 class Pianoteq:
     def __init__(self, jsonrpc_client=None):
         self.headless = Config.PIANOTEQ_HEADLESS
-        self.mapping_name = Config.MIDI_MAPPING_NAME
         self.executable = expanduser(Config.PIANOTEQ_DIR) + Config.PIANOTEQ_BIN
         self.process = None
         self.jsonrpc_client = jsonrpc_client
@@ -34,7 +33,7 @@ class Pianoteq:
         return ' '.join(output.splitlines())
 
     def start(self):
-        args = [self.executable, '--midimapping', self.mapping_name, '--serve', '']
+        args = [self.executable, '--serve', '']
         if self.headless:
             args.append('--headless')
         self.process = subprocess.Popen(args,

@@ -172,18 +172,9 @@ class ConfigLoader:
         # Load each config value with priority: env var > user config > default
         self.PIANOTEQ_DIR = self._get_config('PIANOTEQ_DIR', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
         self.PIANOTEQ_BIN = self._get_config('PIANOTEQ_BIN', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
-        self.PIANOTEQ_DATA_DIR = self._get_config('PIANOTEQ_DATA_DIR', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
-        self.PIANOTEQ_MIDI_MAPPINGS_DIR = self._get_config('PIANOTEQ_MIDI_MAPPINGS_DIR', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
-        self.PIANOTEQ_PREFS_FILE = self._get_config('PIANOTEQ_PREFS_FILE', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
 
         headless_str = self._get_config('PIANOTEQ_HEADLESS', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
         self.PIANOTEQ_HEADLESS = headless_str.lower() == "true"
-
-        self.MIDI_PORT_NAME = self._get_config('MIDI_PORT_NAME', MIDI_SECTION, user_parser, default_parser, user_config_loaded)
-        self.MIDI_MAPPING_NAME = self._get_config('MIDI_MAPPING_NAME', MIDI_SECTION, user_parser, default_parser, user_config_loaded)
-
-        startup_delay_str = self._get_config('MIDI_PIANOTEQ_STARTUP_DELAY', MIDI_SECTION, user_parser, default_parser, user_config_loaded)
-        self.MIDI_PIANOTEQ_STARTUP_DELAY = int(startup_delay_str)
 
         self.SHUTDOWN_COMMAND = self._get_config('SHUTDOWN_COMMAND', SYSTEM_SECTION, user_parser, default_parser, user_config_loaded)
 

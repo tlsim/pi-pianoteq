@@ -1,12 +1,10 @@
 from pi_pianoteq.client.client_api import ClientApi
 from pi_pianoteq.instrument.library import Library
 from pi_pianoteq.instrument.selector import Selector
-from pi_pianoteq.midi.program_change import ProgramChange
 from pi_pianoteq.config.config import Config
 from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
 
 from typing import List
-from time import sleep
 from os import system
 import logging
 
@@ -14,15 +12,14 @@ logger = logging.getLogger(__name__)
 
 class ClientLib(ClientApi):
 
-    def __init__(self, instrument_library: Library, selector: Selector, program_change: ProgramChange, jsonrpc: PianoteqJsonRpc):
-        self.program_change = program_change
+    def __init__(self, instrument_library: Library, selector: Selector, jsonrpc: PianoteqJsonRpc):
+        self.jsonrpc = jsonrpc
         self.instrument_library = instrument_library
         self.selector = selector
         self.on_exit = None
-        sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
-        self.sync_preset(jsonrpc)
+        self.sync_preset()
 
-    def sync_preset(self, jsonrpc: PianoteqJsonRpc) -> None:
+    def sync_preset(self) -> None:
         """
         Sync selector position with Pianoteq's current preset.
 
@@ -31,12 +28,13 @@ class ClientLib(ClientApi):
         """
 
         try:
-            info = jsonrpc.get_info()
+            info = self.jsonrpc.get_info()
             preset_name = info.current_preset.name
 
             if not preset_name:
                 logger.warning("Could not get current preset name from Pianoteq, resetting to first preset")
-                self.program_change.set_preset(self.selector.get_current_preset())
+                preset = self.selector.get_current_preset()
+                self.jsonrpc.load_preset(preset.name)
                 return
 
             logger.info(f"Pianoteq current preset: {preset_name}")
@@ -48,14 +46,17 @@ class ClientLib(ClientApi):
                     logger.info(f"Synced to current preset: {instrument.name} - {preset.name}")
                 else:
                     logger.warning(f"Found preset '{preset_name}' but failed to set position, resetting to first preset")
-                    self.program_change.set_preset(self.selector.get_current_preset())
+                    preset = self.selector.get_current_preset()
+                    self.jsonrpc.load_preset(preset.name)
             else:
                 logger.info(f"Current preset '{preset_name}' not in library, resetting to first preset")
-                self.program_change.set_preset(self.selector.get_current_preset())
+                preset = self.selector.get_current_preset()
+                self.jsonrpc.load_preset(preset.name)
 
         except Exception as e:
             logger.warning(f"Error syncing with Pianoteq: {e}, resetting to first preset")
-            self.program_change.set_preset(self.selector.get_current_preset())
+            preset = self.selector.get_current_preset()
+            self.jsonrpc.load_preset(preset.name)
 
     # Instrument getters
     def get_instruments(self) -> list:
@@ -69,15 +70,18 @@ class ClientLib(ClientApi):
     # Instrument setters
     def set_instrument(self, name) -> None:
         self.selector.set_instrument(name)
-        self.program_change.set_preset(self.selector.get_current_preset())
+        preset = self.selector.get_current_preset()
+        self.jsonrpc.load_preset(preset.name)
 
     def set_instrument_next(self) -> None:
         self.selector.set_instrument_next()
-        self.program_change.set_preset(self.selector.get_current_preset())
+        preset = self.selector.get_current_preset()
+        self.jsonrpc.load_preset(preset.name)
 
     def set_instrument_prev(self) -> None:
         self.selector.set_instrument_prev()
-        self.program_change.set_preset(self.selector.get_current_preset())
+        preset = self.selector.get_current_preset()
+        self.jsonrpc.load_preset(preset.name)
 
     # Preset getters
     def get_presets(self, instrument_name: str) -> list:
@@ -95,18 +99,21 @@ class ClientLib(ClientApi):
         Set specific preset for a specific instrument.
 
         Switches to the instrument if not current, then loads the preset.
-        Uses MIDI Program Change to trigger Pianoteq preset load.
+        Uses JSON-RPC to load the preset in Pianoteq.
         """
         if self.selector.set_preset_by_name(instrument_name, preset_name):
-            self.program_change.set_preset(self.selector.get_current_preset())
+            preset = self.selector.get_current_preset()
+            self.jsonrpc.load_preset(preset.name)
 
     def set_preset_next(self) -> None:
         self.selector.set_preset_next()
-        self.program_change.set_preset(self.selector.get_current_preset())
+        preset = self.selector.get_current_preset()
+        self.jsonrpc.load_preset(preset.name)
 
     def set_preset_prev(self) -> None:
         self.selector.set_preset_prev()
-        self.program_change.set_preset(self.selector.get_current_preset())
+        preset = self.selector.get_current_preset()
+        self.jsonrpc.load_preset(preset.name)
 
     # Utility methods
     def set_on_exit(self, on_exit) -> None:
