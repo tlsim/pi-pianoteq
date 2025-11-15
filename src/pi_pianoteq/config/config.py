@@ -261,6 +261,10 @@ class ConfigLoader:
                 preset = Preset(preset_name, display_name=display_name)
                 instruments_dict[instr_name].add_preset(preset)
 
+            # Add special "Randomised" preset at the end
+            random_preset = Preset(name="__RANDOMISE__", display_name="Randomised")
+            instruments_dict[instr_name].add_preset(random_preset)
+
         result = [instruments_dict[name] for name in preset_order]
         logger.info(f"Discovered {len(result)} instruments from Pianoteq API")
 

@@ -73,6 +73,15 @@ class TestLicenseDetection(unittest.TestCase):
         self.assertEqual(result.error_msg, "Demo")  # Default value
         self.assertEqual(result.addons, [])
 
+    @patch.object(PianoteqJsonRpc, '_call')
+    def test_randomize_parameters(self, mock_call):
+        """Test randomize_parameters calls JSON-RPC method."""
+        mock_call.return_value = None
+
+        self.client.randomize_parameters()
+
+        mock_call.assert_called_once_with('randomizeParameters', [1.0])
+
 
 if __name__ == '__main__':
     unittest.main()
