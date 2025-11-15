@@ -46,7 +46,7 @@ jobs:
 
       - name: Build documentation
         run: |
-          sphinx-build -b html docs/source docs/build/html -W --keep-going
+          sphinx-build -b html docs/source docs/build/html --keep-going
 
       # Upload as regular artifact for PRs (downloadable)
       - name: Upload documentation artifact

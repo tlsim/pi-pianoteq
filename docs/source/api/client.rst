@@ -1,6 +1,6 @@
-==================
+======================
 Client API Reference
-==================
+======================
 
 This page documents the client API interfaces that you'll use when creating a custom client.
 

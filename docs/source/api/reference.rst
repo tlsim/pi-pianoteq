@@ -24,6 +24,7 @@ Client Module
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 .. _client-api-module:
 
@@ -34,6 +35,7 @@ ClientApi Module
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 ClientLib Module
 ================
@@ -52,6 +54,7 @@ Instrument Module
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 .. _preset-module:
 
@@ -62,6 +65,7 @@ Preset Module
    :members:
    :undoc-members:
    :show-inheritance:
+   :no-index:
 
 Library Module
 ==============

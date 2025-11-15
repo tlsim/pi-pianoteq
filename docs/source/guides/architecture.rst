@@ -1,6 +1,6 @@
-====================
+========================
 Architecture Overview
-====================
+========================
 
 This document provides a detailed overview of the pi-pianoteq architecture for developers who want to understand how the system works internally.
 

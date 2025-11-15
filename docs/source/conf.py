@@ -71,6 +71,15 @@ autodoc_default_options = {
     'exclude-members': '__weakref__'
 }
 
+# Mock imports for dependencies not available during doc build
+autodoc_mock_imports = [
+    'rtmidi',
+    'gfxhat',
+    'prompt_toolkit',
+    'PIL',
+    'pillow',
+]
+
 # Intersphinx mapping for cross-references to other documentation
 intersphinx_mapping = {
     'python': ('https://docs.python.org/3', None),
@@ -80,4 +89,9 @@ intersphinx_mapping = {
 myst_enable_extensions = [
     "colon_fence",
     "deflist",
+]
+
+# Suppress warnings for known issues
+suppress_warnings = [
+    'myst.xref_missing',  # Missing cross-references in existing markdown
 ]

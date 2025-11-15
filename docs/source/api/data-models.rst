@@ -1,6 +1,6 @@
-====================
+========================
 Data Models Reference
-====================
+========================
 
 This page documents the data models used in the pi-pianoteq client API.
 
