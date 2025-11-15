@@ -116,7 +116,9 @@ class PianoteqJsonRpc:
             PianoteqJsonRpcError: If the call fails
         """
         logger.debug("Fetching Pianoteq state info")
-        return self._call('getInfo')
+        result = self._call('getInfo')
+        # getInfo returns a list with one element
+        return result[0] if result else {}
 
     def get_activation_info(self) -> Dict:
         """
