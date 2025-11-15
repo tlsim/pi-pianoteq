@@ -95,6 +95,7 @@ pipenv run pytest tests/ -v
 - **Removed**: Removed features
 - Do NOT include internal implementation details ("refactored X", "unified Y architecture")
 - Do NOT include "Changed" entries for WIP code - only for changes between versions
+- Do NOT enumerate test counts or reference GitHub issue numbers
 
 ## Common Tasks
 

@@ -166,3 +166,13 @@ class PianoteqJsonRpc:
         """
         logger.debug(f"Loading preset: {name} (bank: {bank or 'factory'})")
         self._call('loadPreset', [name, bank])
+
+    def quit(self) -> None:
+        """
+        Send quit command to Pianoteq to exit gracefully.
+
+        Raises:
+            PianoteqJsonRpcError: If the call fails
+        """
+        logger.debug("Sending quit command to Pianoteq")
+        self._call('quit')

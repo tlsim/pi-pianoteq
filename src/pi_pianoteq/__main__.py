@@ -1,5 +1,7 @@
 import argparse
+import atexit
 import logging
+import signal
 import sys
 import time
 
@@ -138,6 +140,20 @@ def main():
     pianoteq.start()
 
     jsonrpc = PianoteqJsonRpc()
+    pianoteq.jsonrpc_client = jsonrpc
+
+    # Register cleanup handlers
+    def cleanup_handler(signum=None, frame=None):
+        logger.info("Shutting down pi-pianoteq...")
+        pianoteq.quit()
+        sys.exit(0)
+
+    # Register signal handlers for graceful shutdown
+    signal.signal(signal.SIGTERM, cleanup_handler)
+    signal.signal(signal.SIGINT, cleanup_handler)
+
+    # Register atexit handler for cleanup on normal exit
+    atexit.register(lambda: pianoteq.quit())
     instruments = []
     last_count = 0
     stable_count = 0
@@ -158,7 +174,7 @@ def main():
                 logger.error(f"Failed to connect to API after 8 attempts: {e}")
                 # If we can't connect at all, can't proceed
                 print("ERROR: Could not connect to Pianoteq JSON-RPC API!")
-                pianoteq.terminate()
+                pianoteq.quit()
                 return 1
 
     client.show_loading_message("Loading...")
@@ -182,7 +198,7 @@ def main():
         logger.error("  2. Pianoteq's --serve flag didn't enable the JSON-RPC server")
         logger.error("  3. No instruments are licensed (all show as 'demo' status)")
         logger.error("Please check the logs for error messages.")
-        pianoteq.terminate()
+        pianoteq.quit()
         return 1
 
     # Build library with discovered instruments (already grouped with presets)
@@ -217,7 +233,7 @@ def main():
     # Provide API and start normal operation
     client.set_api(client_lib)
     client.start()
-    pianoteq.terminate()
+    pianoteq.quit()
 
     return 0
 
