@@ -8,26 +8,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
-- CLI client preset menu (press 'p' to open)
-  - Access from main display to browse current instrument's presets
-  - Access from instrument menu to browse any instrument's presets before switching
-  - Current preset automatically highlighted when viewing current instrument
-- CLI client search functionality (press '/' to search)
-  - Search instruments from instrument menu
-  - Search presets from preset menu
-  - Combined search from main display (searches both instruments and presets)
-  - Real-time filtering as you type
-  - Case-insensitive substring matching
-- Preset selection menu for GFX HAT (long press ENTER to open)
-  - Access from main display to browse current instrument's presets
-  - Access from instrument menu to browse any instrument's presets before switching
-  - Current preset automatically highlighted when viewing current instrument
-  - Menu headings distinguish instrument menu ("Select Instrument:") from preset menu ("Select Preset:")
-- Button suppression window to prevent accidental menu activation when navigating with arrow buttons
+- CLI client improvements
+  - Preset menu (press 'p' to open)
+    - Access from main display to browse current instrument's presets
+    - Access from instrument menu to browse any instrument's presets before switching
+    - Current preset automatically highlighted when viewing current instrument
+  - Search functionality (press '/' to search)
+    - Search instruments from instrument menu
+    - Search presets from preset menu
+    - Combined search from main display (searches both instruments and presets)
+    - Real-time filtering as you type
+    - Case-insensitive substring matching
+  - Dynamic menu sizing: menus adapt to terminal height automatically
+  - Log line truncation during loading to prevent horizontal overflow
+- GFX HAT improvements
+  - Preset selection menu (long press ENTER to open)
+    - Access from main display to browse current instrument's presets
+    - Access from instrument menu to browse any instrument's presets before switching
+    - Current preset automatically highlighted when viewing current instrument
+    - Menu headings distinguish instrument menu ("Select Instrument:") from preset menu ("Select Preset:")
+  - Button suppression window to prevent accidental menu activation when navigating with arrow buttons
 - Comprehensive test suite covering all client and process functionality
 - Startup preset sync: matches Pianoteq's current preset instead of always resetting to first
-- Dynamic menu sizing: CLI menus adapt to terminal height automatically
-- Log line truncation during loading to prevent horizontal overflow
 
 ### Changed
 - Preset display names now use longest common word prefix of preset names instead of instrument "instr" field
