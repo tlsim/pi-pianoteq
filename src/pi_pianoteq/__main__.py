@@ -38,7 +38,6 @@ def show_config():
     configs = [
         ("PIANOTEQ_DIR", Config.PIANOTEQ_DIR),
         ("PIANOTEQ_BIN", Config.PIANOTEQ_BIN),
-        ("PIANOTEQ_DATA_DIR", Config.PIANOTEQ_DATA_DIR),
         ("PIANOTEQ_HEADLESS", Config.PIANOTEQ_HEADLESS),
         ("SHUTDOWN_COMMAND", Config.SHUTDOWN_COMMAND),
     ]

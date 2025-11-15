@@ -172,7 +172,6 @@ class ConfigLoader:
         # Load each config value with priority: env var > user config > default
         self.PIANOTEQ_DIR = self._get_config('PIANOTEQ_DIR', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
         self.PIANOTEQ_BIN = self._get_config('PIANOTEQ_BIN', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
-        self.PIANOTEQ_DATA_DIR = self._get_config('PIANOTEQ_DATA_DIR', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
 
         headless_str = self._get_config('PIANOTEQ_HEADLESS', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
         self.PIANOTEQ_HEADLESS = headless_str.lower() == "true"

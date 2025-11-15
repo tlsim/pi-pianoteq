@@ -21,7 +21,6 @@ def temp_config_file():
         f.write("""[Pianoteq]
 PIANOTEQ_DIR = /custom/pianoteq/dir/
 PIANOTEQ_BIN = Custom Pianoteq
-PIANOTEQ_DATA_DIR = /custom/data/
 PIANOTEQ_HEADLESS = true
 
 [System]
@@ -94,14 +93,12 @@ def test_partial_user_config_merges_with_default(partial_config_file):
     assert config.PIANOTEQ_BIN == 'Partial Pianoteq'
 
     # Values should fall back to default
-    assert config.PIANOTEQ_DATA_DIR is not None  # From default
     assert config.SHUTDOWN_COMMAND is not None  # From default
 
     # Check sources
     sources = config.get_config_sources()
     assert sources['PIANOTEQ_DIR'] == 'user_config'
     assert sources['PIANOTEQ_BIN'] == 'user_config'
-    assert sources['PIANOTEQ_DATA_DIR'] == 'bundled_default'
     assert sources['SHUTDOWN_COMMAND'] == 'bundled_default'
 
 
