@@ -362,22 +362,37 @@ def test_discover_instruments_adds_randomised_preset():
             name="Grand K2 Bright",
             instr="Grand K2",
             instrument_class="Acoustic Piano",
+            collection="",
+            license="",
             license_status="ok",
-            tags=[]
+            author="",
+            bank="",
+            comment="",
+            file=""
         ),
         PresetInfo(
             name="Grand K2 Warm",
             instr="Grand K2",
             instrument_class="Acoustic Piano",
+            collection="",
+            license="",
             license_status="ok",
-            tags=[]
+            author="",
+            bank="",
+            comment="",
+            file=""
         ),
         PresetInfo(
             name="Clavinet D6 Funky",
             instr="Clavinet D6",
             instrument_class="Electric Piano",
+            collection="",
+            license="",
             license_status="ok",
-            tags=[]
+            author="",
+            bank="",
+            comment="",
+            file=""
         ),
     ]
     mock_rpc.get_presets.return_value = mock_presets
