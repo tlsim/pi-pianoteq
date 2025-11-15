@@ -135,7 +135,7 @@ For developers who want to build and deploy to a remote Pi, see [docs/developmen
 
 ## Disclaimer
 
-This is an independent project and is not affiliated with, endorsed by, or sponsored by Modartt (the creators of Pianoteq). Pianoteq is a registered trademark of Modartt. This software interacts with Pianoteq via standard MIDI protocols.
+This is an independent project and is not affiliated with, endorsed by, or sponsored by Modartt (the creators of Pianoteq). Pianoteq is a registered trademark of Modartt. This software interacts with Pianoteq via its JSON-RPC API.
 
 ## Requirements
 
