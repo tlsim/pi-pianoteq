@@ -25,7 +25,6 @@ Why Use This Instead of Direct JSON-RPC?
 7. **Shortened preset names** - Removes instrument prefix for cleaner display on small screens (e.g., "Classical" instead of "D4 Grand Piano Classical")
 8. **Preset grouping** - Presets organized by instrument, not a flat list
 9. **UI theming** - Built-in instrument colors for display customization
-10. **Lifecycle hooks** - Clean shutdown with exit callbacks
 
 **Example comparison:**
 
