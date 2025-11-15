@@ -22,8 +22,8 @@ Why Use This Instead of Direct JSON-RPC?
 4. **Pure Python API** - Simple method calls instead of JSON-RPC requests
 5. **MIDI abstraction** - Sends MIDI Program Change messages automatically (no MIDI library needed)
 6. **Typed data models** - Work with ``Instrument`` and ``Preset`` objects instead of raw JSON dictionaries
-7. **Navigation state** - Circular navigation with automatic current selection tracking
-8. **Preset organization** - Automatic grouping by instrument with shortened display names
+7. **Shortened preset names** - Removes instrument prefix for cleaner display on small screens (e.g., "Classical" instead of "D4 Grand Piano Classical")
+8. **Preset grouping** - Presets organized by instrument, not a flat list
 9. **UI theming** - Built-in instrument colors for display customization
 10. **Lifecycle hooks** - Clean shutdown with exit callbacks
 
