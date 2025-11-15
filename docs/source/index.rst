@@ -68,7 +68,6 @@ Quick Start
    :caption: Reference
 
    reference/development
-   reference/pianoteq-api
    reference/systemd
 
 How It Works
