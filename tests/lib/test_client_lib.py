@@ -27,14 +27,6 @@ class ClientLibSyncTestCase(unittest.TestCase):
         self.jsonrpc = Mock()
 
     @patch('pi_pianoteq.lib.client_lib.sleep')
-    def test_sync_with_none_jsonrpc_resets_to_first(self, mock_sleep):
-        client_lib = ClientLib(self.library, self.selector, self.program_change, jsonrpc=None)
-
-        self.program_change.set_preset.assert_called_once()
-        called_preset = self.program_change.set_preset.call_args[0][0]
-        self.assertEqual(self.preset1a.name, called_preset.name)
-
-    @patch('pi_pianoteq.lib.client_lib.sleep')
     def test_sync_with_matching_preset_syncs_position(self, mock_sleep):
         self.jsonrpc.get_info.return_value = {
             'current_preset': {

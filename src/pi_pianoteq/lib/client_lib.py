@@ -3,27 +3,25 @@ from pi_pianoteq.instrument.library import Library
 from pi_pianoteq.instrument.selector import Selector
 from pi_pianoteq.midi.program_change import ProgramChange
 from pi_pianoteq.config.config import Config
+from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
 
-from typing import List, Optional, TYPE_CHECKING
+from typing import List
 from time import sleep
 from os import system
 import logging
-
-if TYPE_CHECKING:
-    from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
 
 logger = logging.getLogger(__name__)
 
 class ClientLib(ClientApi):
 
-    def __init__(self, instrument_library: Library, selector: Selector, program_change: ProgramChange, jsonrpc: Optional['PianoteqJsonRpc'] = None):
+    def __init__(self, instrument_library: Library, selector: Selector, program_change: ProgramChange, jsonrpc: PianoteqJsonRpc):
         self.program_change = program_change
         self.instrument_library = instrument_library
         self.selector = selector
         self.on_exit = None
         self.sync_with_pianoteq(jsonrpc)
 
-    def sync_with_pianoteq(self, jsonrpc: Optional['PianoteqJsonRpc']) -> None:
+    def sync_with_pianoteq(self, jsonrpc: PianoteqJsonRpc) -> None:
         """
         Sync selector state with Pianoteq's current preset.
 
@@ -31,11 +29,6 @@ class ClientLib(ClientApi):
         Otherwise, reset to the first preset (old behavior).
         """
         sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
-
-        if jsonrpc is None:
-            logger.warning("No JSON-RPC client provided, resetting to first preset")
-            self.program_change.set_preset(self.selector.get_current_preset())
-            return
 
         try:
             info = jsonrpc.get_info()
