@@ -145,6 +145,26 @@ class CliClient(Client):
         # Trigger redraw
         self.application.invalidate()
 
+    def _calculate_menu_visible_items(self) -> int:
+        """Calculate how many menu items can fit based on terminal height"""
+        try:
+            terminal_height = os.get_terminal_size().lines
+        except (OSError, AttributeError):
+            return 10  # Default if can't detect terminal size
+
+        # Account for UI elements:
+        # - Frame top/bottom: 2 lines
+        # - Title: 1 line
+        # - Header newline: 1 line
+        # - Scroll indicator (top): 1 line
+        # - Scroll indicator (bottom): 1 line
+        # - Footer newline: 1 line
+        # - Controls section: 6 lines (varies, but average)
+        reserved_lines = 13
+
+        available_lines = terminal_height - reserved_lines
+        return max(5, available_lines)  # At least 5 items visible
+
     def _build_normal_layout(self):
         """Build the normal interactive layout (requires API)"""
         # State management
@@ -155,7 +175,6 @@ class CliClient(Client):
         self.preset_names = []
         self.current_menu_index = 0
         self.menu_scroll_offset = 0
-        self.menu_visible_items = 10
 
         # Search manager
         self.search_manager = SearchManager(self.api)
@@ -411,15 +430,18 @@ class CliClient(Client):
         else:
             menu_items = self.instrument_names
 
+        # Calculate visible items based on current terminal size
+        menu_visible_items = self._calculate_menu_visible_items()
+
         # Keep selected item in the middle of the visible area when possible
-        mid_point = self.menu_visible_items // 2
+        mid_point = menu_visible_items // 2
 
         if self.current_menu_index < mid_point:
             # Near the top
             self.menu_scroll_offset = 0
         elif self.current_menu_index >= len(menu_items) - mid_point:
             # Near the bottom
-            self.menu_scroll_offset = max(0, len(menu_items) - self.menu_visible_items)
+            self.menu_scroll_offset = max(0, len(menu_items) - menu_visible_items)
         else:
             # Middle - center the selection
             self.menu_scroll_offset = self.current_menu_index - mid_point
@@ -481,9 +503,12 @@ class CliClient(Client):
         """Generate instrument menu display using formatted text tuples"""
         lines = [('', '\n')]
 
+        # Calculate visible items based on current terminal size
+        menu_visible_items = self._calculate_menu_visible_items()
+
         # Calculate visible range
         start_idx = self.menu_scroll_offset
-        end_idx = min(start_idx + self.menu_visible_items, len(self.instrument_names))
+        end_idx = min(start_idx + menu_visible_items, len(self.instrument_names))
 
         # Add scroll indicator if needed
         if start_idx > 0:
@@ -508,7 +533,7 @@ class CliClient(Client):
         if start_idx > 0:
             displayed_items += 1  # Account for "..." line
 
-        for _ in range(self.menu_visible_items - displayed_items):
+        for _ in range(menu_visible_items - displayed_items):
             lines.append(('', '\n'))
 
         # Add scroll indicator at bottom if needed
@@ -537,9 +562,12 @@ class CliClient(Client):
         # Get presets with display names
         presets = self.api.get_presets(self.preset_menu_instrument)
 
+        # Calculate visible items based on current terminal size
+        menu_visible_items = self._calculate_menu_visible_items()
+
         # Calculate visible range
         start_idx = self.menu_scroll_offset
-        end_idx = min(start_idx + self.menu_visible_items, len(presets))
+        end_idx = min(start_idx + menu_visible_items, len(presets))
 
         # Add scroll indicator if needed
         if start_idx > 0:
@@ -564,7 +592,7 @@ class CliClient(Client):
         if start_idx > 0:
             displayed_items += 1  # Account for "..." line
 
-        for _ in range(self.menu_visible_items - displayed_items):
+        for _ in range(menu_visible_items - displayed_items):
             lines.append(('', '\n'))
 
         # Add scroll indicator at bottom if needed
@@ -603,9 +631,12 @@ class CliClient(Client):
         else:
             lines.append(('ansigray', f'  {result_count} result(s)\n'))
 
+        # Calculate visible items based on current terminal size
+        menu_visible_items = self._calculate_menu_visible_items()
+
         # Calculate visible range
         start_idx = self.menu_scroll_offset
-        end_idx = min(start_idx + self.menu_visible_items, len(self.search_manager.filtered_items))
+        end_idx = min(start_idx + menu_visible_items, len(self.search_manager.filtered_items))
 
         # Add scroll indicator if needed
         if start_idx > 0:
@@ -635,7 +666,7 @@ class CliClient(Client):
         if start_idx > 0:
             displayed_items += 1  # Account for "..." line
 
-        for _ in range(self.menu_visible_items - displayed_items):
+        for _ in range(menu_visible_items - displayed_items):
             lines.append(('', '\n'))
 
         # Add scroll indicator at bottom if needed
