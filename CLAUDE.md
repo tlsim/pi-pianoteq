@@ -66,12 +66,9 @@ pipenv run pytest tests/ -v
 - GFX HAT and CLI clients follow parallel patterns (LoadingDisplay, get_display(), etc.)
 
 ### Type Safety
-- **JSON-RPC responses**: Use typed dataclasses (defined in `rpc/types.py`), NOT `Dict`
-  - When adding new JSON-RPC methods, create corresponding dataclass types
-  - Use `@dataclass` with type hints for all fields
-  - Provide `from_dict()` class method for complex nested structures
+- **JSON-RPC responses**: Use typed dataclasses in `rpc/types.py`, NOT `Dict`
   - Example: `get_presets() -> List[PresetInfo]` not `-> List[Dict]`
-- This provides IDE autocomplete, type checking, and self-documenting code
+  - Provide `from_dict()` for nested structures
 
 ### Error Handling
 - Use logger for errors/warnings, not print() statements (except for user-facing CLI output)
