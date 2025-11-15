@@ -307,6 +307,7 @@ class CliClient(Client):
             def kb_char(event, c=char):
                 self.search_manager.set_query(self.search_manager.query + c)
                 self.current_menu_index = 0
+                self._update_scroll_offset()
                 self._update_display()
 
         # Backspace in search mode
@@ -315,11 +316,13 @@ class CliClient(Client):
             if self.search_manager.is_active() and self.search_manager.query:
                 self.search_manager.set_query(self.search_manager.query[:-1])
                 self.current_menu_index = 0
+                self._update_scroll_offset()
                 self._update_display()
             elif self.search_manager.is_active() and not self.search_manager.query:
                 # Exit search mode if query is empty
                 self.search_manager.exit_search()
                 self.current_menu_index = 0
+                self._update_scroll_offset()
                 self._update_display()
 
         # Select instrument/preset in menu mode
