@@ -65,6 +65,14 @@ pipenv run pytest tests/ -v
 - Loading mode allows display before API availability
 - GFX HAT and CLI clients follow parallel patterns (LoadingDisplay, get_display(), etc.)
 
+### Type Safety
+- **JSON-RPC responses**: Use typed dataclasses (defined in `rpc/types.py`), NOT `Dict`
+  - When adding new JSON-RPC methods, create corresponding dataclass types
+  - Use `@dataclass` with type hints for all fields
+  - Provide `from_dict()` class method for complex nested structures
+  - Example: `get_presets() -> List[PresetInfo]` not `-> List[Dict]`
+- This provides IDE autocomplete, type checking, and self-documenting code
+
 ### Error Handling
 - Use logger for errors/warnings, not print() statements (except for user-facing CLI output)
 - CLI mode uses buffered logging to avoid breaking the UI
@@ -143,6 +151,7 @@ Release notes format:
 
 - `src/pi_pianoteq/client/` - Client implementations (GFX HAT, CLI)
 - `src/pi_pianoteq/rpc/jsonrpc_client.py` - Pianoteq JSON-RPC wrapper
+- `src/pi_pianoteq/rpc/types.py` - Typed dataclasses for JSON-RPC responses
 - `src/pi_pianoteq/config/config.py` - Configuration and instrument discovery
 - `src/pi_pianoteq/__main__.py` - Main entry point with loading sequence
 - `deploy.sh` - Deployment script (reads `deploy.conf` for Pi connection details)
