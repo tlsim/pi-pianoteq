@@ -245,7 +245,7 @@ class ConfigLoader:
                 continue
 
             if instr_name not in instruments_dict:
-                category = map_instrument_to_category(instr_name, preset_data.class_)
+                category = map_instrument_to_category(instr_name, preset_data.instrument_class)
                 primary, secondary = COLOR_CATEGORIES[category]
 
                 instrument = Instrument(

@@ -15,7 +15,7 @@ class PresetInfo:
     """
     name: str
     instr: str
-    class_: str  # Renamed from 'class' (Python keyword)
+    instrument_class: str
     collection: str
     license: str
     license_status: str  # "ok" or "demo"
@@ -27,10 +27,10 @@ class PresetInfo:
     @classmethod
     def from_dict(cls, data: Dict) -> 'PresetInfo':
         """Create PresetInfo from API response dict."""
-        # Map 'class' to 'class_'
+        # Map 'class' to 'instrument_class'
         data_copy = data.copy()
         if 'class' in data_copy:
-            data_copy['class_'] = data_copy.pop('class')
+            data_copy['instrument_class'] = data_copy.pop('class')
         return cls(**data_copy)
 
 
