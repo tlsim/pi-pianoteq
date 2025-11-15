@@ -23,6 +23,9 @@ PIANOTEQ_DIR = /custom/pianoteq/dir/
 PIANOTEQ_BIN = Custom Pianoteq
 PIANOTEQ_HEADLESS = true
 
+[Client]
+CLIENT = cli
+
 [System]
 SHUTDOWN_COMMAND = custom shutdown command
 """)
@@ -346,3 +349,42 @@ def test_init_user_config_creates_file(tmp_path):
         # If not successful, it already existed
         assert USER_CONFIG_PATH.exists()
         assert "already exists" in message
+
+
+def test_client_config_option(temp_config_file):
+    """Test that CLIENT config option is loaded correctly"""
+    config = ConfigLoader(config_path=temp_config_file)
+
+    # temp_config_file sets CLIENT = cli
+    assert config.CLIENT == 'cli'
+
+    # Check source
+    sources = config.get_config_sources()
+    assert sources['CLIENT'] == 'user_config'
+
+
+def test_client_config_defaults_to_gfxhat():
+    """Test that CLIENT config defaults to gfxhat when not specified"""
+    config = ConfigLoader(config_path=Path('/nonexistent/config.conf'))
+
+    # Should fall back to bundled default (gfxhat)
+    assert config.CLIENT == 'gfxhat'
+
+    sources = config.get_config_sources()
+    assert sources['CLIENT'] == 'bundled_default'
+
+
+def test_client_config_env_override(temp_config_file):
+    """Test that CLIENT environment variable overrides config file"""
+    os.environ['CLIENT'] = 'custom_client'
+
+    try:
+        config = ConfigLoader(config_path=temp_config_file)
+
+        # Env var should override user config
+        assert config.CLIENT == 'custom_client'
+
+        sources = config.get_config_sources()
+        assert sources['CLIENT'] == 'environment'
+    finally:
+        del os.environ['CLIENT']

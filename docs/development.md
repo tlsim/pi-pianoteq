@@ -131,10 +131,77 @@ You can test commands without deploying:
 ```bash
 pipenv run pi-pianoteq --show-config
 pipenv run pi-pianoteq --init-config
-pipenv run pi-pianoteq --cli  # Run CLI client for local testing
+pipenv run pi-pianoteq --client cli  # Run CLI client for local testing
 ```
 
-**Note:** Full testing requires hardware (MIDI, gfxhat) which may not be available on your dev machine. Use `--cli` flag to run the CLI client for testing without the GFX HAT.
+**Note:** Full testing requires hardware (MIDI, gfxhat) which may not be available on your dev machine. Use `--client cli` to run the CLI client for testing without the GFX HAT.
+
+## Using Custom Clients
+
+Pi-Pianoteq supports both built-in clients (gfxhat, cli) and external custom clients.
+
+### Command Line Override
+
+Run with a specific client:
+
+```bash
+pipenv run pi-pianoteq --client cli
+pipenv run pi-pianoteq --client gfxhat
+pipenv run pi-pianoteq --client mypackage.myclient:MyClient
+```
+
+### Set Default Client
+
+Edit your config file to set a default client:
+
+```bash
+pipenv run pi-pianoteq --init-config  # If you haven't already
+nano ~/.config/pi_pianoteq/pi_pianoteq.conf
+```
+
+Add or update the `[Client]` section:
+
+```ini
+[Client]
+CLIENT = cli
+```
+
+Or use an external client:
+
+```ini
+[Client]
+CLIENT = mypackage.myclient:MyClient
+```
+
+### List Available Clients
+
+To see all built-in clients:
+
+```bash
+pipenv run pi-pianoteq --list-clients
+```
+
+### Systemd Service
+
+To use a specific client with the systemd service, edit the service file:
+
+```bash
+sudo systemctl edit pi-pianoteq.service --full
+```
+
+Update the `ExecStart` line to specify the client:
+
+```ini
+[Service]
+ExecStart=/home/pi/pi-pianoteq-venv/bin/pi-pianoteq --client cli
+```
+
+Then reload and restart:
+
+```bash
+sudo systemctl daemon-reload
+sudo systemctl restart pi-pianoteq.service
+```
 
 ## What deploy.sh Does
 
