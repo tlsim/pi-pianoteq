@@ -5,7 +5,6 @@ from pi_pianoteq.config.config import Config
 from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
 
 from typing import List
-from time import sleep
 from os import system
 import logging
 
@@ -18,7 +17,6 @@ class ClientLib(ClientApi):
         self.instrument_library = instrument_library
         self.selector = selector
         self.on_exit = None
-        sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
         self.sync_preset()
 
     def sync_preset(self) -> None:
