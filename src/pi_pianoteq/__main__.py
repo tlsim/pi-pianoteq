@@ -19,23 +19,29 @@ logger = logging.getLogger(__name__)
 
 def list_clients():
     """Display available built-in clients"""
-    from pi_pianoteq.client.discovery import discover_builtin_clients, get_client_info
+    from pi_pianoteq.client.discovery import discover_builtin_clients_with_errors, get_client_info
 
-    print("Available built-in clients:")
+    available, unavailable = discover_builtin_clients_with_errors()
+
+    print("Built-in clients:")
     print()
 
-    clients = discover_builtin_clients()
-    for name, client_class in sorted(clients.items()):
-        info = get_client_info(client_class)
-        print(f"  {name:12} - {info.get('description', 'No description')}")
+    # Show available clients
+    if available:
+        for name, client_class in sorted(available.items()):
+            info = get_client_info(client_class)
+            print(f"  {name:12} - {info.get('description', 'No description')}")
 
-    if not clients:
-        print("  No clients found (all clients have missing dependencies)")
+    # Show unavailable clients with reasons
+    if unavailable:
+        if available:
+            print()
+        for name, error in sorted(unavailable.items()):
+            print(f"  {name:12} - [unavailable: {error}]")
 
-    print()
-    print("Note: Only clients with satisfied dependencies are shown.")
-    print("      Install hardware dependencies to see additional clients.")
-    print("      (e.g., gfxhat requires python3-smbus)")
+    if not available and not unavailable:
+        print("  No clients found")
+
     print()
     print("Usage:")
     print(f"  pi-pianoteq --client <name>")

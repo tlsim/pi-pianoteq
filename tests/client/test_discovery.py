@@ -2,6 +2,7 @@
 import pytest
 from pi_pianoteq.client.discovery import (
     discover_builtin_clients,
+    discover_builtin_clients_with_errors,
     get_client_info,
     load_client
 )
@@ -101,3 +102,37 @@ class TestLoadClient:
         # Missing colon
         with pytest.raises(ValueError):
             load_client('some_invalid_spec_without_colon')
+
+
+class TestDiscoverBuiltinClientsWithErrors:
+    """Test client discovery with error tracking"""
+
+    def test_discovers_both_available_and_unavailable(self):
+        """Test that both available and unavailable clients are discovered"""
+        available, unavailable = discover_builtin_clients_with_errors()
+
+        # In test environment (with mocked gfxhat), both should be available
+        assert 'cli' in available
+        assert 'gfxhat' in available
+
+    def test_returns_tuple_of_dicts(self):
+        """Test that function returns tuple of two dicts"""
+        result = discover_builtin_clients_with_errors()
+        assert isinstance(result, tuple)
+        assert len(result) == 2
+        available, unavailable = result
+        assert isinstance(available, dict)
+        assert isinstance(unavailable, dict)
+
+    def test_available_clients_are_client_subclasses(self):
+        """Test that all available clients are Client subclasses"""
+        available, _ = discover_builtin_clients_with_errors()
+        for name, client_class in available.items():
+            assert issubclass(client_class, Client)
+
+    def test_unavailable_clients_have_error_messages(self):
+        """Test that unavailable clients have error message strings"""
+        _, unavailable = discover_builtin_clients_with_errors()
+        for name, error_msg in unavailable.items():
+            assert isinstance(error_msg, str)
+            assert len(error_msg) > 0
