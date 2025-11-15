@@ -15,6 +15,7 @@ logger = logging.getLogger(__name__)
 CONFIG_FILE = 'pi_pianoteq.conf'
 PTQ_SECTION = 'Pianoteq'
 MIDI_SECTION = 'Midi'
+CLIENT_SECTION = 'Client'
 SYSTEM_SECTION = 'System'
 
 # Config file locations (in priority order: user config > bundled default)
@@ -175,6 +176,8 @@ class ConfigLoader:
 
         headless_str = self._get_config('PIANOTEQ_HEADLESS', PTQ_SECTION, user_parser, default_parser, user_config_loaded)
         self.PIANOTEQ_HEADLESS = headless_str.lower() == "true"
+
+        self.CLIENT = self._get_config('CLIENT', CLIENT_SECTION, user_parser, default_parser, user_config_loaded)
 
         self.SHUTDOWN_COMMAND = self._get_config('SHUTDOWN_COMMAND', SYSTEM_SECTION, user_parser, default_parser, user_config_loaded)
 

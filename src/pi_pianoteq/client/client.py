@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import Optional
+import logging
 
 from pi_pianoteq.client.client_api import ClientApi
 
@@ -39,5 +40,16 @@ class Client(ABC):
         """
         Start normal client operation.
         Called after set_api().
+        """
+        raise NotImplemented
+
+    @abstractmethod
+    def get_logging_handler(self) -> Optional[logging.Handler]:
+        """
+        Return logging handler to use for this client.
+
+        Returns None to use default stdout/stderr handlers.
+        CLI client returns BufferedLoggingHandler for UI display.
+        GFX HAT client returns None for default behavior.
         """
         raise NotImplemented
