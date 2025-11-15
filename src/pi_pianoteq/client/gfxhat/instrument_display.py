@@ -89,30 +89,30 @@ class InstrumentDisplay:
 
     def get_handler(self):
         def handler(ch, event):
-            if event == 'press':
+            if event == 'press' or event == 'held':
                 if ch == touch.DOWN:
                     self.suppression.record()
                     self.api.set_preset_next()
-                if ch == touch.UP:
+                    self.update_display()
+                elif ch == touch.UP:
                     self.suppression.record()
                     self.api.set_preset_prev()
-                if ch == touch.LEFT:
+                    self.update_display()
+                elif ch == touch.LEFT:
                     self.suppression.record()
                     self.api.set_instrument_prev()
-                if ch == touch.RIGHT:
+                    self.update_display()
+                elif ch == touch.RIGHT:
                     self.suppression.record()
                     self.api.set_instrument_next()
-
-                self.update_display()
+                    self.update_display()
+                elif event == 'held' and ch == touch.ENTER:
+                    self.on_enter_preset_menu()
 
             elif event == 'release':
                 if ch == touch.ENTER:
                     if self.suppression.allow_action():
                         self.on_enter()
-
-            elif event == 'held':
-                if ch == touch.ENTER:
-                    self.on_enter_preset_menu()
 
         return handler
 

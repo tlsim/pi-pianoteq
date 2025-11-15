@@ -112,8 +112,8 @@ class MenuDisplay:
 
     def get_handler(self):
         def handler(ch, event):
-            if event == 'press':
-                if ch == touch.BACK:
+            if event == 'press' or event == 'held':
+                if ch == touch.BACK and event == 'press':
                     self.current_menu_option = self.selected_menu_option
                     self.on_exit()
                     return
@@ -123,13 +123,13 @@ class MenuDisplay:
                 if ch == touch.UP:
                     self.suppression.record()
                     self.current_menu_option -= 1
-                if ch == touch.DOWN:
+                elif ch == touch.DOWN:
                     self.suppression.record()
                     self.current_menu_option += 1
-                if ch == touch.LEFT:
+                elif ch == touch.LEFT:
                     self.suppression.record()
                     self.current_menu_option -= 1
-                if ch == touch.RIGHT:
+                elif ch == touch.RIGHT:
                     self.suppression.record()
                     self.current_menu_option += 1
 
