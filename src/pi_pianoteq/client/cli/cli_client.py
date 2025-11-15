@@ -1,16 +1,18 @@
 from prompt_toolkit.application import Application
 from prompt_toolkit.key_binding import KeyBindings
 from prompt_toolkit.layout import Layout
-from prompt_toolkit.layout.containers import HSplit, Window, VSplit
+from prompt_toolkit.layout.containers import HSplit, Window
 from prompt_toolkit.layout.controls import FormattedTextControl
 from prompt_toolkit.widgets import Frame
-from prompt_toolkit.output import Output
+from prompt_toolkit.filters import Condition
 from typing import Optional
 import threading
 import os
 
 from pi_pianoteq.client.client import Client
 from pi_pianoteq.client.client_api import ClientApi
+from pi_pianoteq.client.cli.search_manager import SearchManager
+from pi_pianoteq.client.cli import cli_display
 from pi_pianoteq.logging.logging_config import BufferedLoggingHandler
 
 
@@ -112,19 +114,29 @@ class CliClient(Client):
         if not messages:
             return [('ansigray', '  Initializing...\n')]
 
-        # Calculate how many lines can fit on screen
-        # Terminal height minus loading message area (6 lines) minus frame (3 lines) minus padding
+        # Calculate terminal dimensions
         try:
-            terminal_height = os.get_terminal_size().lines
+            terminal_size = os.get_terminal_size()
+            terminal_height = terminal_size.lines
+            terminal_width = terminal_size.columns
             max_log_lines = max(10, terminal_height - 12)  # At least 10, otherwise height - 12
         except (OSError, AttributeError):
             max_log_lines = 20  # Default if can't detect terminal size
+            terminal_width = 80  # Default width
 
-        # Return last N messages that fit
+        # Account for frame borders (2 chars), padding (2 chars for "  "), and safety margin
+        max_line_width = terminal_width - 6
+
+        # Return last N messages that fit, truncating if needed
         lines = []
         visible_messages = messages[-max_log_lines:]
         for msg in visible_messages:
-            lines.append(('ansibrightblack', f'  {msg}\n'))
+            # Truncate message if too long
+            if len(msg) > max_line_width:
+                truncated_msg = msg[:max_line_width - 3] + '...'
+            else:
+                truncated_msg = msg
+            lines.append(('ansibrightblack', f'  {truncated_msg}\n'))
         return lines
 
     def set_api(self, api: ClientApi):
@@ -146,10 +158,15 @@ class CliClient(Client):
         """Build the normal interactive layout (requires API)"""
         # State management
         self.menu_mode = False
+        self.preset_menu_mode = False
+        self.preset_menu_instrument = None
         self.instrument_names = [i.name for i in self.api.get_instruments()]
+        self.preset_names = []
         self.current_menu_index = 0
         self.menu_scroll_offset = 0
-        self.menu_visible_items = 10
+
+        # Search manager
+        self.search_manager = SearchManager(self.api)
 
         # Set initial menu index to current instrument
         current_instrument = self.api.get_current_instrument()
@@ -180,7 +197,17 @@ class CliClient(Client):
         @kb.add('c-c')
         @kb.add('q')
         def kb_exit(event):
-            if self.menu_mode:
+            if self.search_manager.is_active():
+                # Exit search mode
+                self.search_manager.exit_search()
+                self.current_menu_index = 0
+                self._update_display()
+            elif self.preset_menu_mode:
+                # Exit preset menu mode
+                self.preset_menu_mode = False
+                self.preset_menu_instrument = None
+                self._update_display()
+            elif self.menu_mode:
                 # Exit menu mode
                 self.menu_mode = False
                 self._update_display()
@@ -190,7 +217,15 @@ class CliClient(Client):
 
         @kb.add('escape')
         def kb_escape(event):
-            if self.menu_mode:
+            if self.search_manager.is_active():
+                self.search_manager.exit_search()
+                self.current_menu_index = 0
+                self._update_display()
+            elif self.preset_menu_mode:
+                self.preset_menu_mode = False
+                self.preset_menu_instrument = None
+                self._update_display()
+            elif self.menu_mode:
                 self.menu_mode = False
                 self._update_display()
 
@@ -198,7 +233,7 @@ class CliClient(Client):
         @kb.add('up')
         @kb.add('c-p')
         def kb_up(event):
-            if self.menu_mode:
+            if self.search_manager.is_active() or self.preset_menu_mode or self.menu_mode:
                 self._menu_prev()
             else:
                 self.api.set_preset_prev()
@@ -207,7 +242,7 @@ class CliClient(Client):
         @kb.add('down')
         @kb.add('c-n')
         def kb_down(event):
-            if self.menu_mode:
+            if self.search_manager.is_active() or self.preset_menu_mode or self.menu_mode:
                 self._menu_next()
             else:
                 self.api.set_preset_next()
@@ -216,22 +251,21 @@ class CliClient(Client):
         @kb.add('left')
         @kb.add('c-b')
         def kb_left(event):
-            if not self.menu_mode:
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active():
                 self.api.set_instrument_prev()
                 self._update_display()
 
         @kb.add('right')
         @kb.add('c-f')
         def kb_right(event):
-            if not self.menu_mode:
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active():
                 self.api.set_instrument_next()
                 self._update_display()
 
         # Enter instrument menu
         @kb.add('i')
-        @kb.add('c-i')
         def kb_menu(event):
-            if not self.menu_mode:
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active():
                 self.menu_mode = True
                 # Set menu index to current instrument
                 current_instrument = self.api.get_current_instrument()
@@ -242,10 +276,89 @@ class CliClient(Client):
                     pass
                 self._update_display()
 
-        # Select instrument in menu mode
+        # Enter preset menu for current instrument
+        @kb.add('p')
+        def kb_preset_menu(event):
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active():
+                # Open preset menu for current instrument
+                current_instrument = self.api.get_current_instrument()
+                self._open_preset_menu(current_instrument.name)
+            elif self.menu_mode and not self.search_manager.is_active():
+                # Open preset menu for selected instrument in instrument menu
+                selected_instrument = self.instrument_names[self.current_menu_index]
+                self._open_preset_menu(selected_instrument)
+
+        # Enter search mode
+        @kb.add('/')
+        def kb_search(event):
+            if not self.search_manager.is_active():
+                if self.preset_menu_mode:
+                    self.search_manager.enter_search('preset', self.preset_menu_instrument)
+                elif self.menu_mode:
+                    self.search_manager.enter_search('instrument')
+                else:
+                    self.search_manager.enter_search('combined')
+                self.current_menu_index = 0
+                self._update_display()
+
+        # Handle text input in search mode
+        for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_.,()[]':
+            @kb.add(char, filter=Condition(lambda: self.search_manager.is_active()))
+            def kb_char(event, c=char):
+                self.search_manager.set_query(self.search_manager.query + c)
+                self.current_menu_index = 0
+                self._update_scroll_offset()
+                self._update_display()
+
+        # Backspace in search mode
+        @kb.add('backspace')
+        def kb_backspace(event):
+            if self.search_manager.is_active() and self.search_manager.query:
+                self.search_manager.set_query(self.search_manager.query[:-1])
+                self.current_menu_index = 0
+                self._update_scroll_offset()
+                self._update_display()
+            elif self.search_manager.is_active() and not self.search_manager.query:
+                # Exit search mode if query is empty
+                self.search_manager.exit_search()
+                self.current_menu_index = 0
+                self._update_scroll_offset()
+                self._update_display()
+
+        # Select instrument/preset in menu mode
         @kb.add('enter')
         def kb_select(event):
-            if self.menu_mode:
+            if self.search_manager.is_active():
+                # Select from search results
+                action = self.search_manager.get_selection_action(self.current_menu_index)
+                if action:
+                    action_type, action_data = action
+                    if action_type == 'set_instrument':
+                        self.api.set_instrument(action_data)
+                    elif action_type == 'set_preset':
+                        instrument_name, preset_name = action_data
+                        self.api.set_preset(instrument_name, preset_name)
+                    elif action_type == 'set_preset_single':
+                        self.api.set_preset(self.search_manager.preset_menu_instrument, action_data)
+
+                    # Exit all menus
+                    self.search_manager.exit_search()
+                    self.preset_menu_mode = False
+                    self.menu_mode = False
+                    self.current_menu_index = 0
+                    self._update_display()
+            elif self.preset_menu_mode:
+                # Select preset from preset menu
+                preset_name = self.preset_names[self.current_menu_index]
+                self.api.set_preset(self.preset_menu_instrument, preset_name)
+                self.preset_menu_mode = False
+                self.preset_menu_instrument = None
+                # Also exit instrument menu if open
+                if self.menu_mode:
+                    self.menu_mode = False
+                self._update_display()
+            elif self.menu_mode:
+                # Select instrument from instrument menu
                 selected_instrument = self.instrument_names[self.current_menu_index]
                 self.api.set_instrument(selected_instrument)
                 self.menu_mode = False
@@ -258,9 +371,38 @@ class CliClient(Client):
         self.loading_message = message
         self.application.invalidate()
 
+    def _open_preset_menu(self, instrument_name: str):
+        """Open preset menu for specified instrument"""
+        self.preset_menu_mode = True
+        self.preset_menu_instrument = instrument_name
+
+        # Get presets for the instrument (display names)
+        presets = self.api.get_presets(instrument_name)
+        self.preset_names = [p.name for p in presets]
+
+        # Set initial selection to current preset if viewing current instrument
+        if instrument_name == self.api.get_current_instrument().name:
+            current_preset = self.api.get_current_preset()
+            try:
+                self.current_menu_index = self.preset_names.index(current_preset.name)
+            except ValueError:
+                self.current_menu_index = 0
+        else:
+            self.current_menu_index = 0
+
+        self._update_scroll_offset()
+        self._update_display()
+
     def _menu_next(self):
         """Navigate to next menu item"""
-        if self.current_menu_index < len(self.instrument_names) - 1:
+        if self.search_manager.is_active():
+            menu_items = self.search_manager.filtered_items
+        elif self.preset_menu_mode:
+            menu_items = self.preset_names
+        else:
+            menu_items = self.instrument_names
+
+        if self.current_menu_index < len(menu_items) - 1:
             self.current_menu_index += 1
             self._update_scroll_offset()
 
@@ -272,107 +414,62 @@ class CliClient(Client):
 
     def _update_scroll_offset(self):
         """Update scroll offset to keep selected item visible"""
+        # Get current menu items
+        if self.search_manager.is_active():
+            menu_items = self.search_manager.filtered_items
+        elif self.preset_menu_mode:
+            menu_items = self.preset_names
+        else:
+            menu_items = self.instrument_names
+
+        # Calculate visible items based on current terminal size
+        menu_visible_items = cli_display.calculate_menu_visible_items()
+
         # Keep selected item in the middle of the visible area when possible
-        mid_point = self.menu_visible_items // 2
+        mid_point = menu_visible_items // 2
 
         if self.current_menu_index < mid_point:
             # Near the top
             self.menu_scroll_offset = 0
-        elif self.current_menu_index >= len(self.instrument_names) - mid_point:
+        elif self.current_menu_index >= len(menu_items) - mid_point:
             # Near the bottom
-            self.menu_scroll_offset = max(0, len(self.instrument_names) - self.menu_visible_items)
+            self.menu_scroll_offset = max(0, len(menu_items) - menu_visible_items)
         else:
             # Middle - center the selection
             self.menu_scroll_offset = self.current_menu_index - mid_point
 
     def _get_title(self):
         """Get frame title based on current mode"""
-        if self.menu_mode:
-            return "Select Instrument"
-        else:
-            return "Pi-Pianoteq CLI"
+        return cli_display.get_title(
+            self.search_manager,
+            self.preset_menu_mode,
+            self.preset_menu_instrument,
+            self.menu_mode
+        )
 
     def _get_display_text(self):
         """Generate display text based on current mode"""
-        if self.menu_mode:
-            return self._get_menu_text()
+        if self.search_manager.is_active():
+            return cli_display.get_search_text(
+                self.search_manager,
+                self.current_menu_index,
+                self.menu_scroll_offset
+            )
+        elif self.preset_menu_mode:
+            return cli_display.get_preset_menu_text(
+                self.api,
+                self.preset_menu_instrument,
+                self.current_menu_index,
+                self.menu_scroll_offset
+            )
+        elif self.menu_mode:
+            return cli_display.get_instrument_menu_text(
+                self.instrument_names,
+                self.current_menu_index,
+                self.menu_scroll_offset
+            )
         else:
-            return self._get_normal_text()
-
-    def _get_normal_text(self):
-        """Generate normal mode display using formatted text tuples"""
-        instrument = self.api.get_current_instrument()
-        preset = self.api.get_current_preset().display_name
-
-        # Use list of (style, text) tuples for proper formatting
-        lines = [
-            ('', '\n'),
-            ('bold cyan', 'Instrument:'), ('', '\n'),
-            ('ansigreen', f'  {instrument.name}'), ('', '\n'),
-            ('', '\n'),
-            ('bold cyan', 'Preset:'), ('', '\n'),
-            ('ansiyellow', f'  {preset}'), ('', '\n'),
-            ('', '\n'),
-            ('bold underline', 'Controls:'), ('', '\n'),
-            ('', '  Up/Down     : Navigate presets\n'),
-            ('', '  Left/Right  : Quick instrument switch\n'),
-            ('bold', '  i'), ('', '           : Open instrument menu\n'),
-            ('bold', '  q'), ('', '           : Quit\n'),
-            ('', '\n'),
-        ]
-
-        return lines
-
-    def _get_menu_text(self):
-        """Generate menu mode display using formatted text tuples"""
-        lines = [('', '\n')]
-
-        # Calculate visible range
-        start_idx = self.menu_scroll_offset
-        end_idx = min(start_idx + self.menu_visible_items, len(self.instrument_names))
-
-        # Add scroll indicator if needed
-        if start_idx > 0:
-            lines.append(('ansigray', '  ... (Up for more)\n'))
-        else:
-            lines.append(('', '\n'))
-
-        # Add visible menu items
-        for i in range(start_idx, end_idx):
-            instrument = self.instrument_names[i]
-            # Truncate long names to fit in display
-            display_name = instrument[:58] if len(instrument) > 58 else instrument
-
-            if i == self.current_menu_index:
-                # Highlight selected item
-                lines.append(('bold cyan', f'  > {display_name}\n'))
-            else:
-                lines.append(('', f'    {display_name}\n'))
-
-        # Fill remaining space if needed
-        displayed_items = end_idx - start_idx
-        if start_idx > 0:
-            displayed_items += 1  # Account for "..." line
-
-        for _ in range(self.menu_visible_items - displayed_items):
-            lines.append(('', '\n'))
-
-        # Add scroll indicator at bottom if needed
-        if end_idx < len(self.instrument_names):
-            lines.append(('ansigray', '  ... (Down for more)\n'))
-        else:
-            lines.append(('', '\n'))
-
-        lines.extend([
-            ('', '\n'),
-            ('bold underline', 'Menu Controls:'), ('', '\n'),
-            ('', '  Up/Down  : Navigate menu\n'),
-            ('bold', '  Enter'), ('', '    : Select instrument\n'),
-            ('bold', '  Esc'), ('', ' or '), ('bold', 'q'), ('', ' : Exit menu\n'),
-            ('', '\n'),
-        ])
-
-        return lines
+            return cli_display.get_normal_text(self.api)
 
     def _update_display(self):
         """Force display refresh"""

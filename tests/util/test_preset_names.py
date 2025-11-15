@@ -74,6 +74,12 @@ class CalculateDisplayNameTestCase(unittest.TestCase):
         self.assertEqual('Logical', calculate_display_name('W1 Logical', 'W1'))
         self.assertEqual('Bright', calculate_display_name('W1 - bright', 'W1'))
 
+    def test_hyphenated_instrument_name(self):
+        # Test instrument names with hyphens like "SK-EX"
+        # The prefix normalizes to spaces but preset has hyphens
+        self.assertEqual('Classic', calculate_display_name('Grand Shigeru Kawai SK-EX Classic', 'Grand Shigeru Kawai SK EX'))
+        self.assertEqual('Recording', calculate_display_name('Grand Shigeru Kawai SK-EX Recording', 'Grand Shigeru Kawai SK EX'))
+
 
 if __name__ == '__main__':
     unittest.main()

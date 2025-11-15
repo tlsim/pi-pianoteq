@@ -47,19 +47,27 @@ def calculate_display_name(preset_name: str, common_prefix: str) -> str:
     if not common_prefix:
         return preset_name[0].upper() + preset_name[1:] if len(preset_name) > 1 else preset_name.upper()
 
-    # Check if name starts with prefix (case-insensitive)
-    if not preset_name.lower().startswith(common_prefix.lower()):
+    separator_pattern = r'[\s\-—:|\u2013\u2014]+'
+
+    # Tokenize both the preset name and prefix
+    preset_tokens = re.split(separator_pattern, preset_name.strip())
+    prefix_tokens = re.split(separator_pattern, common_prefix.strip())
+
+    # Check if preset starts with prefix (case-insensitive token comparison)
+    if len(preset_tokens) < len(prefix_tokens):
         return preset_name
 
+    for i, prefix_token in enumerate(prefix_tokens):
+        if preset_tokens[i].lower() != prefix_token.lower():
+            return preset_name
+
     # If name equals prefix, return "Default"
-    if preset_name.strip().lower() == common_prefix.strip().lower():
+    if len(preset_tokens) == len(prefix_tokens):
         return "Default"
 
-    # Strip the prefix
-    result = preset_name[len(common_prefix):]
-
-    # Strip common separators and whitespace from the start
-    result = re.sub(r'^[\s\-—:|\u2013\u2014]+', '', result).strip()
+    # Join the remaining tokens with spaces
+    result_tokens = preset_tokens[len(prefix_tokens):]
+    result = ' '.join(result_tokens)
 
     # Capitalize first letter
     return result[0].upper() + result[1:] if len(result) > 1 else result.upper()
