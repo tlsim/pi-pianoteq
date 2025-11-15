@@ -295,12 +295,11 @@ class CliClient(Client):
 
         # Handle text input in search mode
         for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_.,()[]':
-            @kb.add(char)
+            @kb.add(char, filter=Condition(lambda: self.search_manager.is_active()))
             def kb_char(event, c=char):
-                if self.search_manager.is_active():
-                    self.search_manager.set_query(self.search_manager.query + c)
-                    self.current_menu_index = 0
-                    self._update_display()
+                self.search_manager.set_query(self.search_manager.query + c)
+                self.current_menu_index = 0
+                self._update_display()
 
         # Backspace in search mode
         @kb.add('backspace')
