@@ -236,8 +236,8 @@ class ConfigLoader:
         preset_order = []  # Track order for maintaining API sorting
 
         for preset_data in presets:
-            instr_name = preset_data['instr']
-            license_status = preset_data.get('license_status', 'unknown')
+            instr_name = preset_data.instr
+            license_status = preset_data.license_status
 
             # Filter: only include licensed instruments (license_status == "ok")
             # Demos (license_status == "demo") have limited functionality
@@ -245,7 +245,7 @@ class ConfigLoader:
                 continue
 
             if instr_name not in instruments_dict:
-                category = map_instrument_to_category(instr_name, preset_data['class'])
+                category = map_instrument_to_category(instr_name, preset_data.class_)
                 primary, secondary = COLOR_CATEGORIES[category]
 
                 instrument = Instrument(
@@ -258,7 +258,7 @@ class ConfigLoader:
                 preset_names_by_instrument[instr_name] = []
                 preset_order.append(instr_name)
 
-            preset_names_by_instrument[instr_name].append(preset_data['name'])
+            preset_names_by_instrument[instr_name].append(preset_data.name)
 
         # Second pass: calculate common prefix for each instrument and create Preset objects
         for instr_name in preset_order:

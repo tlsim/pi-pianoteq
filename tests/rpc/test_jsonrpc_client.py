@@ -3,6 +3,7 @@
 import unittest
 from unittest.mock import Mock, patch
 from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
+from pi_pianoteq.rpc.types import ActivationInfo
 
 
 class TestLicenseDetection(unittest.TestCase):
@@ -50,15 +51,16 @@ class TestLicenseDetection(unittest.TestCase):
         self.assertFalse(result)
 
     @patch.object(PianoteqJsonRpc, '_call')
-    def test_get_activation_info_returns_dict(self, mock_call):
-        """Test that get_activation_info extracts first element from list."""
+    def test_get_activation_info_returns_typed_object(self, mock_call):
+        """Test that get_activation_info extracts first element from list and returns ActivationInfo."""
         # Mock response as list with one element
         mock_call.return_value = [{"error_msg": "Demo", "addons": []}]
 
         result = self.client.get_activation_info()
 
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result["error_msg"], "Demo")
+        self.assertIsInstance(result, ActivationInfo)
+        self.assertEqual(result.error_msg, "Demo")
+        self.assertEqual(result.addons, [])
 
     @patch.object(PianoteqJsonRpc, '_call')
     def test_get_activation_info_with_empty_list(self, mock_call):
@@ -67,8 +69,9 @@ class TestLicenseDetection(unittest.TestCase):
 
         result = self.client.get_activation_info()
 
-        self.assertIsInstance(result, dict)
-        self.assertEqual(result, {})
+        self.assertIsInstance(result, ActivationInfo)
+        self.assertEqual(result.error_msg, "Demo")  # Default value
+        self.assertEqual(result.addons, [])
 
 
 if __name__ == '__main__':
