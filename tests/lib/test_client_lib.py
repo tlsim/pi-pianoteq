@@ -43,7 +43,7 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
         client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
 
-        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name, "")
+        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name)
 
     def test_sync_with_empty_preset_name_resets_to_first(self):
         preset_info = CurrentPreset(name='')
@@ -52,7 +52,7 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
         client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
 
-        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name, "")
+        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name)
 
     def test_sync_with_missing_current_preset_resets_to_first(self):
         preset_info = CurrentPreset(name='')
@@ -61,14 +61,14 @@ class ClientLibPresetSyncTestCase(unittest.TestCase):
 
         client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
 
-        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name, "")
+        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name)
 
     def test_sync_with_jsonrpc_exception_resets_to_first(self):
         self.jsonrpc.get_info.side_effect = Exception('Connection failed')
 
         client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
 
-        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name, "")
+        self.jsonrpc.load_preset.assert_called_once_with(self.preset1a.name)
 
     def test_sync_with_first_preset_syncs_correctly(self):
         preset_info = CurrentPreset(name='Steinway D Prelude')
