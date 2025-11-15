@@ -11,6 +11,40 @@ Pi-pianoteq provides a simple client API that lets you create interfaces for:
 - **Input devices**: Rotary encoders, physical buttons, MIDI controllers
 - **Software interfaces**: Web apps, mobile apps, desktop GUIs, voice control
 
+Why Use This Instead of Direct JSON-RPC?
+-----------------------------------------
+
+**You could** use Pianoteq's JSON-RPC API directly, but the client API simplifies development:
+
+1. **Process management** - Automatically starts and stops Pianoteq
+2. **State synchronization** - Handles initialization and syncs with Pianoteq's current state
+3. **Demo filtering** - Automatically filters out demo instruments (only shows licensed ones)
+4. **Pure Python API** - Simple method calls instead of JSON-RPC requests
+5. **MIDI abstraction** - Sends MIDI Program Change messages automatically (no MIDI library needed)
+6. **Typed data models** - Work with ``Instrument`` and ``Preset`` objects instead of raw JSON dictionaries
+7. **Navigation state** - Circular navigation with automatic current selection tracking
+8. **Preset organization** - Automatic grouping by instrument with shortened display names
+9. **UI theming** - Built-in instrument colors for display customization
+10. **Lifecycle hooks** - Clean shutdown with exit callbacks
+
+**Example comparison:**
+
+.. code-block:: python
+
+   # Direct JSON-RPC (complex)
+   response = requests.post('http://localhost:8081/jsonrpc', json={
+       'jsonrpc': '2.0',
+       'method': 'getListOfPresets',
+       'id': 1
+   })
+   presets = response.json()['result']  # Raw list of dicts
+   # Now send MIDI Program Change...
+   # Now update selection state...
+   # Now filter demos...
+
+   # Client API (simple)
+   api.set_preset_next()  # That's it!
+
 Quick Start
 -----------
 
