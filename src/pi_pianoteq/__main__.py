@@ -195,7 +195,7 @@ def main():
     midiout.open_virtual_port(Config.MIDI_PORT_NAME)
     program_change = ProgramChange(midiout)
 
-    client_lib = ClientLib(library, selector, program_change)
+    client_lib = ClientLib(library, selector, program_change, jsonrpc)
 
     # Give Pianoteq a bit more time to detect the virtual MIDI port and update its prefs
     time.sleep(2)

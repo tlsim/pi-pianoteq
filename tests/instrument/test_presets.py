@@ -40,5 +40,41 @@ class PresetDisplayNameFieldTestCase(unittest.TestCase):
         self.assertEqual('Steel Drum natural', preset.display_name)
 
 
+class LibraryFindPresetTestCase(unittest.TestCase):
+    def setUp(self):
+        inst1 = Instrument(i1, i1, '#000000', '#FFFFFF')
+        inst1.presets = [Preset(s1, 'Prelude'), Preset(s2, 'Jazz')]
+        inst2 = Instrument(i2, i2, '#000000', '#FFFFFF')
+        inst2.presets = [Preset(a1, 'Recording 1'), Preset(a2, 'Recording 2')]
+        self.library = Library([inst1, inst2])
+
+    def test_find_preset_by_name_first_instrument(self):
+        result = self.library.find_preset_by_name(s1)
+        self.assertIsNotNone(result)
+        instrument, preset = result
+        self.assertEqual(i1, instrument.name)
+        self.assertEqual(s1, preset.name)
+
+    def test_find_preset_by_name_second_instrument(self):
+        result = self.library.find_preset_by_name(a2)
+        self.assertIsNotNone(result)
+        instrument, preset = result
+        self.assertEqual(i2, instrument.name)
+        self.assertEqual(a2, preset.name)
+
+    def test_find_preset_by_name_not_found(self):
+        result = self.library.find_preset_by_name('Nonexistent Preset')
+        self.assertIsNone(result)
+
+    def test_find_preset_by_name_empty_library(self):
+        empty_library = Library([])
+        result = empty_library.find_preset_by_name(s1)
+        self.assertIsNone(result)
+
+    def test_find_preset_by_name_case_sensitive(self):
+        result = self.library.find_preset_by_name('steinway d prelude')
+        self.assertIsNone(result)
+
+
 if __name__ == '__main__':
     unittest.main()
