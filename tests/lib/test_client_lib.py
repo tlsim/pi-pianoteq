@@ -9,7 +9,7 @@ from pi_pianoteq.instrument.preset import Preset
 from pi_pianoteq.midi.program_change import ProgramChange
 
 
-class ClientLibSyncTestCase(unittest.TestCase):
+class ClientLibPresetSyncTestCase(unittest.TestCase):
     def setUp(self):
         self.inst1 = Instrument('Steinway D', 'Steinway D', '#000000', '#FFFFFF')
         self.preset1a = Preset('Steinway D Prelude', 'Prelude')

@@ -19,16 +19,16 @@ class ClientLib(ClientApi):
         self.instrument_library = instrument_library
         self.selector = selector
         self.on_exit = None
-        self.sync_with_pianoteq(jsonrpc)
+        sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
+        self.sync_preset(jsonrpc)
 
-    def sync_with_pianoteq(self, jsonrpc: PianoteqJsonRpc) -> None:
+    def sync_preset(self, jsonrpc: PianoteqJsonRpc) -> None:
         """
-        Sync selector state with Pianoteq's current preset.
+        Sync selector position with Pianoteq's current preset.
 
         If the current preset in Pianoteq matches one in our library, set it as current.
         Otherwise, reset to the first preset (old behavior).
         """
-        sleep(Config.MIDI_PIANOTEQ_STARTUP_DELAY)
 
         try:
             info = jsonrpc.get_info()
