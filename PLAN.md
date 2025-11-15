@@ -87,11 +87,7 @@ parser.add_argument(
     help='List available built-in clients and exit'
 )
 
-parser.add_argument(
-    '--cli',
-    action='store_true',
-    help='(DEPRECATED: use --client cli) Use CLI client'
-)
+# Remove --cli flag entirely (replaced by --client)
 ```
 
 ### 3.2 Client Selection Logic
@@ -103,19 +99,8 @@ if args.list_clients:
     return 0
 
 # Determine which client to use
-client_spec = None
-
-# Deprecated --cli flag
-if args.cli:
-    logger.warning(
-        "The --cli flag is deprecated and will be removed in a future version. "
-        "Use --client cli instead."
-    )
-    client_spec = 'cli'
-# CLI override
-elif args.client:
+if args.client:
     client_spec = args.client
-# Config default
 else:
     client_spec = Config.CLIENT
 
@@ -313,14 +298,17 @@ Add test for CLIENT config option loading.
 
 ## 7. Migration Path
 
-**Backward Compatibility:**
-- ✅ `--cli` continues to work (with deprecation warning)
+**Breaking Change:**
+- ❌ `--cli` flag removed (replaced by `--client cli`)
 - ✅ Default behavior unchanged (`gfxhat` is still default)
-- ✅ Existing deployments work without changes
+- ✅ Existing deployments without `--cli` work without changes
+- ⚠️ Users with `--cli` in scripts/systemd need to change to `--client cli`
 
-**Deprecation Timeline:**
-- Version X.Y.Z: Add deprecation warning for `--cli`
-- Version X.Y+1.Z: Remove `--cli` support (documented in CHANGELOG)
+**Migration for users of `--cli`:**
+- Old: `pi-pianoteq --cli`
+- New: `pi-pianoteq --client cli`
+
+This is documented in CHANGELOG as a breaking change.
 
 ## 8. Benefits Summary
 
@@ -343,11 +331,13 @@ For **Maintainers:**
 
 - [ ] Create client discovery module (src/pi_pianoteq/client/discovery.py)
 - [ ] Add CLIENT config option to pi_pianoteq.conf and Config class
+- [ ] Add get_logging_handler() method to Client base class
+- [ ] Implement get_logging_handler() in GfxhatClient and CliClient
+- [ ] Update logging_config.py to accept optional handler parameter
 - [ ] Update __main__.py to use config-based client selection
 - [ ] Add --client CLI argument to override config
 - [ ] Add --list-clients CLI argument for discovery
-- [ ] Deprecate --cli argument (keep working, show warning)
-- [ ] Add is_cli_mode() method to Client base class
+- [ ] Remove --cli argument (breaking change)
 - [ ] Update developer documentation with client configuration examples
 - [ ] Write tests for client discovery
-- [ ] Update CHANGELOG.md
+- [ ] Update CHANGELOG.md with breaking change notice
