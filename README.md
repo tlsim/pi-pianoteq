@@ -1,19 +1,19 @@
 # Pi-Pianoteq
 
-Pi-Pianoteq is a Python/MIDI remote control for Pianoteq on Raspberry Pi.
+Pi-Pianoteq is a Python remote control for Pianoteq on Raspberry Pi.
 
 ## About
 
 Pi-Pianoteq provides a simplified hardware interface for controlling Pianoteq on a Raspberry Pi 4B using the [Pimoroni GFX HAT](https://github.com/pimoroni/gfx-hat) - a HAT with 128x64 LCD display, 6 touch buttons and RGB backlight. After configuration, you can run Pianoteq without needing a monitor, using the GFX HAT as your interface.
 
-This project was built in 2019, before Pianoteq's jsonRPC API existed. Instead of using the API, it works by generating MIDI mapping files for Pianoteq and sending MIDI control change messages over a virtual rtmidi port. The scope is intentionally limited to instrument and preset selection - it's designed for the Pianoteq STAGE workflow (playing rather than deep customization).
+This project started in 2019 using MIDI Program Change messages for preset selection (before Pianoteq's JSON-RPC API existed). As of v2.2.0, it uses Pianoteq's JSON-RPC API for direct preset control. The scope is intentionally limited to instrument and preset selection - it's designed for the Pianoteq STAGE workflow (playing rather than deep customization).
 
 A CLI client is also included for testing and development without the GFX HAT hardware.
 
 ## Features
 
 - GFX HAT hardware interface (primary) and CLI client (testing/development)
-- MIDI virtual port communication
+- JSON-RPC API communication with Pianoteq
 - Flexible configuration system
 - Headless operation support
 - Systemd service for auto-start on boot
@@ -81,19 +81,6 @@ User config persists across package upgrades.
 ## Instruments
 
 Instruments are automatically discovered from Pianoteq via its JSON-RPC API. Only licensed instruments are shown; demos are filtered out. Display colors are assigned automatically based on instrument type.
-
-## MIDI Configuration
-
-After installing pi-pianoteq, you need to enable the PI-PTQ MIDI port in Pianoteq:
-
-1. Launch Pianoteq
-2. Go to **Edit → Preferences → Devices**
-3. Under "Active MIDI Inputs", check the box next to **PI-PTQ**
-4. Click OK
-
-This is a one-time setup. The setting persists in your Pianoteq preferences.
-
-**Note:** pi-pianoteq will warn you on startup if this is not configured, but will continue running.
 
 ## Running
 
