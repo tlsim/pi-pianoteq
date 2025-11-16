@@ -8,6 +8,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- CLI logs view (press 'l' to view startup and runtime logs, press Esc or 'q' to return)
 - Key repeat for all navigation and action buttons on GFX HAT with intelligent held event threshold
   - Hold down arrow buttons for continuous scrolling through instruments, presets, and menus
   - Long press ENTER button to open preset menu (with threshold to prevent accidental triggers)
