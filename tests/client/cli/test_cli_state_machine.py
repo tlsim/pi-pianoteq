@@ -416,3 +416,73 @@ class CliClientStateMachineTestCase(unittest.TestCase):
 
             # Should show last 10 items
             self.assertEqual(client.menu_scroll_offset, 10)
+
+    def test_logs_view_mode_initialized_false(self):
+        """logs_view_mode should be False after set_api."""
+        with patch.object(Application, 'run'):
+            client = CliClient(api=None)
+            client.set_api(self.mock_api)
+
+            self.assertFalse(client.logs_view_mode)
+
+    def test_enter_logs_view_mode(self):
+        """Entering logs view mode should set logs_view_mode=True."""
+        with patch.object(Application, 'run'):
+            client = CliClient(api=None)
+            client.set_api(self.mock_api)
+
+            client.logs_view_mode = True
+
+            self.assertTrue(client.logs_view_mode)
+            self.assertFalse(client.menu_mode)
+            self.assertFalse(client.preset_menu_mode)
+            self.assertFalse(client.search_manager.is_active())
+
+    def test_exit_logs_view_mode(self):
+        """Exiting logs view mode should set logs_view_mode=False."""
+        with patch.object(Application, 'run'):
+            client = CliClient(api=None)
+            client.set_api(self.mock_api)
+
+            client.logs_view_mode = True
+            client.logs_view_mode = False
+
+            self.assertFalse(client.logs_view_mode)
+
+    def test_get_title_logs_view(self):
+        """Title should be 'View Logs' in logs view mode."""
+        with patch.object(Application, 'run'):
+            client = CliClient(api=None)
+            client.set_api(self.mock_api)
+
+            client.logs_view_mode = True
+            self.assertEqual(client._get_title(), "View Logs")
+
+    def test_display_text_routing_logs_view(self):
+        """_get_display_text should route to cli_display.get_logs_view_text in logs view mode."""
+        with patch.object(Application, 'run'):
+            client = CliClient(api=None)
+            client.set_api(self.mock_api)
+
+            client.logs_view_mode = True
+            from pi_pianoteq.client.cli import cli_display
+            with patch.object(cli_display, 'get_logs_view_text', return_value=[]) as mock_logs:
+                client._get_display_text()
+                mock_logs.assert_called_once()
+
+    def test_logs_view_priority_over_other_modes(self):
+        """Logs view should take priority in display text routing."""
+        with patch.object(Application, 'run'):
+            client = CliClient(api=None)
+            client.set_api(self.mock_api)
+
+            # Set multiple modes (shouldn't normally happen, but tests priority)
+            client.logs_view_mode = True
+            client.menu_mode = True
+
+            from pi_pianoteq.client.cli import cli_display
+            with patch.object(cli_display, 'get_logs_view_text', return_value=[]) as mock_logs:
+                with patch.object(cli_display, 'get_instrument_menu_text', return_value=[]) as mock_menu:
+                    client._get_display_text()
+                    mock_logs.assert_called_once()
+                    mock_menu.assert_not_called()

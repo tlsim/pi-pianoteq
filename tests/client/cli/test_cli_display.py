@@ -6,6 +6,7 @@ from pi_pianoteq.client.cli import cli_display
 from pi_pianoteq.client.cli.search_manager import SearchManager
 from pi_pianoteq.instrument.instrument import Instrument
 from pi_pianoteq.instrument.preset import Preset
+from pi_pianoteq.logging.logging_config import BufferedLoggingHandler
 from prompt_toolkit.application import Application
 
 
@@ -247,3 +248,67 @@ class CliClientDisplayTestCase(unittest.TestCase):
         self.assertNotIn("A" * 100, text_string)
         # But should contain a truncated version
         self.assertIn("A" * 50, text_string)
+
+    def test_format_log_messages_with_no_messages(self):
+        """format_log_messages should return initializing message when buffer is empty."""
+        log_buffer = BufferedLoggingHandler(maxlen=50)
+
+        text = cli_display.format_log_messages(log_buffer)
+        text_string = ''.join([item[1] for item in text])
+
+        self.assertIn("Initializing", text_string)
+
+    def test_format_log_messages_with_messages(self):
+        """format_log_messages should format log messages from buffer."""
+        log_buffer = BufferedLoggingHandler(maxlen=50)
+        log_buffer.buffer.append("Test log message 1")
+        log_buffer.buffer.append("Test log message 2")
+
+        text = cli_display.format_log_messages(log_buffer)
+        text_string = ''.join([item[1] for item in text])
+
+        self.assertIn("Test log message 1", text_string)
+        self.assertIn("Test log message 2", text_string)
+
+    def test_format_log_messages_returns_formatted_tuples(self):
+        """format_log_messages should return list of (style, text) tuples."""
+        log_buffer = BufferedLoggingHandler(maxlen=50)
+        log_buffer.buffer.append("Test message")
+
+        text = cli_display.format_log_messages(log_buffer)
+
+        self.assertIsInstance(text, list)
+        self.assertTrue(all(isinstance(item, tuple) for item in text))
+        self.assertTrue(all(len(item) == 2 for item in text))
+
+    def test_get_logs_view_text_with_no_messages(self):
+        """get_logs_view_text should show 'No logs available' when buffer is empty."""
+        log_buffer = BufferedLoggingHandler(maxlen=50)
+
+        text = cli_display.get_logs_view_text(log_buffer)
+        text_string = ''.join([item[1] for item in text])
+
+        self.assertIn("No logs available", text_string)
+
+    def test_get_logs_view_text_with_messages(self):
+        """get_logs_view_text should display log messages."""
+        log_buffer = BufferedLoggingHandler(maxlen=50)
+        log_buffer.buffer.append("Log entry 1")
+        log_buffer.buffer.append("Log entry 2")
+
+        text = cli_display.get_logs_view_text(log_buffer)
+        text_string = ''.join([item[1] for item in text])
+
+        self.assertIn("Log entry 1", text_string)
+        self.assertIn("Log entry 2", text_string)
+
+    def test_get_logs_view_text_shows_controls(self):
+        """get_logs_view_text should show exit controls."""
+        log_buffer = BufferedLoggingHandler(maxlen=50)
+        log_buffer.buffer.append("Test log")
+
+        text = cli_display.get_logs_view_text(log_buffer)
+        text_string = ''.join([item[1] for item in text])
+
+        self.assertIn("Logs Controls:", text_string)
+        self.assertIn("Return to main view", text_string)
