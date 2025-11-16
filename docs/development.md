@@ -181,28 +181,6 @@ To see all built-in clients:
 pipenv run pi-pianoteq --list-clients
 ```
 
-### Systemd Service
-
-To use a specific client with the systemd service, edit the service file:
-
-```bash
-sudo systemctl edit pi-pianoteq.service --full
-```
-
-Update the `ExecStart` line to specify the client:
-
-```ini
-[Service]
-ExecStart=/home/pi/pi-pianoteq-venv/bin/pi-pianoteq --client cli
-```
-
-Then reload and restart:
-
-```bash
-sudo systemctl daemon-reload
-sudo systemctl restart pi-pianoteq.service
-```
-
 ## What deploy.sh Does
 
 The deployment script:

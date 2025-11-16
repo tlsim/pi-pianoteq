@@ -12,6 +12,26 @@ from typing import Dict, Type, Optional, Tuple
 from pi_pianoteq.client.client import Client
 
 
+def _format_error_message(error_msg: str) -> str:
+    """
+    Format import error message for display.
+
+    Args:
+        error_msg: Raw error message from ImportError
+
+    Returns:
+        User-friendly formatted error message
+    """
+    if 'No module named' in error_msg:
+        # Extract just the missing module name
+        missing = error_msg.split("'")[1] if "'" in error_msg else error_msg
+        return f"missing dependency: {missing}"
+    else:
+        # Keep first line of error only, truncate if too long
+        first_line = error_msg.split('\n')[0]
+        return first_line[:60] if len(first_line) > 60 else first_line
+
+
 def discover_builtin_clients() -> Dict[str, Type[Client]]:
     """
     Scan pi_pianoteq.client.* for Client subclasses.
@@ -44,9 +64,6 @@ def discover_builtin_clients_with_errors() -> Tuple[Dict[str, Type[Client]], Dic
             # Skip base classes and this module
             continue
 
-        client_found = False
-        import_error = None
-
         try:
             # Import the module
             full_module_name = f'pi_pianoteq.client.{modname}'
@@ -60,8 +77,9 @@ def discover_builtin_clients_with_errors() -> Tuple[Dict[str, Type[Client]], Dic
                     submodule = importlib.import_module(submodule_name)
                     module = submodule
                 except ImportError as e:
-                    # Track this error for potential unavailable listing
-                    import_error = e
+                    # If the submodule can't be imported, mark as unavailable
+                    unavailable[modname] = _format_error_message(str(e))
+                    continue
 
             # Find Client subclasses in the module
             for name, obj in inspect.getmembers(module, inspect.isclass):
@@ -70,32 +88,11 @@ def discover_builtin_clients_with_errors() -> Tuple[Dict[str, Type[Client]], Dic
                     obj.__module__.startswith('pi_pianoteq.client')):
                     # Use the module/package name as the client name
                     available[modname] = obj
-                    client_found = True
                     break  # Only take the first Client subclass from each module
 
-            # If we didn't find a client but had an import error, mark as unavailable
-            if not client_found and import_error:
-                error_msg = str(import_error)
-                if 'No module named' in error_msg:
-                    missing = error_msg.split("'")[1] if "'" in error_msg else error_msg
-                    unavailable[modname] = f"missing dependency: {missing}"
-                elif 'python3-smbus' in error_msg:
-                    unavailable[modname] = "missing dependency: python3-smbus"
-                else:
-                    # Keep first line of error only
-                    first_line = error_msg.split('\n')[0]
-                    unavailable[modname] = first_line[:60]  # Truncate if too long
-
         except ImportError as e:
-            # Track modules that can't be imported (e.g., missing dependencies)
-            # Extract a user-friendly error message
-            error_msg = str(e)
-            if 'No module named' in error_msg:
-                # Extract just the missing module name
-                missing = error_msg.split("'")[1] if "'" in error_msg else error_msg
-                unavailable[modname] = f"missing dependency: {missing}"
-            else:
-                unavailable[modname] = f"import error: {error_msg}"
+            # Package itself can't be imported
+            unavailable[modname] = _format_error_message(str(e))
 
     return available, unavailable
 
