@@ -271,6 +271,41 @@ def get_search_text(search_manager: SearchManager, current_menu_index: int,
     return lines
 
 
+def format_log_messages(log_buffer: BufferedLoggingHandler, reserved_lines: int = 10,
+                        default_max_lines: int = 20) -> List[Tuple[str, str]]:
+    """Format log messages for display with terminal-aware sizing"""
+    messages = log_buffer.get_messages()
+
+    if not messages:
+        return [('ansigray', '  Initializing...\n')]
+
+    # Calculate terminal dimensions
+    try:
+        terminal_size = os.get_terminal_size()
+        terminal_height = terminal_size.lines
+        terminal_width = terminal_size.columns
+        max_log_lines = max(10, terminal_height - reserved_lines)
+    except (OSError, AttributeError):
+        max_log_lines = default_max_lines
+        terminal_width = 80
+
+    # Account for frame borders and padding
+    max_line_width = terminal_width - 6
+
+    # Build log lines
+    lines = []
+    visible_messages = messages[-max_log_lines:]
+    for msg in visible_messages:
+        # Truncate message if too long
+        if len(msg) > max_line_width:
+            truncated_msg = msg[:max_line_width - 3] + '...'
+        else:
+            truncated_msg = msg
+        lines.append(('ansibrightblack', f'  {truncated_msg}\n'))
+
+    return lines
+
+
 def get_logs_view_text(log_buffer: BufferedLoggingHandler) -> List[Tuple[str, str]]:
     """Generate logs view display using formatted text tuples"""
     messages = log_buffer.get_messages()
@@ -282,30 +317,8 @@ def get_logs_view_text(log_buffer: BufferedLoggingHandler) -> List[Tuple[str, st
             ('', '\n'),
         ]
 
-    # Calculate terminal dimensions
-    try:
-        terminal_size = os.get_terminal_size()
-        terminal_height = terminal_size.lines
-        terminal_width = terminal_size.columns
-        # Reserve space for frame, title, and controls
-        max_log_lines = max(10, terminal_height - 10)
-    except (OSError, AttributeError):
-        max_log_lines = 20
-        terminal_width = 80
-
-    # Account for frame borders and padding
-    max_line_width = terminal_width - 6
-
-    # Build log lines
     lines = [('', '\n')]
-    visible_messages = messages[-max_log_lines:]
-    for msg in visible_messages:
-        # Truncate message if too long
-        if len(msg) > max_line_width:
-            truncated_msg = msg[:max_line_width - 3] + '...'
-        else:
-            truncated_msg = msg
-        lines.append(('ansibrightblack', f'  {truncated_msg}\n'))
+    lines.extend(format_log_messages(log_buffer, reserved_lines=10, default_max_lines=20))
 
     lines.extend([
         ('', '\n'),
