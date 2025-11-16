@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 - CLI logs view (press 'l' to view startup and runtime logs, press Esc or 'q' to return)
+- Control menu on GFX HAT: new top-level menu accessed via middle button press
+  - Instrument selection moved to first menu item
+  - Provides framework for additional control functions in future releases
 - Key repeat for all navigation and action buttons on GFX HAT with intelligent held event threshold
   - Hold down arrow buttons for continuous scrolling through instruments, presets, and menus
   - Long press ENTER button to open preset menu (with threshold to prevent accidental triggers)
