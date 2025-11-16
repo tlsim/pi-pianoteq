@@ -26,7 +26,7 @@ class GfxhatClient(Client):
         super().__init__(api)
         self.interrupt = False
         self.control_menu_open = False
-        self.menu_open = False
+        self.instrument_menu_open = False
         self.preset_menu_open = False
         self.preset_menu_source = None
         self.width, self.height = lcd.dimensions()
@@ -119,7 +119,7 @@ class GfxhatClient(Client):
     def update_handler(self):
         if self.preset_menu_open:
             self.set_handler(self.preset_menu_display.get_handler())
-        elif self.menu_open:
+        elif self.instrument_menu_open:
             self.set_handler(self.menu_display.get_handler())
         elif self.control_menu_open:
             self.set_handler(self.control_menu_display.get_handler())
@@ -137,7 +137,7 @@ class GfxhatClient(Client):
             return self.loading_display
         elif self.preset_menu_open:
             return self.preset_menu_display
-        elif self.menu_open:
+        elif self.instrument_menu_open:
             return self.menu_display
         elif self.control_menu_open:
             return self.control_menu_display
@@ -182,14 +182,14 @@ class GfxhatClient(Client):
 
     def on_enter_instrument_menu(self):
         self.control_menu_display.stop_scrolling()
-        self.menu_open = True
+        self.instrument_menu_open = True
         self.menu_display.update_instrument()
         self.menu_display.start_scrolling()
         self.update_handler()
 
     def on_exit_instrument_menu(self):
         self.menu_display.stop_scrolling()
-        self.menu_open = False
+        self.instrument_menu_open = False
         self.update_handler()
         self.control_menu_display.start_scrolling()
 
@@ -228,9 +228,9 @@ class GfxhatClient(Client):
         # Otherwise (BACK pressed), return to source
         if self.preset_menu_display.preset_selected:
             # Close all menus if they were open
-            if self.menu_open:
+            if self.instrument_menu_open:
                 self.menu_display.stop_scrolling()
-                self.menu_open = False
+                self.instrument_menu_open = False
             if self.control_menu_open:
                 self.control_menu_display.stop_scrolling()
                 self.control_menu_open = False
