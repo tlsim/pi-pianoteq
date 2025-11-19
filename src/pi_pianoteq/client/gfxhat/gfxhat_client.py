@@ -7,6 +7,7 @@ from typing import Optional
 
 from pi_pianoteq.client.gfxhat.instrument_display import InstrumentDisplay
 from pi_pianoteq.client.gfxhat.instrument_menu_display import InstrumentMenuDisplay
+from pi_pianoteq.client.gfxhat.control_menu_display import ControlMenuDisplay
 from pi_pianoteq.client.gfxhat.loading_display import LoadingDisplay
 from pi_pianoteq.client.gfxhat.preset_menu_display import PresetMenuDisplay
 from pi_pianoteq.client.client import Client
@@ -24,7 +25,8 @@ class GfxhatClient(Client):
     def __init__(self, api: Optional[ClientApi]):
         super().__init__(api)
         self.interrupt = False
-        self.menu_open = False
+        self.control_menu_open = False
+        self.instrument_menu_open = False
         self.preset_menu_open = False
         self.preset_menu_source = None
         self.width, self.height = lcd.dimensions()
@@ -38,6 +40,7 @@ class GfxhatClient(Client):
 
         # Normal mode displays (initialized later if api provided)
         self.instrument_display = None
+        self.control_menu_display = None
         self.menu_display = None
         self.preset_menu_display = None
 
@@ -49,12 +52,17 @@ class GfxhatClient(Client):
         self.api.set_on_exit(self.cleanup)
         self.instrument_display = InstrumentDisplay(
             self.api, self.width, self.height, self.font,
-            self.on_enter_menu,
+            self.on_enter_control_menu,
             self.on_enter_preset_menu_from_main
+        )
+        self.control_menu_display = ControlMenuDisplay(
+            self.api, self.width, self.height, self.font,
+            self.on_exit_control_menu,
+            self.on_enter_instrument_menu
         )
         self.menu_display = InstrumentMenuDisplay(
             self.api, self.width, self.height, self.font,
-            self.on_exit_menu,
+            self.on_exit_instrument_menu,
             self.on_enter_preset_menu_from_instrument_menu
         )
         self.loading_mode = False
@@ -111,8 +119,10 @@ class GfxhatClient(Client):
     def update_handler(self):
         if self.preset_menu_open:
             self.set_handler(self.preset_menu_display.get_handler())
-        elif self.menu_open:
+        elif self.instrument_menu_open:
             self.set_handler(self.menu_display.get_handler())
+        elif self.control_menu_open:
+            self.set_handler(self.control_menu_display.get_handler())
         else:
             self.set_handler(self.instrument_display.get_handler())
 
@@ -122,13 +132,15 @@ class GfxhatClient(Client):
             touch.on(index, handler)
 
     def get_display(self):
-        """Get current active display (loading, preset menu, menu, or instrument)"""
+        """Get current active display (loading, preset menu, menu, control menu, or instrument)"""
         if self.loading_mode:
             return self.loading_display
         elif self.preset_menu_open:
             return self.preset_menu_display
-        elif self.menu_open:
+        elif self.instrument_menu_open:
             return self.menu_display
+        elif self.control_menu_open:
+            return self.control_menu_display
         else:
             return self.instrument_display
 
@@ -143,6 +155,8 @@ class GfxhatClient(Client):
         # Stop all scrolling threads (if displays are initialized)
         if self.instrument_display:
             self.instrument_display.stop_scrolling()
+        if self.control_menu_display:
+            self.control_menu_display.stop_scrolling()
         if self.menu_display:
             self.menu_display.stop_scrolling()
         if self.preset_menu_display:
@@ -153,19 +167,43 @@ class GfxhatClient(Client):
         lcd.clear()
         lcd.show()
 
-    def on_enter_menu(self):
+    def on_enter_control_menu(self):
         self.instrument_display.stop_scrolling()
-        self.menu_open = True
+        self.control_menu_open = True
+        self.control_menu_display.start_scrolling()
+        self.update_handler()
+
+    def on_exit_control_menu(self):
+        self.control_menu_display.stop_scrolling()
+        self.control_menu_open = False
+        self.update_handler()
+        self.instrument_display.update_display()
+        self.instrument_display.start_scrolling()
+
+    def on_enter_instrument_menu(self):
+        self.control_menu_display.stop_scrolling()
+        self.instrument_menu_open = True
         self.menu_display.update_instrument()
         self.menu_display.start_scrolling()
         self.update_handler()
 
-    def on_exit_menu(self):
+    def on_exit_instrument_menu(self):
         self.menu_display.stop_scrolling()
-        self.menu_open = False
+        self.instrument_menu_open = False
+
+        # If an instrument was selected, close all menus and return to main display
+        # Otherwise (BACK pressed), return to control menu
+        if self.menu_display.instrument_selected:
+            self.menu_display.instrument_selected = False
+            if self.control_menu_open:
+                self.control_menu_display.stop_scrolling()
+                self.control_menu_open = False
+            self.instrument_display.update_display()
+            self.instrument_display.start_scrolling()
+        else:
+            self.control_menu_display.start_scrolling()
+
         self.update_handler()
-        self.instrument_display.update_display()
-        self.instrument_display.start_scrolling()
 
     def on_enter_preset_menu_from_main(self):
         """Long press ENTER on main display - show presets for current instrument."""
@@ -201,10 +239,13 @@ class GfxhatClient(Client):
         # If a preset was selected, always return to main display
         # Otherwise (BACK pressed), return to source
         if self.preset_menu_display.preset_selected:
-            # Close instrument menu too if it was open
-            if self.menu_open:
+            # Close all menus if they were open
+            if self.instrument_menu_open:
                 self.menu_display.stop_scrolling()
-                self.menu_open = False
+                self.instrument_menu_open = False
+            if self.control_menu_open:
+                self.control_menu_display.stop_scrolling()
+                self.control_menu_open = False
             self.instrument_display.update_display()
             self.instrument_display.start_scrolling()
         elif self.preset_menu_source == 'main':

@@ -12,6 +12,7 @@ class InstrumentMenuDisplay(MenuDisplay):
     def __init__(self, api: ClientApi, width, height, font, on_exit, on_enter_preset_menu):
         super().__init__(api, width, height, font, on_exit)
         self.on_enter_preset_menu = on_enter_preset_menu
+        self.instrument_selected = False
         self.menu_open = False
         self.shutdown_display = ShutdownDisplay(api, width, height, font, self.on_exit_menu)
 
@@ -27,6 +28,7 @@ class InstrumentMenuDisplay(MenuDisplay):
 
     def set_instrument(self, name):
         self.api.set_instrument(name)
+        self.instrument_selected = True
         self.on_exit()
 
     def update_instrument(self):
