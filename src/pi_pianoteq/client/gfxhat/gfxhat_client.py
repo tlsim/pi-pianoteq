@@ -190,8 +190,20 @@ class GfxhatClient(Client):
     def on_exit_instrument_menu(self):
         self.menu_display.stop_scrolling()
         self.instrument_menu_open = False
+
+        # If an instrument was selected, close all menus and return to main display
+        # Otherwise (BACK pressed), return to control menu
+        if self.menu_display.instrument_selected:
+            self.menu_display.instrument_selected = False
+            if self.control_menu_open:
+                self.control_menu_display.stop_scrolling()
+                self.control_menu_open = False
+            self.instrument_display.update_display()
+            self.instrument_display.start_scrolling()
+        else:
+            self.control_menu_display.start_scrolling()
+
         self.update_handler()
-        self.control_menu_display.start_scrolling()
 
     def on_enter_preset_menu_from_main(self):
         """Long press ENTER on main display - show presets for current instrument."""

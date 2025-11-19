@@ -157,8 +157,8 @@ class GfxhatClientStateMachineTestCase(unittest.TestCase):
         client.menu_display.update_instrument.assert_called_once()
         client.menu_display.start_scrolling.assert_called_once()
 
-    def test_on_exit_instrument_menu_returns_to_control_menu(self, mock_touch, mock_lcd, mock_backlight, mock_fonts):
-        """Exiting instrument menu should return to control menu."""
+    def test_on_exit_instrument_menu_back_returns_to_control_menu(self, mock_touch, mock_lcd, mock_backlight, mock_fonts):
+        """Pressing BACK in instrument menu should return to control menu."""
         mock_lcd.dimensions.return_value = (128, 64)
         mock_fonts.BitbuntuFull = "/fake/font.ttf"
 
@@ -168,13 +168,45 @@ class GfxhatClientStateMachineTestCase(unittest.TestCase):
 
         # Mock the displays
         client.menu_display.stop_scrolling = Mock()
+        client.menu_display.instrument_selected = False  # User pressed BACK
         client.control_menu_display.start_scrolling = Mock()
+        client.instrument_display.update_display = Mock()
 
         client.on_exit_instrument_menu()
 
         self.assertFalse(client.instrument_menu_open)
         client.menu_display.stop_scrolling.assert_called_once()
         client.control_menu_display.start_scrolling.assert_called_once()
+        # Should not update main display
+        client.instrument_display.update_display.assert_not_called()
+
+    def test_instrument_selected_closes_all_menus(self, mock_touch, mock_lcd, mock_backlight, mock_fonts):
+        """Selecting an instrument should close all menus and return to main display."""
+        mock_lcd.dimensions.return_value = (128, 64)
+        mock_fonts.BitbuntuFull = "/fake/font.ttf"
+
+        client = GfxhatClient(api=self.mock_api)
+        client.instrument_menu_open = True
+        client.control_menu_open = True
+
+        # Mock the displays
+        client.menu_display.stop_scrolling = Mock()
+        client.menu_display.instrument_selected = True  # User selected an instrument
+        client.control_menu_display.stop_scrolling = Mock()
+        client.instrument_display.update_display = Mock()
+        client.instrument_display.start_scrolling = Mock()
+
+        client.on_exit_instrument_menu()
+
+        # Both menus should close
+        self.assertFalse(client.instrument_menu_open)
+        self.assertFalse(client.control_menu_open)
+        client.menu_display.stop_scrolling.assert_called_once()
+        client.control_menu_display.stop_scrolling.assert_called_once()
+
+        # Should return to main display
+        client.instrument_display.update_display.assert_called_once()
+        client.instrument_display.start_scrolling.assert_called_once()
 
     @patch('pi_pianoteq.client.gfxhat.gfxhat_client.PresetMenuDisplay')
     def test_preset_menu_from_main_display(self, mock_preset_menu_class,
