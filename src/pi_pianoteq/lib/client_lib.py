@@ -7,6 +7,7 @@ from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
 from typing import List
 from os import system
 import logging
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -114,6 +115,55 @@ class ClientLib(ClientApi):
         self.selector.set_preset_prev()
         preset = self.selector.get_current_preset()
         self.jsonrpc.load_preset(preset.name)
+
+    # Randomization methods
+    def randomize_current_preset(self) -> None:
+        """
+        Randomize parameters of the current preset.
+
+        Keeps the current instrument and preset selection, only randomizes
+        the parameters using Pianoteq's randomizeParameters API.
+        """
+        logger.info("Randomizing current preset parameters")
+        self.jsonrpc.randomize_parameters()
+
+    def randomize_all(self) -> None:
+        """
+        Randomly select instrument and preset, then randomize parameters.
+
+        This provides a complete surprise by:
+        1. Selecting a random instrument from the library
+        2. Selecting a random preset from that instrument
+        3. Loading the preset
+        4. Randomizing the parameters
+        """
+        instruments = self.instrument_library.get_instruments()
+
+        if not instruments:
+            logger.warning("No instruments available for randomization")
+            return
+
+        # Pick random instrument
+        random_instrument = random.choice(instruments)
+        logger.info(f"Random instrument selected: {random_instrument.name}")
+
+        # Pick random preset (filter out special presets if any exist)
+        presets = [p for p in random_instrument.presets if not p.name.startswith("__")]
+
+        if not presets:
+            logger.warning(f"No presets available for instrument {random_instrument.name}")
+            return
+
+        random_preset = random.choice(presets)
+        logger.info(f"Random preset selected: {random_preset.name}")
+
+        # Update selector position to match our random selection
+        self.selector.set_preset_by_name(random_instrument.name, random_preset.name)
+
+        # Load the preset and randomize parameters
+        self.jsonrpc.load_preset(random_preset.name)
+        self.jsonrpc.randomize_parameters()
+        logger.info(f"Randomized all: {random_instrument.name} - {random_preset.name}")
 
     # Utility methods
     def set_on_exit(self, on_exit) -> None:

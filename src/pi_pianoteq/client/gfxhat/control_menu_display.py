@@ -10,13 +10,17 @@ class ControlMenuDisplay(MenuDisplay):
     """
     Top-level control menu with options for various functions.
 
-    Currently contains:
+    Contains:
     - Select Instrument: Opens instrument selection menu
+    - Randomise Parameters: Randomize current preset's parameters
+    - Randomise All: Randomly select instrument, preset, and randomize parameters
     - Shut down: Opens shutdown confirmation menu
     """
 
-    def __init__(self, api: ClientApi, width, height, font, on_exit, on_select_instrument):
+    def __init__(self, api: ClientApi, width, height, font, on_exit, on_select_instrument, on_randomize_preset, on_random_all):
         self.on_select_instrument = on_select_instrument
+        self.on_randomize_preset = on_randomize_preset
+        self.on_random_all = on_random_all
         super().__init__(api, width, height, font, on_exit)
         self.shutdown_menu_open = False
         self.shutdown_display = ShutdownDisplay(api, width, height, font, self.on_exit_menu)
@@ -24,6 +28,8 @@ class ControlMenuDisplay(MenuDisplay):
     def get_menu_options(self):
         return [
             MenuOption("Select Instrument", self.on_select_instrument, self.font),
+            MenuOption("Randomise Parameters", self.on_randomize_preset, self.font),
+            MenuOption("Randomise All", self.on_random_all, self.font),
             MenuOption("Shut down", self.on_enter_menu, self.font)
         ]
 

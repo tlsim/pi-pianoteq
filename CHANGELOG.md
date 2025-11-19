@@ -8,6 +8,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Parameter randomization via control menu
+  - GFX HAT: New "Randomize" option in control menu with submenu
+    - "Randomize Preset": Randomize parameters of current preset
+    - "Random All": Randomly select instrument and preset, then randomize parameters
+  - CLI: Direct keyboard shortcuts for randomization
+    - Press 'r' to randomize current preset parameters
+    - Press 'R' (Shift+r) to randomly select instrument, preset, and randomize parameters
 - CLI logs view (press 'l' to view startup and runtime logs, press Esc or 'q' to return)
 - Control menu on GFX HAT: new top-level menu accessed via middle button press
   - Instrument selection moved to first menu item

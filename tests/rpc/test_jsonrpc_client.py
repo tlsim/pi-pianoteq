@@ -74,5 +74,27 @@ class TestLicenseDetection(unittest.TestCase):
         self.assertEqual(result.addons, [])
 
 
+class TestRandomizeParameters(unittest.TestCase):
+    """Test randomize parameters functionality."""
+
+    def setUp(self):
+        """Create a JSON-RPC client instance."""
+        self.client = PianoteqJsonRpc()
+
+    @patch.object(PianoteqJsonRpc, '_call')
+    def test_randomize_parameters_default_amount(self, mock_call):
+        """Test randomize parameters with default amount (1.0)."""
+        self.client.randomize_parameters()
+
+        mock_call.assert_called_once_with('randomizeParameters', [1.0])
+
+    @patch.object(PianoteqJsonRpc, '_call')
+    def test_randomize_parameters_custom_amount(self, mock_call):
+        """Test randomize parameters with custom amount."""
+        self.client.randomize_parameters(amount=0.5)
+
+        mock_call.assert_called_once_with('randomizeParameters', [0.5])
+
+
 if __name__ == '__main__':
     unittest.main()
