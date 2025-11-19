@@ -30,11 +30,8 @@ class PresetMenuDisplay(MenuDisplay):
         self.update_preset()
 
     def get_menu_options(self):
-        """Build menu options with 'Randomise' as first option, followed by presets."""
+        """Build menu options with presets followed by 'Randomise' as last option."""
         options = []
-
-        # Add "Randomise" as first option
-        options.append(MenuOption("Randomise", self.randomize_preset, self.font))
 
         # Add all presets for this instrument (filter out special presets)
         presets = self.api.get_presets(self.instrument_name)
@@ -42,6 +39,9 @@ class PresetMenuDisplay(MenuDisplay):
             # Skip special presets (those starting with __)
             if not preset.name.startswith("__"):
                 options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
+
+        # Add "Randomise" as last option
+        options.append(MenuOption("Randomise", self.randomize_preset, self.font))
 
         return options
 
@@ -65,11 +65,10 @@ class PresetMenuDisplay(MenuDisplay):
         if self.instrument_name == self.api.get_current_instrument().name:
             current_preset = self.api.get_current_preset()
             # Compare raw names (stored in options[0]), not display names
-            # Skip first option (Randomise) when searching
-            current_option = next((o for o in self.menu_options[1:]
+            # Search all options except last (Randomise)
+            current_option = next((o for o in self.menu_options[:-1]
                                   if o.options and o.options[0] == current_preset.name), None)
             if current_option is not None:
-                # Add 1 to account for "Randomise" at index 0
                 self.current_menu_option = self.menu_options.index(current_option)
                 self._update_selected_option()
                 self.draw_image()

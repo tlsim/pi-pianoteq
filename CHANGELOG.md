@@ -12,7 +12,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   - GFX HAT: New "Randomize" option in control menu with submenu
     - "Randomize Preset": Randomize parameters of current preset
     - "Random All": Randomly select instrument and preset, then randomize parameters
-  - Quick access: "Randomise" option now appears as first option in preset menu (long-press ENTER from main display)
+  - Quick access: "Randomise" option now appears as last option in preset menu (long-press ENTER from main display)
   - Modified indicator: Displays show "(modified)" suffix after parameter randomization
   - CLI: Direct keyboard shortcuts for randomization
     - Press 'r' to randomize current preset parameters
