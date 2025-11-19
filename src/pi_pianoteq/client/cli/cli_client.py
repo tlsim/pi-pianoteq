@@ -110,34 +110,7 @@ class CliClient(Client):
 
     def _get_log_text(self):
         """Generate log text display from buffered messages"""
-        messages = self.log_buffer.get_messages()
-        if not messages:
-            return [('ansigray', '  Initializing...\n')]
-
-        # Calculate terminal dimensions
-        try:
-            terminal_size = os.get_terminal_size()
-            terminal_height = terminal_size.lines
-            terminal_width = terminal_size.columns
-            max_log_lines = max(10, terminal_height - 12)  # At least 10, otherwise height - 12
-        except (OSError, AttributeError):
-            max_log_lines = 20  # Default if can't detect terminal size
-            terminal_width = 80  # Default width
-
-        # Account for frame borders (2 chars), padding (2 chars for "  "), and safety margin
-        max_line_width = terminal_width - 6
-
-        # Return last N messages that fit, truncating if needed
-        lines = []
-        visible_messages = messages[-max_log_lines:]
-        for msg in visible_messages:
-            # Truncate message if too long
-            if len(msg) > max_line_width:
-                truncated_msg = msg[:max_line_width - 3] + '...'
-            else:
-                truncated_msg = msg
-            lines.append(('ansibrightblack', f'  {truncated_msg}\n'))
-        return lines
+        return cli_display.format_log_messages(self.log_buffer, reserved_lines=12, default_max_lines=20)
 
     def set_api(self, api: ClientApi):
         """Provide API and switch to normal layout"""
@@ -160,6 +133,7 @@ class CliClient(Client):
         self.menu_mode = False
         self.preset_menu_mode = False
         self.preset_menu_instrument = None
+        self.logs_view_mode = False
         self.instrument_names = [i.name for i in self.api.get_instruments()]
         self.preset_names = []
         self.current_menu_index = 0
@@ -211,6 +185,10 @@ class CliClient(Client):
                 # Exit menu mode
                 self.menu_mode = False
                 self._update_display()
+            elif self.logs_view_mode:
+                # Exit logs view mode
+                self.logs_view_mode = False
+                self._update_display()
             else:
                 # Exit application
                 event.app.exit()
@@ -227,6 +205,9 @@ class CliClient(Client):
                 self._update_display()
             elif self.menu_mode:
                 self.menu_mode = False
+                self._update_display()
+            elif self.logs_view_mode:
+                self.logs_view_mode = False
                 self._update_display()
 
         # Normal mode: Arrow keys for navigation
@@ -299,6 +280,13 @@ class CliClient(Client):
                 else:
                     self.search_manager.enter_search('combined')
                 self.current_menu_index = 0
+                self._update_display()
+
+        # Enter logs view mode
+        @kb.add('l')
+        def kb_logs(event):
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active() and not self.logs_view_mode:
+                self.logs_view_mode = True
                 self._update_display()
 
         # Handle text input in search mode
@@ -444,12 +432,15 @@ class CliClient(Client):
             self.search_manager,
             self.preset_menu_mode,
             self.preset_menu_instrument,
-            self.menu_mode
+            self.menu_mode,
+            self.logs_view_mode
         )
 
     def _get_display_text(self):
         """Generate display text based on current mode"""
-        if self.search_manager.is_active():
+        if self.logs_view_mode:
+            return cli_display.get_logs_view_text(self.log_buffer)
+        elif self.search_manager.is_active():
             return cli_display.get_search_text(
                 self.search_manager,
                 self.current_menu_index,
