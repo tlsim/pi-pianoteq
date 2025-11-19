@@ -33,12 +33,10 @@ class PresetMenuDisplay(MenuDisplay):
         """Build menu options with presets followed by 'Randomise' as last option."""
         options = []
 
-        # Add all presets for this instrument (filter out special presets)
+        # Add all presets for this instrument
         presets = self.api.get_presets(self.instrument_name)
         for preset in presets:
-            # Skip special presets (those starting with __)
-            if not preset.name.startswith("__"):
-                options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
+            options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
 
         # Add "Randomise" as last option
         options.append(MenuOption("Randomise", self.randomize_preset, self.font))
@@ -61,11 +59,8 @@ class PresetMenuDisplay(MenuDisplay):
             # Switch to this instrument by loading its first preset
             presets = self.api.get_presets(self.instrument_name)
             if presets:
-                # Filter out special presets
-                regular_presets = [p for p in presets if not p.name.startswith("__")]
-                if regular_presets:
-                    first_preset = regular_presets[0]
-                    self.api.set_preset(self.instrument_name, first_preset.name)
+                first_preset = presets[0]
+                self.api.set_preset(self.instrument_name, first_preset.name)
 
         # Now randomize the current preset
         self.api.randomize_current_preset()

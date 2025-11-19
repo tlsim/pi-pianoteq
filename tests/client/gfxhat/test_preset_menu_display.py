@@ -342,29 +342,6 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
         self.assertTrue(menu.preset_selected)
         self.mock_on_exit.assert_called_once()
 
-    @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')
-    @patch('PIL.ImageDraw.Draw')
-    @patch('PIL.Image.new')
-    def test_filters_special_presets(self, mock_image, mock_draw, mock_scroller):
-        """Test that presets starting with __ are filtered out."""
-        self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_presets.return_value = [
-            Preset("Bright", "Bright"),
-            Preset("__SPECIAL__", "Special"),
-            Preset("Dark", "Dark")
-        ]
-
-        menu = PresetMenuDisplay(
-            self.mock_api, 128, 64, self.mock_font,
-            self.mock_on_exit, "Piano"
-        )
-
-        # Should have 2 regular presets + Randomise (special preset filtered)
-        self.assertEqual(3, len(menu.menu_options))
-        self.assertEqual("Bright", menu.menu_options[0].name)
-        self.assertEqual("Dark", menu.menu_options[1].name)
-        self.assertEqual("Randomise", menu.menu_options[2].name)
-
 
 if __name__ == '__main__':
     unittest.main()

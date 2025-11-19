@@ -127,25 +127,6 @@ class ClientLibRandomizationTestCase(unittest.TestCase):
         self.assertEqual(1, self.selector.current_instrument_idx)
         self.assertEqual(1, self.selector.current_instrument_preset_idx)
 
-    @patch('pi_pianoteq.lib.client_lib.random.choice')
-    def test_randomize_all_filters_special_presets(self, mock_choice):
-        """Test that randomize_all excludes presets starting with __."""
-        special_preset = Preset('__RANDOMISE__', 'Randomised')
-        self.inst1.presets.append(special_preset)
-
-        client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
-        self.jsonrpc.reset_mock()
-
-        mock_choice.side_effect = [self.inst1, self.preset1a]
-
-        client_lib.randomize_all()
-
-        # Second call to random.choice should be for presets
-        presets_arg = mock_choice.call_args_list[1][0][0]
-        self.assertNotIn(special_preset, presets_arg)
-        self.assertIn(self.preset1a, presets_arg)
-        self.assertIn(self.preset1b, presets_arg)
-
     def test_randomize_all_handles_empty_library(self):
         """Test that randomize_all handles empty instrument library gracefully."""
         empty_library = Library([])

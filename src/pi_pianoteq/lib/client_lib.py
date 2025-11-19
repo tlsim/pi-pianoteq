@@ -155,14 +155,12 @@ class ClientLib(ClientApi):
         random_instrument = random.choice(instruments)
         logger.info(f"Random instrument selected: {random_instrument.name}")
 
-        # Pick random preset (filter out special presets if any exist)
-        presets = [p for p in random_instrument.presets if not p.name.startswith("__")]
-
-        if not presets:
+        # Pick random preset
+        if not random_instrument.presets:
             logger.warning(f"No presets available for instrument {random_instrument.name}")
             return
 
-        random_preset = random.choice(presets)
+        random_preset = random.choice(random_instrument.presets)
         logger.info(f"Random preset selected: {random_preset.name}")
 
         # Update selector position to match our random selection
