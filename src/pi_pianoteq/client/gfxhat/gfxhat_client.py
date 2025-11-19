@@ -8,7 +8,6 @@ from typing import Optional
 from pi_pianoteq.client.gfxhat.instrument_display import InstrumentDisplay
 from pi_pianoteq.client.gfxhat.instrument_menu_display import InstrumentMenuDisplay
 from pi_pianoteq.client.gfxhat.control_menu_display import ControlMenuDisplay
-from pi_pianoteq.client.gfxhat.randomize_menu_display import RandomizeMenuDisplay
 from pi_pianoteq.client.gfxhat.loading_display import LoadingDisplay
 from pi_pianoteq.client.gfxhat.preset_menu_display import PresetMenuDisplay
 from pi_pianoteq.client.client import Client
@@ -28,7 +27,6 @@ class GfxhatClient(Client):
         self.interrupt = False
         self.control_menu_open = False
         self.instrument_menu_open = False
-        self.randomize_menu_open = False
         self.preset_menu_open = False
         self.preset_menu_source = None
         self.width, self.height = lcd.dimensions()
@@ -43,7 +41,6 @@ class GfxhatClient(Client):
         # Normal mode displays (initialized later if api provided)
         self.instrument_display = None
         self.control_menu_display = None
-        self.randomize_menu_display = None
         self.menu_display = None
         self.preset_menu_display = None
 
@@ -63,13 +60,7 @@ class GfxhatClient(Client):
             self.api, self.width, self.height, self.font,
             self.on_exit_control_menu,
             self.on_enter_instrument_menu,
-            self.on_enter_randomize_menu
-        )
-        self.randomize_menu_display = RandomizeMenuDisplay(
-            self.api, self.width, self.height, self.font,
-            self.on_exit_randomize_menu,
-            self.on_randomize_preset,
-            self.on_randomize_all
+            self.on_random_all
         )
         self.menu_display = InstrumentMenuDisplay(
             self.api, self.width, self.height, self.font,
@@ -130,8 +121,6 @@ class GfxhatClient(Client):
     def update_handler(self):
         if self.preset_menu_open:
             self.set_handler(self.preset_menu_display.get_handler())
-        elif self.randomize_menu_open:
-            self.set_handler(self.randomize_menu_display.get_handler())
         elif self.instrument_menu_open:
             self.set_handler(self.menu_display.get_handler())
         elif self.control_menu_open:
@@ -145,13 +134,11 @@ class GfxhatClient(Client):
             touch.on(index, handler)
 
     def get_display(self):
-        """Get current active display (loading, preset menu, randomize menu, instrument menu, control menu, or instrument)"""
+        """Get current active display (loading, preset menu, instrument menu, control menu, or instrument)"""
         if self.loading_mode:
             return self.loading_display
         elif self.preset_menu_open:
             return self.preset_menu_display
-        elif self.randomize_menu_open:
-            return self.randomize_menu_display
         elif self.instrument_menu_open:
             return self.menu_display
         elif self.control_menu_open:
@@ -172,8 +159,6 @@ class GfxhatClient(Client):
             self.instrument_display.stop_scrolling()
         if self.control_menu_display:
             self.control_menu_display.stop_scrolling()
-        if self.randomize_menu_display:
-            self.randomize_menu_display.stop_scrolling()
         if self.menu_display:
             self.menu_display.stop_scrolling()
         if self.preset_menu_display:
@@ -189,7 +174,7 @@ class GfxhatClient(Client):
         if self.instrument_display:
             self.instrument_display.modified = modified
             # Only update display if we're showing it (not in a menu)
-            if not self.control_menu_open and not self.randomize_menu_open and not self.preset_menu_open and not self.instrument_menu_open:
+            if not self.control_menu_open and not self.preset_menu_open and not self.instrument_menu_open:
                 self.instrument_display.update_display()
 
     def on_enter_control_menu(self):
@@ -230,42 +215,11 @@ class GfxhatClient(Client):
 
         self.update_handler()
 
-    def on_enter_randomize_menu(self):
-        """Enter randomize submenu from control menu."""
-        self.control_menu_display.stop_scrolling()
-        self.randomize_menu_open = True
-        self.randomize_menu_display.start_scrolling()
-        self.update_handler()
-
-    def on_exit_randomize_menu(self):
-        """Exit randomize menu and return to control menu."""
-        self.randomize_menu_display.stop_scrolling()
-        self.randomize_menu_open = False
-        self.control_menu_display.start_scrolling()
-        self.update_handler()
-
-    def on_randomize_preset(self):
-        """Randomize parameters of current preset and return to main display."""
-        self.api.randomize_current_preset()
-
-        # Close all menus and return to main display
-        self.randomize_menu_display.stop_scrolling()
-        self.randomize_menu_open = False
-        if self.control_menu_open:
-            self.control_menu_display.stop_scrolling()
-            self.control_menu_open = False
-
-        self.instrument_display.update_display()
-        self.instrument_display.start_scrolling()
-        self.update_handler()
-
-    def on_randomize_all(self):
+    def on_random_all(self):
         """Randomly select instrument and preset, randomize parameters, and return to main display."""
         self.api.randomize_all()
 
-        # Close all menus and return to main display
-        self.randomize_menu_display.stop_scrolling()
-        self.randomize_menu_open = False
+        # Close control menu and return to main display
         if self.control_menu_open:
             self.control_menu_display.stop_scrolling()
             self.control_menu_open = False

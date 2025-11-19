@@ -55,7 +55,19 @@ class PresetMenuDisplay(MenuDisplay):
         self.on_exit()
 
     def randomize_preset(self):
-        """Randomize current preset and mark for menu exit."""
+        """Randomize preset for this instrument and mark for menu exit."""
+        # If we're viewing a different instrument's presets, switch to it first
+        if self.instrument_name != self.api.get_current_instrument().name:
+            # Switch to this instrument by loading its first preset
+            presets = self.api.get_presets(self.instrument_name)
+            if presets:
+                # Filter out special presets
+                regular_presets = [p for p in presets if not p.name.startswith("__")]
+                if regular_presets:
+                    first_preset = regular_presets[0]
+                    self.api.set_preset(self.instrument_name, first_preset.name)
+
+        # Now randomize the current preset
         self.api.randomize_current_preset()
         self.preset_selected = True
         self.on_exit()
