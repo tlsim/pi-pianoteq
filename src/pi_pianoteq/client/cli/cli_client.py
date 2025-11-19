@@ -289,6 +289,20 @@ class CliClient(Client):
                 self.logs_view_mode = True
                 self._update_display()
 
+        # Randomize current preset
+        @kb.add('r')
+        def kb_randomize_preset(event):
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active() and not self.logs_view_mode:
+                self.api.randomize_current_preset()
+                self._update_display()
+
+        # Random instrument and randomize parameters
+        @kb.add('R')
+        def kb_random_instrument(event):
+            if not self.menu_mode and not self.preset_menu_mode and not self.search_manager.is_active() and not self.logs_view_mode:
+                self.api.randomize_instrument_and_preset()
+                self._update_display()
+
         # Handle text input in search mode
         for char in 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 -_.,()[]':
             @kb.add(char, filter=Condition(lambda: self.search_manager.is_active()))

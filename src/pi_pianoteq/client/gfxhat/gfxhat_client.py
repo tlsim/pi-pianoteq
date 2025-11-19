@@ -58,7 +58,9 @@ class GfxhatClient(Client):
         self.control_menu_display = ControlMenuDisplay(
             self.api, self.width, self.height, self.font,
             self.on_exit_control_menu,
-            self.on_enter_instrument_menu
+            self.on_enter_instrument_menu,
+            self.on_randomize_preset,
+            self.on_random_instrument
         )
         self.menu_display = InstrumentMenuDisplay(
             self.api, self.width, self.height, self.font,
@@ -254,4 +256,22 @@ class GfxhatClient(Client):
         else:
             self.menu_display.start_scrolling()
 
+        self.update_handler()
+
+    def on_randomize_preset(self):
+        """Randomize current preset and close menu."""
+        self.api.randomize_current_preset()
+        self.control_menu_display.stop_scrolling()
+        self.control_menu_open = False
+        self.instrument_display.update_display()
+        self.instrument_display.start_scrolling()
+        self.update_handler()
+
+    def on_random_instrument(self):
+        """Randomly select instrument, randomize parameters, and close menu."""
+        self.api.randomize_instrument_and_preset()
+        self.control_menu_display.stop_scrolling()
+        self.control_menu_open = False
+        self.instrument_display.update_display()
+        self.instrument_display.start_scrolling()
         self.update_handler()

@@ -67,6 +67,8 @@ def get_normal_text(api: ClientApi) -> List[Tuple[str, str]]:
         ('', '  Left/Right  : Quick instrument switch\n'),
         ('bold', '  i'), ('', '           : Open instrument menu\n'),
         ('bold', '  p'), ('', '           : Open preset menu\n'),
+        ('bold', '  r'), ('', '           : Randomize preset\n'),
+        ('bold', '  R'), ('', '           : Random instrument\n'),
         ('bold', '  /'), ('', '           : Search instruments & presets\n'),
         ('bold', '  l'), ('', '           : View logs\n'),
         ('bold', '  q'), ('', '           : Quit\n'),

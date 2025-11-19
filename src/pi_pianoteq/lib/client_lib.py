@@ -7,6 +7,7 @@ from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
 from typing import List
 from os import system
 import logging
+import random
 
 logger = logging.getLogger(__name__)
 
@@ -124,3 +125,31 @@ class ClientLib(ClientApi):
         if self.on_exit is not None:
             self.on_exit()
         system(Config.SHUTDOWN_COMMAND)
+
+    # Randomization methods
+    def randomize_current_preset(self) -> None:
+        """
+        Randomize parameters of the current preset.
+
+        Uses Pianoteq's randomizeParameters() with default amount (1.0).
+        """
+        logger.info("Randomizing current preset parameters")
+        self.jsonrpc.randomize_parameters()
+
+    def randomize_instrument_and_preset(self) -> None:
+        """
+        Randomly select an instrument and randomize its parameters.
+
+        Selects a random instrument from the library, loads its first preset,
+        then randomizes the parameters.
+        """
+        instruments = self.instrument_library.get_instruments()
+        if not instruments:
+            logger.warning("No instruments available for randomization")
+            return
+
+        random_instrument = random.choice(instruments)
+        logger.info(f"Randomly selected instrument: {random_instrument.name}")
+
+        self.set_instrument(random_instrument.name)
+        self.randomize_current_preset()
