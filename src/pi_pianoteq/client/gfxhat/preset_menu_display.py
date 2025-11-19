@@ -30,16 +30,13 @@ class PresetMenuDisplay(MenuDisplay):
         self.update_preset()
 
     def get_menu_options(self):
-        """Build menu options with presets followed by 'Randomise' as last option."""
+        """Build menu options from presets."""
         options = []
 
         # Add all presets for this instrument
         presets = self.api.get_presets(self.instrument_name)
         for preset in presets:
             options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
-
-        # Add "Randomise" as last option
-        options.append(MenuOption("Randomise", self.randomize_preset, self.font))
 
         return options
 
@@ -52,28 +49,12 @@ class PresetMenuDisplay(MenuDisplay):
         self.api.set_preset(self.instrument_name, preset_name)
         self.on_exit()
 
-    def randomize_preset(self):
-        """Randomize preset for this instrument and mark for menu exit."""
-        # If we're viewing a different instrument's presets, switch to it first
-        if self.instrument_name != self.api.get_current_instrument().name:
-            # Switch to this instrument by loading its first preset
-            presets = self.api.get_presets(self.instrument_name)
-            if presets:
-                first_preset = presets[0]
-                self.api.set_preset(self.instrument_name, first_preset.name)
-
-        # Now randomize the current preset
-        self.api.randomize_current_preset()
-        self.preset_selected = True
-        self.on_exit()
-
     def update_preset(self):
         """Highlight currently loaded preset if viewing current instrument's presets."""
         if self.instrument_name == self.api.get_current_instrument().name:
             current_preset = self.api.get_current_preset()
             # Compare raw names (stored in options[0]), not display names
-            # Search all options except last (Randomise)
-            current_option = next((o for o in self.menu_options[:-1]
+            current_option = next((o for o in self.menu_options
                                   if o.options and o.options[0] == current_preset.name), None)
             if current_option is not None:
                 self.current_menu_option = self.menu_options.index(current_option)

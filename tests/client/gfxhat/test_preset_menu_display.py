@@ -35,7 +35,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.ImageDraw.Draw')
     @patch('PIL.Image.new')
     def test_get_menu_options_creates_options_from_api(self, mock_image, mock_draw, mock_scroller_class):
-        """Menu options should include presets plus Randomise as last option."""
+        """Menu options should include all presets."""
         self._configure_scroller_mock(mock_scroller_class)
         self.mock_api.get_presets.return_value = [
             Preset("Bright", "Bright"),
@@ -48,12 +48,11 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
             self.mock_on_exit, "Piano"
         )
 
-        # Should create 4 menu options: 3 presets + Randomise
-        self.assertEqual(4, len(menu.menu_options))
+        # Should create 3 menu options from presets
+        self.assertEqual(3, len(menu.menu_options))
         self.assertEqual("Bright", menu.menu_options[0].name)
         self.assertEqual("Dark", menu.menu_options[1].name)
         self.assertEqual("Medium", menu.menu_options[2].name)
-        self.assertEqual("Randomise", menu.menu_options[3].name)
 
     @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')
     @patch('PIL.ImageDraw.Draw')
@@ -103,7 +102,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
             self.mock_on_exit, "Piano"  # Viewing current instrument
         )
 
-        # Should position on "Medium" (index 2: Bright, Dark, Medium, then Randomise at end)
+        # Should position on "Medium" (index 2: Bright, Dark, Medium)
         self.assertEqual(2, menu.current_menu_option)
 
     @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')
@@ -165,7 +164,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.ImageDraw.Draw')
     @patch('PIL.Image.new')
     def test_empty_preset_list(self, mock_image, mock_draw, mock_scroller):
-        """Should have Randomise option even with empty preset list."""
+        """Should handle empty preset list."""
         self.mock_api.get_presets.return_value = []
         self._configure_scroller_mock(mock_scroller)
 
@@ -174,9 +173,8 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
             self.mock_on_exit, "Piano"
         )
 
-        # Should have 1 option (Randomise) even with no presets, and it's the last (only) option
-        self.assertEqual(1, len(menu.menu_options))
-        self.assertEqual("Randomise", menu.menu_options[-1].name)
+        # Should have 0 options with no presets
+        self.assertEqual(0, len(menu.menu_options))
 
     @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')
     @patch('PIL.ImageDraw.Draw')
@@ -292,55 +290,13 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
             self.mock_on_exit, "Piano"
         )
 
-        # Presets first, then Randomise as last option
         # Menu options should show display names (without prefix)
         self.assertEqual("Bright", menu.menu_options[0].name)
         self.assertEqual("Dark", menu.menu_options[1].name)
-        self.assertEqual("Randomise", menu.menu_options[2].name)
 
         # But stored raw names should include prefix
         self.assertEqual("Piano Bright", menu.menu_options[0].options[0])
         self.assertEqual("Piano Dark", menu.menu_options[1].options[0])
-
-    @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')
-    @patch('PIL.ImageDraw.Draw')
-    @patch('PIL.Image.new')
-    def test_randomise_option_appears_last(self, mock_image, mock_draw, mock_scroller):
-        """Test that 'Randomise' appears as last menu option."""
-        self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_presets.return_value = [
-            Preset("Bright", "Bright"),
-            Preset("Dark", "Dark")
-        ]
-
-        menu = PresetMenuDisplay(
-            self.mock_api, 128, 64, self.mock_font,
-            self.mock_on_exit, "Piano"
-        )
-
-        self.assertEqual("Randomise", menu.menu_options[-1].name)
-
-    @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')
-    @patch('PIL.ImageDraw.Draw')
-    @patch('PIL.Image.new')
-    def test_randomise_calls_api_and_closes_menu(self, mock_image, mock_draw, mock_scroller):
-        """Test that selecting Randomise randomizes and closes menu."""
-        self._configure_scroller_mock(mock_scroller)
-        self.mock_api.get_presets.return_value = [
-            Preset("Bright", "Bright"),
-            Preset("Dark", "Dark")
-        ]
-
-        menu = PresetMenuDisplay(
-            self.mock_api, 128, 64, self.mock_font,
-            self.mock_on_exit, "Piano"
-        )
-
-        menu.randomize_preset()
-
-        self.mock_api.randomize_current_preset.assert_called_once()
-        self.assertTrue(menu.preset_selected)
-        self.mock_on_exit.assert_called_once()
 
 
 if __name__ == '__main__':
