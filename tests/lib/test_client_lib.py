@@ -140,7 +140,8 @@ class ClientLibRandomizationTestCase(unittest.TestCase):
 
         client_lib.randomize_all()
 
-        instrument_arg, presets_arg = mock_choice.call_args_list[1][0]
+        # Second call to random.choice should be for presets
+        presets_arg = mock_choice.call_args_list[1][0][0]
         self.assertNotIn(special_preset, presets_arg)
         self.assertIn(self.preset1a, presets_arg)
         self.assertIn(self.preset1b, presets_arg)
