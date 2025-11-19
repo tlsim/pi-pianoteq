@@ -49,10 +49,15 @@ def get_title(search_manager: SearchManager, preset_menu_mode: bool,
         return "Pi-Pianoteq CLI"
 
 
-def get_normal_text(api: ClientApi) -> List[Tuple[str, str]]:
+def get_normal_text(api: ClientApi, modified: bool = False) -> List[Tuple[str, str]]:
     """Generate normal mode display using formatted text tuples"""
     instrument = api.get_current_instrument()
-    preset = api.get_current_preset().display_name
+    preset_name = api.get_current_preset().display_name
+    # Append (modified) suffix if preset has been modified
+    if modified:
+        preset = f'{preset_name} (modified)'
+    else:
+        preset = preset_name
 
     lines = [
         ('', '\n'),

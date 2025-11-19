@@ -157,11 +157,66 @@ class ClientLibRandomizationTestCase(unittest.TestCase):
         client_lib.instrument_library = empty_library
         client_lib.selector = empty_selector
         client_lib.on_exit = None
+        client_lib.on_preset_modified = None
 
         client_lib.randomize_all()
 
         self.jsonrpc.load_preset.assert_not_called()
         self.jsonrpc.randomize_parameters.assert_not_called()
+
+    def test_randomize_current_preset_sets_modified_flag(self):
+        """Test that randomize_current_preset triggers modified callback."""
+        client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
+        modified_callback = Mock()
+        client_lib.set_on_preset_modified(modified_callback)
+
+        client_lib.randomize_current_preset()
+
+        modified_callback.assert_called_once_with(True)
+
+    def test_randomize_all_sets_modified_flag(self):
+        """Test that randomize_all triggers modified callback."""
+        client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
+        modified_callback = Mock()
+        client_lib.set_on_preset_modified(modified_callback)
+
+        with patch('pi_pianoteq.lib.client_lib.random.choice') as mock_choice:
+            mock_choice.side_effect = [self.inst1, self.preset1a]
+            client_lib.randomize_all()
+
+        # Should be called with True when randomizing
+        self.assertTrue(any(call == ((True,),) for call in modified_callback.call_args_list))
+
+    def test_set_preset_clears_modified_flag(self):
+        """Test that loading a preset clears modified flag."""
+        client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
+        modified_callback = Mock()
+        client_lib.set_on_preset_modified(modified_callback)
+
+        client_lib.set_preset(self.inst1.name, self.preset1a.name)
+
+        # Should be called with False when loading preset
+        modified_callback.assert_called_with(False)
+
+    def test_set_preset_next_clears_modified_flag(self):
+        """Test that navigating presets clears modified flag."""
+        client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
+        modified_callback = Mock()
+        client_lib.set_on_preset_modified(modified_callback)
+
+        client_lib.set_preset_next()
+
+        modified_callback.assert_called_with(False)
+
+    def test_set_instrument_clears_modified_flag(self):
+        """Test that changing instruments clears modified flag."""
+        client_lib = ClientLib(self.library, self.selector, self.jsonrpc)
+        modified_callback = Mock()
+        client_lib.set_on_preset_modified(modified_callback)
+
+        client_lib.set_instrument(self.inst2.name)
+
+        modified_callback.assert_called_with(False)
 
 
 if __name__ == '__main__':

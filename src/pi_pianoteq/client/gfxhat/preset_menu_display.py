@@ -30,12 +30,18 @@ class PresetMenuDisplay(MenuDisplay):
         self.update_preset()
 
     def get_menu_options(self):
-        """Build menu options from preset names for this instrument."""
-        presets = self.api.get_presets(self.instrument_name)
-
+        """Build menu options with 'Randomise' as first option, followed by presets."""
         options = []
+
+        # Add "Randomise" as first option
+        options.append(MenuOption("Randomise", self.randomize_preset, self.font))
+
+        # Add all presets for this instrument (filter out special presets)
+        presets = self.api.get_presets(self.instrument_name)
         for preset in presets:
-            options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
+            # Skip special presets (those starting with __)
+            if not preset.name.startswith("__"):
+                options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
 
         return options
 
@@ -48,14 +54,22 @@ class PresetMenuDisplay(MenuDisplay):
         self.api.set_preset(self.instrument_name, preset_name)
         self.on_exit()
 
+    def randomize_preset(self):
+        """Randomize current preset and mark for menu exit."""
+        self.api.randomize_current_preset()
+        self.preset_selected = True
+        self.on_exit()
+
     def update_preset(self):
         """Highlight currently loaded preset if viewing current instrument's presets."""
         if self.instrument_name == self.api.get_current_instrument().name:
             current_preset = self.api.get_current_preset()
             # Compare raw names (stored in options[0]), not display names
-            current_option = next((o for o in self.menu_options
+            # Skip first option (Randomise) when searching
+            current_option = next((o for o in self.menu_options[1:]
                                   if o.options and o.options[0] == current_preset.name), None)
             if current_option is not None:
+                # Add 1 to account for "Randomise" at index 0
                 self.current_menu_option = self.menu_options.index(current_option)
                 self._update_selected_option()
                 self.draw_image()

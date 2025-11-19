@@ -53,6 +53,7 @@ class GfxhatClient(Client):
     def _init_normal_displays(self):
         """Initialize normal operation displays (requires API)"""
         self.api.set_on_exit(self.cleanup)
+        self.api.set_on_preset_modified(self.on_preset_modified)
         self.instrument_display = InstrumentDisplay(
             self.api, self.width, self.height, self.font,
             self.on_enter_control_menu,
@@ -182,6 +183,14 @@ class GfxhatClient(Client):
         backlight.show()
         lcd.clear()
         lcd.show()
+
+    def on_preset_modified(self, modified: bool):
+        """Update instrument display when preset modification state changes."""
+        if self.instrument_display:
+            self.instrument_display.modified = modified
+            # Only update display if we're showing it (not in a menu)
+            if not self.control_menu_open and not self.randomize_menu_open and not self.preset_menu_open and not self.instrument_menu_open:
+                self.instrument_display.update_display()
 
     def on_enter_control_menu(self):
         self.instrument_display.stop_scrolling()
