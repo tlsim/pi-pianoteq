@@ -20,6 +20,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
     - Hold: continuous scrolling/long-press action starts after brief delay (2 held events)
     - Prevents accidental over-navigation or unintended long-press activation
 
+### Changed
+- GFX HAT shutdown option moved from instrument selection menu to control menu for easier access
+
 ## [2.2.0] - 2025-11-15
 
 ### Changed
