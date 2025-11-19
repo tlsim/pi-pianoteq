@@ -22,4 +22,4 @@ class ControlMenuDisplay(MenuDisplay):
         ]
 
     def get_heading(self):
-        return "Control Menu:"
+        return "Menu:"
