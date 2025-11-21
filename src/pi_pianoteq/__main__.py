@@ -95,6 +95,11 @@ def main():
 
     args = parser.parse_args()
 
+    # Override config with CLI arguments (before show_config so it's visible)
+    if args.headless is not None:
+        Config.PIANOTEQ_HEADLESS = args.headless
+        Config._config_sources['PIANOTEQ_HEADLESS'] = 'cli_argument'
+
     # Handle special commands
     if args.show_config:
         show_config()
@@ -102,11 +107,6 @@ def main():
 
     if args.init_config:
         return init_config()
-
-    # Override config with CLI arguments
-    if args.headless is not None:
-        Config.PIANOTEQ_HEADLESS = args.headless
-        Config._config_sources['PIANOTEQ_HEADLESS'] = 'cli_argument'
 
     # Normal startup - import hardware dependencies only when needed
     from pi_pianoteq.instrument.library import Library
