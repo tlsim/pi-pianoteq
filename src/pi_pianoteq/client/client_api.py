@@ -55,11 +55,6 @@ class ClientApi(ABC):
         raise NotImplemented
 
     @abstractmethod
-    def set_preset_modified(self, modified: bool) -> None:
-        """Notify displays that preset has been modified/reset."""
-        raise NotImplemented
-
-    @abstractmethod
     def get_presets(self, instrument_name: str) -> list:
         """Get list of Preset objects for a specific instrument."""
         raise NotImplemented
