@@ -72,9 +72,10 @@ pi-pianoteq --show-config
 ### Configuration Priority
 
 Configuration is loaded with the following priority (highest to lowest):
-1. Environment variables
-2. User config (`~/.config/pi_pianoteq/pi_pianoteq.conf`)
-3. Bundled default
+1. Command line arguments (only `--headless`/`--no-headless`)
+2. Environment variables
+3. User config (`~/.config/pi_pianoteq/pi_pianoteq.conf`)
+4. Bundled default
 
 User config persists across package upgrades.
 
@@ -94,6 +95,8 @@ pi-pianoteq
 
 - `--cli`: Use CLI client instead of GFX HAT (for testing/development)
 - `--include-demo`: Include demo instruments with limited functionality
+- `--headless`: Force Pianoteq to run in headless mode (no GUI)
+- `--no-headless`: Force Pianoteq to run with GUI
 - `--show-config`: Display current configuration and exit
 - `--init-config`: Initialize user config file and exit
 
