@@ -18,7 +18,7 @@ class ControlMenuDisplay(MenuDisplay):
     def __init__(self, api: ClientApi, width, height, font, on_exit, on_select_instrument):
         self.on_select_instrument = on_select_instrument
         super().__init__(api, width, height, font, on_exit)
-        self.menu_open = False
+        self.shutdown_menu_open = False
         self.shutdown_display = ShutdownDisplay(api, width, height, font, self.on_exit_menu)
 
     def get_menu_options(self):
@@ -31,13 +31,13 @@ class ControlMenuDisplay(MenuDisplay):
         return "Menu:"
 
     def get_image(self):
-        if self.menu_open:
+        if self.shutdown_menu_open:
             return self.shutdown_display.get_image()
         else:
             return self.image
 
     def get_backlight(self):
-        if self.menu_open:
+        if self.shutdown_menu_open:
             return self.shutdown_display.get_backlight()
         else:
             return self.backlight
@@ -48,15 +48,15 @@ class ControlMenuDisplay(MenuDisplay):
             touch.on(index, handler)
 
     def update_handler(self):
-        if self.menu_open:
+        if self.shutdown_menu_open:
             self.set_handler(self.shutdown_display.get_handler())
         else:
             self.set_handler(self.get_handler())
 
     def on_enter_menu(self):
-        self.menu_open = True
+        self.shutdown_menu_open = True
         self.update_handler()
 
     def on_exit_menu(self):
-        self.menu_open = False
+        self.shutdown_menu_open = False
         self.update_handler()

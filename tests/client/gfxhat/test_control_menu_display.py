@@ -55,13 +55,13 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         handler(touch.ENTER, 'release')
 
         # Should have opened shutdown menu
-        self.assertTrue(display.menu_open)
+        self.assertTrue(display.shutdown_menu_open)
 
     def test_get_image_returns_shutdown_display_when_menu_open(self):
         """get_image should return shutdown display image when menu is open."""
         display = self.create_display()
 
-        display.menu_open = True
+        display.shutdown_menu_open = True
         display.shutdown_display.get_image = Mock(return_value="shutdown_image")
 
         image = display.get_image()
@@ -72,7 +72,7 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         """get_image should return main menu image when shutdown menu closed."""
         display = self.create_display()
 
-        display.menu_open = False
+        display.shutdown_menu_open = False
 
         image = display.get_image()
 
@@ -83,7 +83,7 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         """get_backlight should return shutdown backlight when menu is open."""
         display = self.create_display()
 
-        display.menu_open = True
+        display.shutdown_menu_open = True
         display.shutdown_display.get_backlight = Mock(return_value="shutdown_backlight")
 
         backlight = display.get_backlight()
@@ -94,7 +94,7 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         """get_backlight should return main backlight when shutdown menu closed."""
         display = self.create_display()
 
-        display.menu_open = False
+        display.shutdown_menu_open = False
 
         backlight = display.get_backlight()
 
@@ -102,28 +102,28 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
 
     @patch('pi_pianoteq.client.gfxhat.control_menu_display.touch')
     def test_on_enter_menu_opens_shutdown_menu(self, mock_touch):
-        """on_enter_menu should set menu_open flag."""
+        """on_enter_menu should set shutdown_menu_open flag."""
         display = self.create_display()
 
         display.on_enter_menu()
 
-        self.assertTrue(display.menu_open)
+        self.assertTrue(display.shutdown_menu_open)
 
     @patch('pi_pianoteq.client.gfxhat.control_menu_display.touch')
     def test_on_exit_menu_closes_shutdown_menu(self, mock_touch):
-        """on_exit_menu should clear menu_open flag."""
+        """on_exit_menu should clear shutdown_menu_open flag."""
         display = self.create_display()
 
-        display.menu_open = True
+        display.shutdown_menu_open = True
         display.on_exit_menu()
 
-        self.assertFalse(display.menu_open)
+        self.assertFalse(display.shutdown_menu_open)
 
     @patch('pi_pianoteq.client.gfxhat.control_menu_display.touch')
     def test_update_handler_sets_shutdown_handler_when_menu_open(self, mock_touch):
         """update_handler should set shutdown handler when menu is open."""
         display = self.create_display()
-        display.menu_open = True
+        display.shutdown_menu_open = True
 
         mock_shutdown_handler = Mock()
         display.shutdown_display.get_handler = Mock(return_value=mock_shutdown_handler)
@@ -137,7 +137,7 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
     def test_update_handler_sets_main_handler_when_menu_closed(self, mock_touch):
         """update_handler should set main handler when menu is closed."""
         display = self.create_display()
-        display.menu_open = False
+        display.shutdown_menu_open = False
 
         display.update_handler()
 
@@ -150,11 +150,11 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
 
         self.assertIsNotNone(display.shutdown_display)
 
-    def test_menu_open_flag_initialized_false(self):
-        """menu_open flag should be initialized to False."""
+    def test_shutdown_menu_open_flag_initialized_false(self):
+        """shutdown_menu_open flag should be initialized to False."""
         display = self.create_display()
 
-        self.assertFalse(display.menu_open)
+        self.assertFalse(display.shutdown_menu_open)
 
     @patch('pi_pianoteq.client.gfxhat.control_menu_display.touch')
     def test_shutdown_option_is_callable(self, mock_touch):
@@ -167,8 +167,8 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         # Should be able to trigger it
         shutdown_option.trigger()
 
-        # Should have set menu_open
-        self.assertTrue(display.menu_open)
+        # Should have set shutdown_menu_open
+        self.assertTrue(display.shutdown_menu_open)
 
     def test_base_handler_still_works(self):
         """Base MenuDisplay handler functionality should still work."""
