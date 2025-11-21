@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [2.3.0] - 2025-11-21
+
 ### Added
 - Parameter randomization via control menu
   - GFX HAT: Control menu (press ENTER on main display) with two randomization options:
