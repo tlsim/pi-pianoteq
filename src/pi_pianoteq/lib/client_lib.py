@@ -18,7 +18,6 @@ class ClientLib(ClientApi):
         self.instrument_library = instrument_library
         self.selector = selector
         self.on_exit = None
-        self.on_preset_modified = None
         self.sync_preset()
 
     def sync_preset(self) -> None:
@@ -74,19 +73,16 @@ class ClientLib(ClientApi):
         self.selector.set_instrument(name)
         preset = self.selector.get_current_preset()
         self.jsonrpc.load_preset(preset.name)
-        self._set_preset_modified(False)
 
     def set_instrument_next(self) -> None:
         self.selector.set_instrument_next()
         preset = self.selector.get_current_preset()
         self.jsonrpc.load_preset(preset.name)
-        self._set_preset_modified(False)
 
     def set_instrument_prev(self) -> None:
         self.selector.set_instrument_prev()
         preset = self.selector.get_current_preset()
         self.jsonrpc.load_preset(preset.name)
-        self._set_preset_modified(False)
 
     # Preset getters
     def get_presets(self, instrument_name: str) -> list:
@@ -109,19 +105,16 @@ class ClientLib(ClientApi):
         if self.selector.set_preset_by_name(instrument_name, preset_name):
             preset = self.selector.get_current_preset()
             self.jsonrpc.load_preset(preset.name)
-            self._set_preset_modified(False)
-
+    
     def set_preset_next(self) -> None:
         self.selector.set_preset_next()
         preset = self.selector.get_current_preset()
         self.jsonrpc.load_preset(preset.name)
-        self._set_preset_modified(False)
 
     def set_preset_prev(self) -> None:
         self.selector.set_preset_prev()
         preset = self.selector.get_current_preset()
         self.jsonrpc.load_preset(preset.name)
-        self._set_preset_modified(False)
 
     # Randomization methods
     def randomize_current_preset(self) -> None:
@@ -133,7 +126,6 @@ class ClientLib(ClientApi):
         """
         logger.info("Randomizing current preset parameters")
         self.jsonrpc.randomize_parameters()
-        self._set_preset_modified(True)
 
     def randomize_all(self) -> None:
         """
@@ -169,21 +161,11 @@ class ClientLib(ClientApi):
         # Load the preset and randomize parameters
         self.jsonrpc.load_preset(random_preset.name)
         self.jsonrpc.randomize_parameters()
-        self._set_preset_modified(True)
         logger.info(f"Randomized all: {random_instrument.name} - {random_preset.name}")
 
     # Utility methods
     def set_on_exit(self, on_exit) -> None:
         self.on_exit = on_exit
-
-    def set_on_preset_modified(self, callback) -> None:
-        """Set callback for preset modification state changes."""
-        self.on_preset_modified = callback
-
-    def _set_preset_modified(self, modified: bool) -> None:
-        """Notify listeners that preset modification state changed."""
-        if self.on_preset_modified:
-            self.on_preset_modified(modified)
 
     def shutdown_device(self) -> None:
         logger.info("Client requested shutdown")

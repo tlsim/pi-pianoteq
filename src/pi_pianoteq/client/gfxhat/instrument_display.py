@@ -29,7 +29,6 @@ class InstrumentDisplay:
         self.suppression = ButtonSuppression(300)
         self.held_count = {}
         self.held_threshold = 2
-        self.modified = False
         current_instrument = self.api.get_current_instrument()
         self.preset = self.api.get_current_preset().display_name
         self.instrument = current_instrument.name
@@ -151,12 +150,7 @@ class InstrumentDisplay:
     def update_display(self):
         """Update display when instrument/preset changes (e.g., button press)."""
         current_instrument = self.api.get_current_instrument()
-        preset_name = self.api.get_current_preset().display_name
-        # Append (modified) suffix if preset has been modified
-        if self.modified:
-            self.preset = f"{preset_name} (modified)"
-        else:
-            self.preset = preset_name
+        self.preset = self.api.get_current_preset().display_name
         self.instrument = current_instrument.name
         self.background_primary = current_instrument.background_primary
         self.background_secondary = current_instrument.background_secondary

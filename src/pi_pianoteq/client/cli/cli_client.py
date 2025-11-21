@@ -134,7 +134,6 @@ class CliClient(Client):
         self.preset_menu_mode = False
         self.preset_menu_instrument = None
         self.logs_view_mode = False
-        self.modified = False
         self.instrument_names = [i.name for i in self.api.get_instruments()]
         self.preset_names = []
         self.current_menu_index = 0
@@ -142,9 +141,6 @@ class CliClient(Client):
 
         # Search manager
         self.search_manager = SearchManager(self.api)
-
-        # Set up preset modified callback
-        self.api.set_on_preset_modified(self.on_preset_modified)
 
         # Set initial menu index to current instrument
         current_instrument = self.api.get_current_instrument()
@@ -478,12 +474,7 @@ class CliClient(Client):
                 self.menu_scroll_offset
             )
         else:
-            return cli_display.get_normal_text(self.api, self.modified)
-
-    def on_preset_modified(self, modified: bool):
-        """Update display when preset modification state changes."""
-        self.modified = modified
-        self._update_display()
+            return cli_display.get_normal_text(self.api)
 
     def _update_display(self):
         """Force display refresh"""
