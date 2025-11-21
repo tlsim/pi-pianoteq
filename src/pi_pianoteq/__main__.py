@@ -48,7 +48,7 @@ def show_config():
         print(f"  {' ' * 30}   [{source}]")
         print()
 
-    print("Priority order: environment > user_config > bundled_default")
+    print("Priority order: cli_argument > environment > user_config > bundled_default")
 
 
 def init_config():
@@ -86,8 +86,19 @@ def main():
         action='store_true',
         help='Include demo instruments (with limited functionality)'
     )
+    parser.add_argument(
+        '--headless',
+        action=argparse.BooleanOptionalAction,
+        default=None,
+        help='Run Pianoteq in headless mode (no GUI) or with GUI (--no-headless)'
+    )
 
     args = parser.parse_args()
+
+    # Override config with CLI arguments (before show_config so it's visible)
+    if args.headless is not None:
+        Config.PIANOTEQ_HEADLESS = args.headless
+        Config._config_sources['PIANOTEQ_HEADLESS'] = 'cli_argument'
 
     # Handle special commands
     if args.show_config:
