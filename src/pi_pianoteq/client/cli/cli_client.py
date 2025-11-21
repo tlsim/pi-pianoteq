@@ -8,6 +8,7 @@ from prompt_toolkit.filters import Condition
 from typing import Optional
 import threading
 import os
+import logging
 
 from pi_pianoteq.client.client import Client
 from pi_pianoteq.client.client_api import ClientApi
@@ -485,3 +486,7 @@ class CliClient(Client):
         # App is already running in background thread, just wait for it
         if self.app_thread:
             self.app_thread.join()
+
+    def get_logging_handler(self) -> Optional[logging.Handler]:
+        """Return BufferedLoggingHandler for UI display"""
+        return self.log_buffer

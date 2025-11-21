@@ -38,21 +38,19 @@ class BufferedLoggingHandler(logging.Handler):
         return list(self.buffer)
 
 
-def setup_logging(cli_mode=False, log_buffer: Optional[BufferedLoggingHandler] = None):
+def setup_logging(handler: Optional[logging.Handler] = None):
     """
     Configure logging for the application.
 
     Args:
-        cli_mode: If True, use buffered logging for display within prompt_toolkit UI
-        log_buffer: Optional BufferedLoggingHandler to use for CLI mode
+        handler: Optional handler from client, or None for default stdout/stderr
+
+    If handler is provided, uses it for all logging.
+    Otherwise uses default stdout (INFO/DEBUG) and stderr (WARNING/ERROR).
 
     Sets up a consistent logging format with timestamps, log levels, and module names.
     Log level can be controlled via PI_PIANOTEQ_LOG_LEVEL environment variable.
     Defaults to INFO level.
-
-    INFO and DEBUG messages are sent to stdout (or buffer in CLI mode).
-    WARNING and ERROR messages are sent to stderr (or buffer in CLI mode).
-    Both streams are captured by systemd/journalctl.
     """
     # Get log level from environment, default to INFO
     log_level = os.environ.get('PI_PIANOTEQ_LOG_LEVEL', 'INFO').upper()
@@ -69,11 +67,11 @@ def setup_logging(cli_mode=False, log_buffer: Optional[BufferedLoggingHandler] =
         datefmt='%Y-%m-%d %H:%M:%S'
     )
 
-    if cli_mode and log_buffer:
-        # Use buffered handler for CLI mode
-        log_buffer.setLevel(logging.DEBUG)
-        log_buffer.setFormatter(formatter)
-        root_logger.addHandler(log_buffer)
+    if handler:
+        # Use client-provided handler
+        handler.setLevel(logging.DEBUG)
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
     else:
         # Handler for INFO and DEBUG -> stdout
         stdout_handler = logging.StreamHandler(sys.stdout)

@@ -17,6 +17,40 @@ from pi_pianoteq.logging.logging_config import setup_logging
 logger = logging.getLogger(__name__)
 
 
+def list_clients():
+    """Display available built-in clients"""
+    from pi_pianoteq.client.discovery import discover_builtin_clients_with_errors, get_client_info
+
+    available, unavailable = discover_builtin_clients_with_errors()
+
+    print("Built-in clients:")
+    print()
+
+    # Show available clients
+    if available:
+        for name, client_class in sorted(available.items()):
+            info = get_client_info(client_class)
+            print(f"  {name:12} - {info.get('description', 'No description')}")
+
+    # Show unavailable clients with reasons
+    if unavailable:
+        if available:
+            print()
+        for name, error in sorted(unavailable.items()):
+            print(f"  {name:12} - [unavailable: {error}]")
+
+    if not available and not unavailable:
+        print("  No clients found")
+
+    print()
+    print("Usage:")
+    print(f"  pi-pianoteq --client <name>")
+    print(f"  pi-pianoteq --client mypackage.module:ClassName")
+    print()
+    print("To set a default client, edit the config file:")
+    print(f"  {USER_CONFIG_PATH}")
+
+
 def show_config():
     """Display current configuration and sources"""
     print("Pi-Pianoteq Configuration")
@@ -39,6 +73,7 @@ def show_config():
         ("PIANOTEQ_DIR", Config.PIANOTEQ_DIR),
         ("PIANOTEQ_BIN", Config.PIANOTEQ_BIN),
         ("PIANOTEQ_HEADLESS", Config.PIANOTEQ_HEADLESS),
+        ("CLIENT", Config.CLIENT),
         ("SHUTDOWN_COMMAND", Config.SHUTDOWN_COMMAND),
     ]
 
@@ -77,9 +112,14 @@ def main():
         help='Initialize user config file at ~/.config/pi_pianoteq/ and exit'
     )
     parser.add_argument(
-        '--cli',
+        '--client',
+        type=str,
+        help='Specify client to use (e.g., "cli", "gfxhat", or "mypackage:MyClient")'
+    )
+    parser.add_argument(
+        '--list-clients',
         action='store_true',
-        help='Use CLI client instead of GFX HAT client (for development/testing)'
+        help='List available built-in clients and exit'
     )
     parser.add_argument(
         '--include-demo',
@@ -97,6 +137,10 @@ def main():
     if args.init_config:
         return init_config()
 
+    if args.list_clients:
+        list_clients()
+        return 0
+
     # Normal startup - import hardware dependencies only when needed
     from pi_pianoteq.instrument.library import Library
     from pi_pianoteq.instrument.selector import Selector
@@ -104,21 +148,25 @@ def main():
     from pi_pianoteq.lib.client_lib import ClientLib
     from pi_pianoteq.process.pianoteq import Pianoteq
 
-    # Import appropriate client based on mode
-    if args.cli:
-        from pi_pianoteq.client.cli.cli_client import CliClient
+    # Determine which client to use
+    if args.client:
+        client_spec = args.client
     else:
-        from pi_pianoteq.client.gfxhat.gfxhat_client import GfxhatClient
+        client_spec = Config.CLIENT
 
-    # Instantiate client early (in loading mode, api=None)
-    if args.cli:
-        client = CliClient(api=None)
-    else:
-        client = GfxhatClient(api=None)
+    # Load and instantiate client
+    try:
+        from pi_pianoteq.client.discovery import load_client
+        ClientClass = load_client(client_spec)
+        client = ClientClass(api=None)
+    except (ImportError, AttributeError, ValueError) as e:
+        logger.error(f"Failed to load client '{client_spec}': {e}")
+        print(f"ERROR: Could not load client '{client_spec}'")
+        print("Use --list-clients to see available built-in clients")
+        return 1
 
-    # Setup logging - use buffered handler for CLI mode
-    log_buffer = client.log_buffer if args.cli else None
-    setup_logging(cli_mode=args.cli, log_buffer=log_buffer)
+    # Setup logging with client's handler
+    setup_logging(handler=client.get_logging_handler())
 
     pianoteq = Pianoteq()
 

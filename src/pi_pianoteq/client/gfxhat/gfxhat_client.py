@@ -1,4 +1,5 @@
 import signal
+import logging
 
 from gfxhat import touch, lcd, backlight, fonts
 from PIL import ImageFont
@@ -273,3 +274,7 @@ class GfxhatClient(Client):
             self.menu_display.start_scrolling()
 
         self.update_handler()
+
+    def get_logging_handler(self) -> Optional[logging.Handler]:
+        """Return None to use default stdout/stderr handlers"""
+        return None

@@ -7,6 +7,27 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Breaking Changes
+
+- `--cli` flag removed: Use `--client cli` instead
+  - Old: `pi-pianoteq --cli`
+  - New: `pi-pianoteq --client cli`
+  - Update any scripts or systemd service configurations that use `--cli`
+
+### Added
+
+- Client discovery system for flexible client selection
+- `--client` flag to specify which client to use (e.g., `--client cli`, `--client gfxhat`, or `--client mypackage:MyClient`)
+- `--list-clients` flag to display available built-in clients
+- Config-based default client selection via `[Client]` section in `pi_pianoteq.conf`
+  - Set default client: `CLIENT = cli` or `CLIENT = mypackage:MyClient`
+- Support for external custom clients using module:class specification
+
+### Changed
+
+- Client selection now uses discoverable system instead of hardcoded imports
+- Logging configuration simplified to use client-provided handlers
+
 ## [2.3.0] - 2025-11-21
 
 ### Added
