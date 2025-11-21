@@ -176,11 +176,17 @@ class GfxhatClient(Client):
         self.update_handler()
 
     def on_exit_control_menu(self):
-        self.control_menu_display.stop_scrolling()
-        self.control_menu_open = False
-        self.update_handler()
+        self._close_control_menu_and_return_to_main()
+
+    def _close_control_menu_and_return_to_main(self):
+        """Close control menu and return to main instrument display."""
+        if self.control_menu_open:
+            self.control_menu_display.stop_scrolling()
+            self.control_menu_open = False
+
         self.instrument_display.update_display()
         self.instrument_display.start_scrolling()
+        self.update_handler()
 
     def on_enter_instrument_menu(self):
         self.control_menu_display.stop_scrolling()
@@ -210,28 +216,12 @@ class GfxhatClient(Client):
     def on_randomize_preset(self):
         """Randomize parameters of current preset and return to main display."""
         self.api.randomize_current_preset()
-
-        # Close control menu and return to main display
-        if self.control_menu_open:
-            self.control_menu_display.stop_scrolling()
-            self.control_menu_open = False
-
-        self.instrument_display.update_display()
-        self.instrument_display.start_scrolling()
-        self.update_handler()
+        self._close_control_menu_and_return_to_main()
 
     def on_random_all(self):
         """Randomly select instrument and preset, randomize parameters, and return to main display."""
         self.api.randomize_all()
-
-        # Close control menu and return to main display
-        if self.control_menu_open:
-            self.control_menu_display.stop_scrolling()
-            self.control_menu_open = False
-
-        self.instrument_display.update_display()
-        self.instrument_display.start_scrolling()
-        self.update_handler()
+        self._close_control_menu_and_return_to_main()
 
     def on_enter_preset_menu_from_main(self):
         """Long press ENTER on main display - show presets for current instrument."""
