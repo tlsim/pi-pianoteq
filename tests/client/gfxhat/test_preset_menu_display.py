@@ -35,7 +35,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.ImageDraw.Draw')
     @patch('PIL.Image.new')
     def test_get_menu_options_creates_options_from_api(self, mock_image, mock_draw, mock_scroller_class):
-        """Menu options should be created from API preset list."""
+        """Menu options should include all presets."""
         self._configure_scroller_mock(mock_scroller_class)
         self.mock_api.get_presets.return_value = [
             Preset("Bright", "Bright"),
@@ -48,7 +48,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
             self.mock_on_exit, "Piano"
         )
 
-        # Should create 3 menu options
+        # Should create 3 menu options from presets
         self.assertEqual(3, len(menu.menu_options))
         self.assertEqual("Bright", menu.menu_options[0].name)
         self.assertEqual("Dark", menu.menu_options[1].name)
@@ -102,7 +102,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
             self.mock_on_exit, "Piano"  # Viewing current instrument
         )
 
-        # Should position on "Medium" (index 2)
+        # Should position on "Medium" (index 2: Bright, Dark, Medium)
         self.assertEqual(2, menu.current_menu_option)
 
     @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')
@@ -164,7 +164,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
     @patch('PIL.ImageDraw.Draw')
     @patch('PIL.Image.new')
     def test_empty_preset_list(self, mock_image, mock_draw, mock_scroller):
-        """Should handle empty preset list without crashing."""
+        """Should handle empty preset list."""
         self.mock_api.get_presets.return_value = []
         self._configure_scroller_mock(mock_scroller)
 
@@ -173,6 +173,7 @@ class PresetMenuDisplayTestCase(unittest.TestCase):
             self.mock_on_exit, "Piano"
         )
 
+        # Should have 0 options with no presets
         self.assertEqual(0, len(menu.menu_options))
 
     @patch('pi_pianoteq.client.gfxhat.menu_display.ScrollingText')

@@ -30,10 +30,11 @@ class PresetMenuDisplay(MenuDisplay):
         self.update_preset()
 
     def get_menu_options(self):
-        """Build menu options from preset names for this instrument."""
-        presets = self.api.get_presets(self.instrument_name)
-
+        """Build menu options from presets."""
         options = []
+
+        # Add all presets for this instrument
+        presets = self.api.get_presets(self.instrument_name)
         for preset in presets:
             options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
 

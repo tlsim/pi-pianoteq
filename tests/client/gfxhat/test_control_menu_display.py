@@ -15,6 +15,8 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         self.mock_font.getbbox.return_value = (0, 0, 50, 10)
         self.on_exit = Mock()
         self.on_select_instrument = Mock()
+        self.on_randomize_preset = Mock()
+        self.on_random_all = Mock()
 
     def create_display(self):
         """Helper to create ControlMenuDisplay with mocks."""
@@ -24,16 +26,20 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
             height=64,
             font=self.mock_font,
             on_exit=self.on_exit,
-            on_select_instrument=self.on_select_instrument
+            on_select_instrument=self.on_select_instrument,
+            on_randomize_preset=self.on_randomize_preset,
+            on_random_all=self.on_random_all
         )
 
     def test_get_menu_options_includes_instrument_and_shutdown(self):
-        """Menu options should include Select Instrument and Shut down."""
+        """Menu options should include all control menu items."""
         display = self.create_display()
 
-        self.assertEqual(len(display.menu_options), 2)
+        self.assertEqual(len(display.menu_options), 4)
         self.assertEqual(display.menu_options[0].name, "Select Instrument")
-        self.assertEqual(display.menu_options[1].name, "Shut down")
+        self.assertEqual(display.menu_options[1].name, "Randomise Parameters")
+        self.assertEqual(display.menu_options[2].name, "Randomise All")
+        self.assertEqual(display.menu_options[3].name, "Shut down")
 
     def test_select_instrument_option_calls_callback(self):
         """Selecting 'Select Instrument' should call on_select_instrument."""
@@ -50,7 +56,7 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         display = self.create_display()
         handler = display.get_handler()
 
-        display.current_menu_option = 1  # Shut down
+        display.current_menu_option = 3  # Shut down
 
         handler(touch.ENTER, 'release')
 
@@ -162,7 +168,7 @@ class ControlMenuDisplayTestCase(unittest.TestCase):
         display = self.create_display()
 
         # Get shutdown option (last)
-        shutdown_option = display.menu_options[1]
+        shutdown_option = display.menu_options[3]
 
         # Should be able to trigger it
         shutdown_option.trigger()

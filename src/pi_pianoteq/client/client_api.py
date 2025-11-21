@@ -57,3 +57,13 @@ class ClientApi(ABC):
     @abstractmethod
     def set_preset(self, instrument_name: str, preset_name: str):
         raise NotImplemented
+
+    @abstractmethod
+    def randomize_current_preset(self):
+        """Randomize parameters of the current preset."""
+        raise NotImplemented
+
+    @abstractmethod
+    def randomize_all(self):
+        """Randomly select instrument and preset, then randomize parameters."""
+        raise NotImplemented
