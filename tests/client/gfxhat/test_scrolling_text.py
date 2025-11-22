@@ -76,7 +76,7 @@ class ScrollingTextTestCase(unittest.TestCase):
         self.mock_font.getbbox.return_value = (0, 0, 150, 10)
 
         scroller = ScrollingText("Long text", self.mock_font, max_width=100,
-                                 scroll_speed=5, initial_delay=0.05, update_interval=0.05)
+                                 scroll_speed=2, initial_delay=0.05, update_interval=0.05)
         scroller.start()
 
         # Wait for initial delay + several updates
@@ -86,7 +86,7 @@ class ScrollingTextTestCase(unittest.TestCase):
         # Should have scrolled (at least one update, but allow for timing variance)
         self.assertGreater(offset, 0)
         # Should be multiple of scroll_speed
-        self.assertEqual(offset % 5, 0)
+        self.assertEqual(offset % 2, 0)
 
         # Cleanup
         scroller.stop()
@@ -295,11 +295,11 @@ class ScrollingTextTestCase(unittest.TestCase):
         self.mock_font.getbbox.return_value = (0, 0, 100, 10)
 
         scroller = ScrollingText("Text", self.mock_font, max_width=80,
-                                 scroll_speed=3, update_interval=0.1,
+                                 scroll_speed=3, update_interval=0.2,
                                  wrap_gap=15, initial_delay=0.05)
 
         self.assertEqual(scroller.scroll_speed, 3)
-        self.assertEqual(scroller.update_interval, 0.1)
+        self.assertEqual(scroller.update_interval, 0.2)
         self.assertEqual(scroller.wrap_gap, 15)
         self.assertEqual(scroller.initial_delay, 0.05)
 
