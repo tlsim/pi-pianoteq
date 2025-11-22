@@ -10,7 +10,7 @@ class ScrollingText:
     Threading-based for smooth animation.
     """
 
-    def __init__(self, text, font, max_width, scroll_speed=1, update_interval=0.2, initial_delay=1.0, wrap_gap=20):
+    def __init__(self, text, font, max_width, scroll_speed=2, update_interval=0.1, initial_delay=1.0, wrap_gap=20):
         """
         Initialize scrolling text.
 
@@ -18,8 +18,8 @@ class ScrollingText:
             text: The text to display
             font: PIL font object for measuring text
             max_width: Maximum width in pixels before scrolling
-            scroll_speed: Pixels to scroll per update (default: 1)
-            update_interval: Seconds between updates (default: 0.2)
+            scroll_speed: Pixels to scroll per update (default: 2)
+            update_interval: Seconds between updates (default: 0.1)
             initial_delay: Seconds to wait before starting scroll (default: 1.0)
             wrap_gap: Gap in pixels between end of text and wrap (default: 20)
         """
