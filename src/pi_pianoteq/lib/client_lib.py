@@ -3,8 +3,9 @@ from pi_pianoteq.instrument.library import Library
 from pi_pianoteq.instrument.selector import Selector
 from pi_pianoteq.config.config import Config
 from pi_pianoteq.rpc.jsonrpc_client import PianoteqJsonRpc
+from pi_pianoteq.state.state_monitor import StateMonitor, PianoteqState
 
-from typing import List
+from typing import List, Callable, Optional
 from os import system
 import logging
 import random
@@ -18,6 +19,13 @@ class ClientLib(ClientApi):
         self.instrument_library = instrument_library
         self.selector = selector
         self.on_exit = None
+        self._state_callbacks: List[Callable[[PianoteqState], None]] = []
+
+        # Initialize state monitor
+        self.state_monitor = StateMonitor(jsonrpc, poll_interval=1.0)
+        self.state_monitor.subscribe(self._on_state_change)
+        self.state_monitor.start()
+
         self.sync_preset()
 
     def sync_preset(self) -> None:
@@ -45,6 +53,8 @@ class ClientLib(ClientApi):
                 instrument, preset = result
                 if self.selector.set_preset_by_name(instrument.name, preset.name):
                     logger.info(f"Synced to current preset: {instrument.name} - {preset.name}")
+                    # Update modified flag
+                    preset.modified = info.modified
                 else:
                     logger.warning(f"Found preset '{preset_name}' but failed to set position, resetting to first preset")
                     preset = self.selector.get_current_preset()
@@ -58,6 +68,55 @@ class ClientLib(ClientApi):
             logger.warning(f"Error syncing with Pianoteq: {e}, resetting to first preset")
             preset = self.selector.get_current_preset()
             self.jsonrpc.load_preset(preset.name)
+
+    def _on_state_change(self, state: PianoteqState) -> None:
+        """
+        Handle Pianoteq state changes detected by state monitor.
+
+        Updates the current preset's modified flag and syncs preset selection
+        if the preset changed externally.
+        """
+        # Check if preset changed (externally changed in Pianoteq)
+        current_preset = self.selector.get_current_preset()
+        if current_preset and state.preset_name != current_preset.name:
+            logger.info(f"Preset changed externally: {current_preset.name} -> {state.preset_name}")
+            # Try to sync to the new preset
+            result = self.instrument_library.find_preset_by_name(state.preset_name)
+            if result is not None:
+                instrument, preset = result
+                self.selector.set_preset_by_name(instrument.name, preset.name)
+                preset.modified = state.modified
+            else:
+                logger.debug(f"External preset '{state.preset_name}' not in library")
+        elif current_preset:
+            # Same preset, just update modified flag
+            if current_preset.modified != state.modified:
+                logger.debug(f"Modified state changed: {state.modified}")
+                current_preset.modified = state.modified
+
+        # Notify client callbacks
+        for callback in self._state_callbacks:
+            try:
+                callback(state)
+            except Exception as e:
+                logger.error(f"Error in client state callback: {e}")
+
+    def subscribe_to_state_changes(self, callback: Callable[[PianoteqState], None]) -> None:
+        """
+        Subscribe to Pianoteq state changes.
+
+        Callback will be invoked when preset or modified state changes.
+
+        Args:
+            callback: Function to call on state changes
+        """
+        self._state_callbacks.append(callback)
+        logger.debug(f"Client subscribed to state changes (total: {len(self._state_callbacks)})")
+
+    def cleanup(self) -> None:
+        """Clean up resources (stop state monitor)."""
+        if hasattr(self, 'state_monitor'):
+            self.state_monitor.stop()
 
     # Instrument getters
     def get_instruments(self) -> list:
@@ -169,6 +228,7 @@ class ClientLib(ClientApi):
 
     def shutdown_device(self) -> None:
         logger.info("Client requested shutdown")
+        self.cleanup()
         if self.on_exit is not None:
             self.on_exit()
         system(Config.SHUTDOWN_COMMAND)

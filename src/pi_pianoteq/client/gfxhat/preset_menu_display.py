@@ -36,7 +36,7 @@ class PresetMenuDisplay(MenuDisplay):
         # Add all presets for this instrument
         presets = self.api.get_presets(self.instrument_name)
         for preset in presets:
-            options.append(MenuOption(preset.display_name, self.set_preset, self.font, (preset.name,)))
+            options.append(MenuOption(preset.get_display_name_with_modified(), self.set_preset, self.font, (preset.name,)))
 
         return options
 

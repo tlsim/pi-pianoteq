@@ -64,7 +64,7 @@ class SearchManager:
                 return
 
             presets = self.api.get_presets(self.preset_menu_instrument)
-            all_items = [(p.display_name, 'preset', p.name) for p in presets]
+            all_items = [(p.get_display_name_with_modified(), 'preset', p.name) for p in presets]
 
         else:  # combined
             # Search both instruments and presets
@@ -77,7 +77,7 @@ class SearchManager:
             # Add presets from all instruments
             for instrument in self.api.get_instruments():
                 for preset in instrument.presets:
-                    display = f"{preset.display_name} ({instrument.name})"
+                    display = f"{preset.get_display_name_with_modified()} ({instrument.name})"
                     all_items.append((display, 'preset', (instrument.name, preset.name)))
 
         # Filter items by query
