@@ -30,7 +30,7 @@ class GfxhatClient(Client):
         self.preset_menu_open = False
         self.preset_menu_source = None
         self.width, self.height = lcd.dimensions()
-        self.font = ImageFont.truetype(fonts.BitbuntuFull, 10)
+        self.font = ImageFont.truetype(fonts.PressStart2P, 8)
 
         # Loading mode state
         self.loading_mode = (api is None)
