@@ -30,7 +30,7 @@ class InstrumentDisplay:
         self.held_count = {}
         self.held_threshold = 2
         current_instrument = self.api.get_current_instrument()
-        self.preset = self.api.get_current_preset().display_name
+        self.preset = self.api.get_current_preset().get_display_name_with_modified()
         self.instrument = current_instrument.name
         self.background_primary = current_instrument.background_primary
         self.background_secondary = current_instrument.background_secondary
@@ -42,6 +42,13 @@ class InstrumentDisplay:
         self.draw_text()
         self.backlight = Backlight("000000")
         self.set_backlight()
+
+        # Subscribe to state changes
+        self.api.subscribe_to_state_changes(self._on_state_change)
+
+    def _on_state_change(self, state):
+        """Update display when Pianoteq state changes externally."""
+        self.update_display()
 
     def draw_text(self):
         """
@@ -148,9 +155,9 @@ class InstrumentDisplay:
         return self.image
 
     def update_display(self):
-        """Update display when instrument/preset changes (e.g., button press)."""
+        """Update display when instrument/preset changes (e.g., button press or external state change)."""
         current_instrument = self.api.get_current_instrument()
-        self.preset = self.api.get_current_preset().display_name
+        self.preset = self.api.get_current_preset().get_display_name_with_modified()
         self.instrument = current_instrument.name
         self.background_primary = current_instrument.background_primary
         self.background_secondary = current_instrument.background_secondary

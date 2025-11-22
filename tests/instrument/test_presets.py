@@ -40,6 +40,39 @@ class PresetDisplayNameFieldTestCase(unittest.TestCase):
         self.assertEqual('Steel Drum natural', preset.display_name)
 
 
+class PresetModifiedStateTestCase(unittest.TestCase):
+    def test_preset_modified_defaults_to_false(self):
+        preset = Preset('Test Preset')
+        self.assertFalse(preset.modified)
+
+    def test_preset_modified_can_be_set_on_init(self):
+        preset = Preset('Test Preset', modified=True)
+        self.assertTrue(preset.modified)
+
+    def test_preset_modified_can_be_changed(self):
+        preset = Preset('Test Preset')
+        self.assertFalse(preset.modified)
+
+        preset.modified = True
+        self.assertTrue(preset.modified)
+
+    def test_get_display_name_with_modified_unmodified(self):
+        preset = Preset('Test Preset', display_name='Display Name', modified=False)
+        self.assertEqual('Display Name', preset.get_display_name_with_modified())
+
+    def test_get_display_name_with_modified_modified(self):
+        preset = Preset('Test Preset', display_name='Display Name', modified=True)
+        self.assertEqual('Display Name (modified)', preset.get_display_name_with_modified())
+
+    def test_get_display_name_with_modified_uses_display_name_not_name(self):
+        preset = Preset('Long Full Preset Name', display_name='Short', modified=True)
+        self.assertEqual('Short (modified)', preset.get_display_name_with_modified())
+
+    def test_get_display_name_with_modified_defaults_to_name(self):
+        preset = Preset('Test Preset', modified=True)
+        self.assertEqual('Test Preset (modified)', preset.get_display_name_with_modified())
+
+
 class LibraryFindPresetTestCase(unittest.TestCase):
     def setUp(self):
         inst1 = Instrument(i1, i1, '#000000', '#FFFFFF')

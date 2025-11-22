@@ -52,7 +52,7 @@ def get_title(search_manager: SearchManager, preset_menu_mode: bool,
 def get_normal_text(api: ClientApi) -> List[Tuple[str, str]]:
     """Generate normal mode display using formatted text tuples"""
     instrument = api.get_current_instrument()
-    preset = api.get_current_preset().display_name
+    preset = api.get_current_preset().get_display_name_with_modified()
 
     lines = [
         ('', '\n'),
@@ -161,7 +161,8 @@ def get_preset_menu_text(api: ClientApi, preset_menu_instrument: str,
     for i in range(start_idx, end_idx):
         preset = presets[i]
         # Truncate long names to fit in display
-        display_name = preset.display_name[:58] if len(preset.display_name) > 58 else preset.display_name
+        display_name_full = preset.get_display_name_with_modified()
+        display_name = display_name_full[:58] if len(display_name_full) > 58 else display_name_full
 
         if i == current_menu_index:
             # Highlight selected item

@@ -210,6 +210,9 @@ def main():
     # Provide API and start normal operation
     client.set_api(client_lib)
     client.start()
+
+    # Cleanup state monitor before shutting down
+    client_lib.cleanup()
     pianoteq.quit()
 
     return 0

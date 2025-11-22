@@ -124,8 +124,15 @@ class CliClient(Client):
         self.application.layout = self.normal_layout
         self.application.key_bindings = self.normal_kb
 
+        # Subscribe to state changes
+        self.api.subscribe_to_state_changes(self._on_state_change)
+
         # Trigger redraw
         self.application.invalidate()
+
+    def _on_state_change(self, state):
+        """Update display when Pianoteq state changes externally."""
+        self._update_display()
 
     def _build_normal_layout(self):
         """Build the normal interactive layout (requires API)"""
